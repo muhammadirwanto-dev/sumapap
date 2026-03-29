@@ -36,13 +36,18 @@ jobs:
           for file in src/**/*.csproj; do
             PROJECT_NAME=$(basename "$file" .csproj)
             
-            # Check if Package Generation is disabled
-            GENERATE_PACKAGE=$(dotnet msbuild "$file" --getProperty:GeneratePackageOnBuild --nologo | xargs | tr '[:upper:]' '[:lower:]')
+            # Explicitly pass -p:Configuration=Release to ensure MSBuild evaluates the 
+            # correct PropertyGroup in your Directory.Build.props
+            GENERATE_PACKAGE=$(dotnet msbuild "$file" --getProperty:GeneratePackageOnBuild -p:Configuration=Release --nologo | xargs | tr '[:upper:]' '[:lower:]')
+            
+            # Debugging: Print it so you can see what MSBuild actually sees
+            echo ">> [DEBUG] $PROJECT_NAME GeneratePackageOnBuild: '$GENERATE_PACKAGE'"
+            
             if [ "$GENERATE_PACKAGE" == "false" ]; then
               SKIPPED_PACKS+=("$PROJECT_NAME (Disabled)")
               continue
             fi
-
+            
             # Evaluate version
             VERSION=$(dotnet msbuild "$file" --getProperty:VersionPrefix --nologo | xargs)
             [ -z "$VERSION" ] && VERSION=$(dotnet msbuild "$file" --getProperty:Version --nologo | xargs)
