@@ -36,11 +36,16 @@ jobs:
           for file in src/**/*.csproj; do
             PROJECT_NAME=$(basename "$file" .csproj)
             
+            # Check if Package Generation is disabled
+            GENERATE_PACKAGE=$(dotnet msbuild "$file" --getProperty:GeneratePackageOnBuild --nologo | xargs | tr '[:upper:]' '[:lower:]')
+            if [ "$GENERATE_PACKAGE" == "false" ]; then
+              SKIPPED_PACKS+=("$PROJECT_NAME (Disabled)")
+              continue
+            fi
+
             # Evaluate version
             VERSION=$(dotnet msbuild "$file" --getProperty:VersionPrefix --nologo | xargs)
-            if [ -z "$VERSION" ]; then
-              VERSION=$(dotnet msbuild "$file" --getProperty:Version --nologo | xargs)
-            fi
+            [ -z "$VERSION" ] && VERSION=$(dotnet msbuild "$file" --getProperty:Version --nologo | xargs)
 
             if [ -z "$VERSION" ] || [ "$VERSION" == "0.0.0" ]; then
               SKIPPED_PACKS+=("$PROJECT_NAME (No Version)")
@@ -52,21 +57,19 @@ jobs:
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://api.nuget.org/v3-flatcontainer/$LOWER_NAME/$VERSION/$LOWER_NAME.nuspec")
 
             if [ "$STATUS" == "200" ]; then
-              SKIPPED_PACKS+=("$PROJECT_NAME ($VERSION) - Already on NuGet")
+              SKIPPED_PACKS+=("$PROJECT_NAME ($VERSION) - Existing")
             else
               echo ">> Attempting to pack $PROJECT_NAME ($VERSION)..."
-              
               if dotnet pack "$file" -c Release --no-restore -o .nuget/; then
                 SUCCESS_PACKS+=("$PROJECT_NAME ($VERSION)")
               else
-                # Log as a GitHub UI Warning so it's visible in the summary
-                echo "::warning title=Pack Failure::$PROJECT_NAME failed to pack. Likely missing docs or a build error."
+                echo "::warning title=Pack Failure::$PROJECT_NAME failed to pack."
                 FAILED_PACKS+=("$PROJECT_NAME ($VERSION)")
               fi
             fi
           done
 
-          # Output lists for the next steps
+          # Save to ENV
           echo "SUCCESS_LIST=${SUCCESS_PACKS[*]}" >> $GITHUB_ENV
           echo "FAILED_LIST=${FAILED_PACKS[*]}" >> $GITHUB_ENV
           echo "SKIPPED_LIST=${SKIPPED_PACKS[*]}" >> $GITHUB_ENV
@@ -83,14 +86,22 @@ jobs:
       - name: Final Summary
         run: |
           echo "--------------------------------------------------"
-          echo "✅ SUCCESSFULLY UPLOADED:"
-          for pkg in $SUCCESS_LIST; do echo "  - $pkg"; done
           
-          echo ""
-          echo "⚠️ FAILED (NOT UPLOADED):"
-          if [ -z "$FAILED_LIST" ]; then echo "  - None"; else for pkg in $FAILED_LIST; do echo "  - $pkg"; done; fi
+          if [ ! -z "$SUCCESS_LIST" ]; then
+            echo "✅ SUCCESSFULLY UPLOADED:"
+            for pkg in $SUCCESS_LIST; do echo "  - $pkg"; done
+            echo ""
+          fi
           
-          echo ""
-          echo "⏭️ SKIPPED (EXISTING OR NO VERSION):"
-          for pkg in $SKIPPED_LIST; do echo "  - $pkg"; done
+          if [ ! -z "$FAILED_LIST" ]; then
+            echo "⚠️ FAILED (NOT UPLOADED):"
+            for pkg in $FAILED_LIST; do echo "  - $pkg"; done
+            echo ""
+          fi
+          
+          if [ ! -z "$SKIPPED_LIST" ]; then
+            echo "⏭️ SKIPPED (EXISTING, NO VERSION, OR DISABLED):"
+            for pkg in $SKIPPED_LIST; do echo "  - $pkg"; done
+          fi
+          
           echo "--------------------------------------------------"
