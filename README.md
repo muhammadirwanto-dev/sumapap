@@ -15,7 +15,7 @@ This repository contains several .NET libraries that can be used with `.NET 8` a
 # ⭐ Naming Convention
 
 ```jsx
-SingleScope.<Capability>.<Technology>
+Sumapap.<Capability>.<Technology>
 ```
 
 # 🚩 Layer Diagram
@@ -31,7 +31,7 @@ The diagram is arranged **vertically (bottom → top)** to show dependency direc
 
 # **🚀 Getting Started**
 
-Please read the documentation for each respective library in the [/docs](https://github.com/muhirwanto-dev/singlescope-plugins/tree/main/docs) folder.
+Please read the documentation for each respective library in the [/docs](https://github.com/muhirwanto-dev/sumapap/tree/main/docs) folder.
 
 # **💪 Support**
 
