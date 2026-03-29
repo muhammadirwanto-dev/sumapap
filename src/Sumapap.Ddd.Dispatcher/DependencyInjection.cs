@@ -6,7 +6,7 @@ namespace Sumapap.Ddd.Dispatcher
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection RegisterDomainEvents(
+        public static IServiceCollection AddDomainEventsDispatcher(
             this IServiceCollection services,
             params Assembly[] assemblies)
         {
@@ -29,6 +29,8 @@ namespace Sumapap.Ddd.Dispatcher
                     services.AddScoped(handler.Interface, handler.Implementation);
                 }
             }
+
+            services.AddSingleton<IDomainEventDispatcher, DomainEventDispatcher>();
 
             return services;
         }

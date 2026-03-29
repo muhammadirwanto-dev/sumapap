@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="Sumapap.Ddd.Dispatcher/Sumapap.Ddd.Dispatcher.csproj" Id="e88bce95-a3a1-4bc1-8656-5545bfc2748f" />
+  <Project Path="Sumapap.Ddd.Mediator/Sumapap.Ddd.Mediator.csproj" Id="38da446b-fa53-4c51-8bc8-daa619399d1c" />
   <Project Path="Sumapap.Ddd/Sumapap.Ddd.csproj" Id="17579796-fdad-4781-ae9c-e4e852a190d1" />
 </Solution>
