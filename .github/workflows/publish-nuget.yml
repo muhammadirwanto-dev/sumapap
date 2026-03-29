@@ -17,7 +17,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x' # Use your preferred stable version
+          dotnet-version: '10.0.x'
 
       - name: Cleanup NuGet Output Folder
         run: rm -rf .nuget/
@@ -25,25 +25,35 @@ jobs:
       - name: Restore Dependencies
         run: dotnet restore src/
 
-      # 1. LOOP THROUGH PROJECTS AND PROCESS INDIVIDUALLY
+      # 1. LOOP THROUGH PROJECTS AND CHECK INDIVIDUAL VERSIONS
       - name: Pack New Versions Only
         run: |
-          # Extract the shared version from Directory.Build.props
-          VERSION=$(grep -oPm1 "(?<=<VersionPrefix>)[^<]+" src/Directory.Build.props)
-          echo "Detected Shared Version: $VERSION"
-
           for file in src/**/*.csproj; do
             # Extract project name (e.g., Sumapap.Ddd)
             PROJECT_NAME=$(basename "$file" .csproj)
-            echo "--- Checking $PROJECT_NAME ---"
+            
+            # Extract version from THIS specific .csproj file
+            # It checks for <Version> or <VersionPrefix>
+            VERSION=$(grep -oPm1 "(?<=<(Version|VersionPrefix)>)[^<]+" "$file" || true)
+            
+            # Fallback: if not in .csproj, try checking Directory.Build.props 
+            if [ -z "$VERSION" ]; then
+              VERSION=$(grep -oPm1 "(?<=<VersionPrefix>)[^<]+" src/Directory.Build.props || true)
+            fi
+
+            echo "--- Checking $PROJECT_NAME (Version: $VERSION) ---"
+
+            if [ -z "$VERSION" ]; then
+              echo ">> Error: Could not find version for $PROJECT_NAME. Skipping."
+              continue
+            fi
 
             # Check NuGet API for this specific package and version
-            # NuGet package IDs in the URL must be lowercase
             LOWER_NAME=$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]')
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://api.nuget.org/v3-flatcontainer/$LOWER_NAME/$VERSION/$LOWER_NAME.nuspec")
 
             if [ "$STATUS" == "200" ]; then
-              echo ">> $PROJECT_NAME version $VERSION already exists. Skipping."
+              echo ">> $PROJECT_NAME version $VERSION already exists on NuGet. Skipping."
             else
               echo ">> $PROJECT_NAME version $VERSION is new! Packing..."
               dotnet pack "$file" -c Release --no-restore
@@ -52,8 +62,6 @@ jobs:
 
       # 2. PUSH ONLY WHAT WAS PACKED
       - name: Push to NuGet
-        # If no new packages were packed, the folder will be empty/non-existent
-        # We use a shell check to avoid errors if there's nothing to push
         run: |
           if [ -d ".nuget" ] && [ "$(ls -A .nuget/*.nupkg 2>/dev/null)" ]; then
             dotnet nuget push ".nuget/*.nupkg" \
@@ -61,5 +69,5 @@ jobs:
               --source https://api.nuget.org/v3/index.json \
               --skip-duplicate
           else
-            echo "No new packages to push."
+            echo "No new packages found to push."
           fi
