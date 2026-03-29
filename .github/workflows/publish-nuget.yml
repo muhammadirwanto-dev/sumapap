@@ -26,6 +26,10 @@ jobs:
       - name: Restore Dependencies
         run: dotnet restore src/
 
+      # Fix for NU5026: Build the binaries before attempting to pack
+      - name: Build Projects
+        run: dotnet build src/ -c Release --no-restore
+
       - name: Process and Pack Projects
         id: pack_step
         run: |
@@ -36,40 +40,45 @@ jobs:
           for file in src/**/*.csproj; do
             PROJECT_NAME=$(basename "$file" .csproj)
             
-            # Evaluate version
-            VERSION=$(dotnet msbuild "$file" --getProperty:VersionPrefix --nologo | xargs)
-            if [ -z "$VERSION" ]; then
-              VERSION=$(dotnet msbuild "$file" --getProperty:Version --nologo | xargs)
+            # Explicitly pass -p:Configuration=Release to ensure MSBuild evaluates Directory.Build.props
+            GENERATE_PACKAGE=$(dotnet msbuild "$file" --getProperty:GeneratePackageOnBuild -p:Configuration=Release --nologo | xargs | tr '[:upper:]' '[:lower:]')
+            
+            echo ">> [DEBUG] $PROJECT_NAME GeneratePackageOnBuild: '$GENERATE_PACKAGE'"
+            
+            if [ "$GENERATE_PACKAGE" == "false" ]; then
+              SKIPPED_PACKS+=("$PROJECT_NAME (Disabled)")
+              continue
             fi
+            
+            VERSION=$(dotnet msbuild "$file" --getProperty:VersionPrefix --nologo | xargs)
+            [ -z "$VERSION" ] && VERSION=$(dotnet msbuild "$file" --getProperty:Version --nologo | xargs)
 
             if [ -z "$VERSION" ] || [ "$VERSION" == "0.0.0" ]; then
               SKIPPED_PACKS+=("$PROJECT_NAME (No Version)")
               continue
             fi
 
-            # Check NuGet API
             LOWER_NAME=$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]')
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://api.nuget.org/v3-flatcontainer/$LOWER_NAME/$VERSION/$LOWER_NAME.nuspec")
 
             if [ "$STATUS" == "200" ]; then
-              SKIPPED_PACKS+=("$PROJECT_NAME ($VERSION) - Already on NuGet")
+              SKIPPED_PACKS+=("$PROJECT_NAME ($VERSION) - Existing")
             else
               echo ">> Attempting to pack $PROJECT_NAME ($VERSION)..."
-              
-              if dotnet pack "$file" -c Release --no-restore -o .nuget/; then
+              # Added --no-build because we built in the previous step
+              if dotnet pack "$file" -c Release --no-build --no-restore -o .nuget/; then
                 SUCCESS_PACKS+=("$PROJECT_NAME ($VERSION)")
               else
-                # Log as a GitHub UI Warning so it's visible in the summary
-                echo "::warning title=Pack Failure::$PROJECT_NAME failed to pack. Likely missing docs or a build error."
+                echo "::warning title=Pack Failure::$PROJECT_NAME failed to pack."
                 FAILED_PACKS+=("$PROJECT_NAME ($VERSION)")
               fi
             fi
           done
 
-          # Output lists for the next steps
-          echo "SUCCESS_LIST=${SUCCESS_PACKS[*]}" >> $GITHUB_ENV
-          echo "FAILED_LIST=${FAILED_PACKS[*]}" >> $GITHUB_ENV
-          echo "SKIPPED_LIST=${SKIPPED_PACKS[*]}" >> $GITHUB_ENV
+          # Use pipe delimiter to prevent string splitting on spaces in project names
+          echo "SUCCESS_LIST=$(printf "|%s" "${SUCCESS_PACKS[@]}")" >> $GITHUB_ENV
+          echo "FAILED_LIST=$(printf "|%s" "${FAILED_PACKS[@]}")" >> $GITHUB_ENV
+          echo "SKIPPED_LIST=$(printf "|%s" "${SKIPPED_PACKS[@]}")" >> $GITHUB_ENV
 
       - name: Push to NuGet
         run: |
@@ -83,14 +92,25 @@ jobs:
       - name: Final Summary
         run: |
           echo "--------------------------------------------------"
-          echo "✅ SUCCESSFULLY UPLOADED:"
-          for pkg in $SUCCESS_LIST; do echo "  - $pkg"; done
           
-          echo ""
-          echo "⚠️ FAILED (NOT UPLOADED):"
-          if [ -z "$FAILED_LIST" ]; then echo "  - None"; else for pkg in $FAILED_LIST; do echo "  - $pkg"; done; fi
+          if [ ! -z "$SUCCESS_LIST" ]; then
+            echo "✅ SUCCESSFULLY UPLOADED:"
+            IFS='|' read -ra ADDR <<< "$SUCCESS_LIST"
+            for i in "${ADDR[@]}"; do [ -z "$i" ] || echo "  - $i"; done
+            echo ""
+          fi
           
-          echo ""
-          echo "⏭️ SKIPPED (EXISTING OR NO VERSION):"
-          for pkg in $SKIPPED_LIST; do echo "  - $pkg"; done
+          if [ ! -z "$FAILED_LIST" ]; then
+            echo "⚠️ FAILED (NOT UPLOADED):"
+            IFS='|' read -ra ADDR <<< "$FAILED_LIST"
+            for i in "${ADDR[@]}"; do [ -z "$i" ] || echo "  - $i"; done
+            echo ""
+          fi
+          
+          if [ ! -z "$SKIPPED_LIST" ]; then
+            echo "⏭️ SKIPPED (EXISTING, NO VERSION, OR DISABLED):"
+            IFS='|' read -ra ADDR <<< "$SKIPPED_LIST"
+            for i in "${ADDR[@]}"; do [ -z "$i" ] || echo "  - $i"; done
+          fi
+          
           echo "--------------------------------------------------"
