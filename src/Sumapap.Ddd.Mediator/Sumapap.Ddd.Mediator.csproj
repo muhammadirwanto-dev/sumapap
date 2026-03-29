@@ -16,12 +16,12 @@
     <Description>
       This package implements the Adapter Pattern to allow IDomainEvent instances (defined in your Domain Entities) to be dispatched seamlessly through MediatR. This ensures your Domain Layer remains free of external dependencies while allowing your Application Layer to leverage standard `INotificationHandlerT` implementations.
     </Description>
-    <!--<PackageReadmeFile>docs\Sumapap.Ddd.Mediator.md</PackageReadmeFile>-->
+    <PackageReadmeFile>docs\Sumapap.Ddd.md</PackageReadmeFile>
   </PropertyGroup>
 
-  <!--<ItemGroup>
-    <None Include="..\..\docs\Sumapap.Ddd.Mediator.md" Pack="true" PackagePath="docs" />
-  </ItemGroup>-->
+  <ItemGroup>
+    <None Include="..\..\docs\Sumapap.Ddd.md" Pack="true" PackagePath="docs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Mediator.Abstractions" Version="3.0.*" />
