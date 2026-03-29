@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0329</FileVersion>
+    <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
+  </PropertyGroup>
+
+  <!--NuGet properties-->
+  <PropertyGroup>
+    <Title>Sumapap.Queries.Execution</Title>
+    <PackageId>Sumapap.Queries.Execution</PackageId>
+    <PackageTags>Sumapap;Queries;Execution</PackageTags>
+    <Description>
+      Utility for building dynamic queries, filtering, and sorting logic within the persistence layer.
+    </Description>
+    <PackageReadmeFile>docs\Sumapap.Queries.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\Sumapap.Queries.md" Pack="true" PackagePath="docs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Sumapap.Queries" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>
