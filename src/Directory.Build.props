@@ -1,0 +1,39 @@
+<Project>
+  <PropertyGroup>
+    <AnalysisLevel>latest</AnalysisLevel>
+
+    <Authors>muhirwanto.dev</Authors>
+    <Company>Sumapap Software Development</Company>
+    <Copyright>Copyright © $([System.DateTime]::Now.Year) Sumapap</Copyright>
+
+    <PackageProjectUrl>https://github.com/muhirwanto-dev/sumapap</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/muhirwanto-dev/sumapap.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+    <PackageIcon>assets\img\logo.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+
+    <PackageOutputPath>..\..\.nupkg</PackageOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <VersionSuffix Condition="'$(Configuration)' == 'Debug'">beta</VersionSuffix>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\assets\img\logo.png" 
+		  Pack="true"
+		  PackagePath="\assets\img" />
+    
+	<None Include="$(MSBuildThisFileDirectory)..\README.md"
+		  Pack="true"
+		  PackagePath="\" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+</Project>
