@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0105</FileVersion>
+    <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
+  </PropertyGroup>
+
+  <!--NuGet properties-->
+  <PropertyGroup>
+    <Title>Sumapap.Ddd</Title>
+    <PackageId>Sumapap.Ddd</PackageId>
+    <PackageTags>Sumapap;DDD;Domain</PackageTags>
+    <Description>
+		Core Domain-Driven Design (DDD) abstractions for the Sumapap ecosystem.
+		Provides essential building blocks including Entity base classes, Value Objects, Aggregate Roots, and Domain Event interfaces to enforce clean separation of concerns and rich domain modeling in .NET applications.	
+    </Description>
+    <PackageReadmeFile>docs\Sumapap.Ddd.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\Sumapap.Ddd.md" Pack="true" PackagePath="docs" />
+  </ItemGroup>
+
+</Project>
