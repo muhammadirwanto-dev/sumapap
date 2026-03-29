@@ -1,0 +1,38 @@
+﻿using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
+using Sumapap.Ddd.Abstractions;
+
+namespace Sumapap.Ddd.Mediator
+{
+    public static class DependencyInjection
+    {
+        /// <summary>
+        /// Adds a domain event dispatcher to the service collection for handling domain events within the application.
+        /// You have to register your Mediator instance in order to use the DomainEventDispatcher. For example, if you are using MediatR, you can do it like this:
+        ///
+        ///  .AddMediator(options =>
+        ///   {
+        ///      options.Assemblies = [typeof(DependencyInjection)];
+        ///      options.PipelineBehaviors = [typeof(ValidationBehavior<,>)];
+        ///   });             
+        ///
+        /// Also, add the following line to your .csproj:
+        ///  <PackageReference Include="Mediator.Abstractions" Version="3.0.*"/>
+        ///  <PackageReference Include="Mediator.SourceGenerator" Version = "3.0.*">
+        ///      <PrivateAssets> all </PrivateAssets>
+        ///      <IncludeAssets> runtime; build; native; contentfiles; analyzers </IncludeAssets>
+        ///  </PackageReference>
+        /// </summary>
+        /// <param name="services">The service collection to which the domain event dispatcher will be added. Cannot be null.</param>
+        /// <param name="assemblies">An array of assemblies to scan for domain event handlers. Can be empty.</param>
+        /// <returns>The service collection with the domain event dispatcher registered. This enables domain event dispatching
+        /// capabilities in the application's dependency injection container.</returns>
+        public static IServiceCollection AddDomainEventsDispatcher(
+            this IServiceCollection services,
+            params Assembly[] assemblies)
+        {
+            return services
+                .AddSingleton<IDomainEventDispatcher, DomainEventDispatcher>();
+        }
+    }
+}
