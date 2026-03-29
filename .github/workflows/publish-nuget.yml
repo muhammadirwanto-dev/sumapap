@@ -29,34 +29,33 @@ jobs:
       - name: Pack New Versions Only
         run: |
           for file in src/**/*.csproj; do
-            # Extract project name (e.g., Sumapap.Ddd)
             PROJECT_NAME=$(basename "$file" .csproj)
-            
-            # Extract version from THIS specific .csproj file
-            # It checks for <Version> or <VersionPrefix>
-            VERSION=$(grep -oPm1 "(?<=<(Version|VersionPrefix)>)[^<]+" "$file" || true)
-            
-            # Fallback: if not in .csproj, try checking Directory.Build.props 
+
+            # Use dotnet msbuild to EVALUATE the property. 
+            # This solves the $(AssemblyVersion) variable issue.
+            VERSION=$(dotnet msbuild "$file" --getProperty:VersionPrefix --nologo | xargs)
+
+            # Fallback: if VersionPrefix is empty, try Version
             if [ -z "$VERSION" ]; then
-              VERSION=$(grep -oPm1 "(?<=<VersionPrefix>)[^<]+" src/Directory.Build.props || true)
+              VERSION=$(dotnet msbuild "$file" --getProperty:Version --nologo | xargs)
             fi
 
-            echo "--- Checking $PROJECT_NAME (Version: $VERSION) ---"
-
-            if [ -z "$VERSION" ]; then
-              echo ">> Error: Could not find version for $PROJECT_NAME. Skipping."
+            if [ -z "$VERSION" ] || [ "$VERSION" == "0.0.0" ]; then
+              echo ">> SKIPPING $PROJECT_NAME: Could not evaluate a valid version."
               continue
             fi
 
-            # Check NuGet API for this specific package and version
+            echo "--- Checking $PROJECT_NAME (Evaluated Version: $VERSION) ---"
+
+            # NuGet API Check
             LOWER_NAME=$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]')
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://api.nuget.org/v3-flatcontainer/$LOWER_NAME/$VERSION/$LOWER_NAME.nuspec")
 
             if [ "$STATUS" == "200" ]; then
-              echo ">> $PROJECT_NAME version $VERSION already exists on NuGet. Skipping."
+              echo ">> $PROJECT_NAME version $VERSION already exists. Skipping."
             else
-              echo ">> $PROJECT_NAME version $VERSION is new! Packing..."
-              dotnet pack "$file" -c Release --no-restore
+              echo ">> $PROJECT_NAME version $VERSION is new! (Status $STATUS). Packing..."
+              dotnet pack "$file" -c Release --no-restore -o .nuget/
             fi
           done
 
