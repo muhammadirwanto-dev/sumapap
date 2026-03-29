@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Sumapap.Ddd.Abstractions;
 
-namespace Sumapap.Ddd.Domain
+namespace Sumapap.Ddd
 {
     public abstract class DomainEntity
     {
