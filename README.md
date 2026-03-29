@@ -10,7 +10,7 @@ This repository contains several .NET libraries that can be used with `.NET 8` a
 
 | Package | Description | Latest Version | Download |
 | --- | --- | --- | --- |
-| [Sumapap.Common](https://github.com/muhirwanto-dev/sumapap/blob/main/docs/Sumapap.Common.md) | Shared core utilities, constants, and basic helpers used across the `Sumapap`ecosystem. | `[![NuGet](https://img.shields.io/nuget/v/Sumapap.Common)](https://www.nuget.org/packages/Sumapap.Common/)` | `![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Common)` |
+| [Sumapap.Common](https://github.com/muhirwanto-dev/sumapap/blob/main/docs/Sumapap.Common.md) | Shared core utilities, constants, and basic helpers used across the `Sumapap`ecosystem. | [![NuGet](https://img.shields.io/nuget/v/Sumapap.Common)](https://www.nuget.org/packages/Sumapap.Common/) | ![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Common) |
 
 # ⭐ Naming Convention
 
