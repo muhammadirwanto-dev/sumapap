@@ -1,21 +1,14 @@
 name: Publish Sumapap NuGet Packages
 
 on:
-  # Allows manual triggering from the Actions tab
   workflow_dispatch:
-  
-  # Existing trigger for merged PRs
   pull_request:
     branches: [ main ]
     types: [ closed ]
 
 jobs:
   publish:
-    # Run if it's a manual trigger OR if it's a merged PR
-    if: |
-      github.event_name == 'workflow_dispatch' || 
-      (github.event.pull_request.merged == true)
-    
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
@@ -28,39 +21,55 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Cleanup NuGet Output Folder
-        run: rm -rf .nuget/
+        run: mkdir -p .nuget && rm -rf .nuget/*
 
       - name: Restore Dependencies
         run: dotnet restore src/
 
-      - name: Process Projects
+      - name: Process and Pack Projects
+        id: pack_step
         run: |
+          SUCCESS_PACKS=()
+          FAILED_PACKS=()
+          SKIPPED_PACKS=()
+
           for file in src/**/*.csproj; do
             PROJECT_NAME=$(basename "$file" .csproj)
-
-            # Evaluate the version (handles variables like $(AssemblyVersion))
+            
+            # Evaluate version
             VERSION=$(dotnet msbuild "$file" --getProperty:VersionPrefix --nologo | xargs)
             if [ -z "$VERSION" ]; then
               VERSION=$(dotnet msbuild "$file" --getProperty:Version --nologo | xargs)
             fi
 
             if [ -z "$VERSION" ] || [ "$VERSION" == "0.0.0" ]; then
-              echo ">> SKIPPING $PROJECT_NAME: No valid version found."
+              SKIPPED_PACKS+=("$PROJECT_NAME (No Version)")
               continue
             fi
 
-            echo "--- Checking $PROJECT_NAME (Version: $VERSION) ---"
-
+            # Check NuGet API
             LOWER_NAME=$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]')
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://api.nuget.org/v3-flatcontainer/$LOWER_NAME/$VERSION/$LOWER_NAME.nuspec")
 
             if [ "$STATUS" == "200" ]; then
-              echo ">> $PROJECT_NAME version $VERSION already exists. Skipping."
+              SKIPPED_PACKS+=("$PROJECT_NAME ($VERSION) - Already on NuGet")
             else
-              echo ">> $PROJECT_NAME version $VERSION is new! Packing..."
-              dotnet pack "$file" -c Release --no-restore -o .nuget/
+              echo ">> Attempting to pack $PROJECT_NAME ($VERSION)..."
+              
+              if dotnet pack "$file" -c Release --no-restore -o .nuget/; then
+                SUCCESS_PACKS+=("$PROJECT_NAME ($VERSION)")
+              else
+                # Log as a GitHub UI Warning so it's visible in the summary
+                echo "::warning title=Pack Failure::$PROJECT_NAME failed to pack. Likely missing docs or a build error."
+                FAILED_PACKS+=("$PROJECT_NAME ($VERSION)")
+              fi
             fi
           done
+
+          # Output lists for the next steps
+          echo "SUCCESS_LIST=${SUCCESS_PACKS[*]}" >> $GITHUB_ENV
+          echo "FAILED_LIST=${FAILED_PACKS[*]}" >> $GITHUB_ENV
+          echo "SKIPPED_LIST=${SKIPPED_PACKS[*]}" >> $GITHUB_ENV
 
       - name: Push to NuGet
         run: |
@@ -69,6 +78,19 @@ jobs:
               --api-key ${{ secrets.NUGET_API_KEY }} \
               --source https://api.nuget.org/v3/index.json \
               --skip-duplicate
-          else
-            echo "No new packages found to push."
           fi
+
+      - name: Final Summary
+        run: |
+          echo "--------------------------------------------------"
+          echo "✅ SUCCESSFULLY UPLOADED:"
+          for pkg in $SUCCESS_LIST; do echo "  - $pkg"; done
+          
+          echo ""
+          echo "⚠️ FAILED (NOT UPLOADED):"
+          if [ -z "$FAILED_LIST" ]; then echo "  - None"; else for pkg in $FAILED_LIST; do echo "  - $pkg"; done; fi
+          
+          echo ""
+          echo "⏭️ SKIPPED (EXISTING OR NO VERSION):"
+          for pkg in $SKIPPED_LIST; do echo "  - $pkg"; done
+          echo "--------------------------------------------------"
