@@ -1,13 +1,21 @@
 name: Publish Sumapap NuGet Packages
 
 on:
+  # Allows manual triggering from the Actions tab
+  workflow_dispatch:
+  
+  # Existing trigger for merged PRs
   pull_request:
     branches: [ main ]
     types: [ closed ]
 
 jobs:
   publish:
-    if: github.event.pull_request.merged == true
+    # Run if it's a manual trigger OR if it's a merged PR
+    if: |
+      github.event_name == 'workflow_dispatch' || 
+      (github.event.pull_request.merged == true)
+    
     runs-on: ubuntu-latest
 
     steps:
@@ -25,41 +33,35 @@ jobs:
       - name: Restore Dependencies
         run: dotnet restore src/
 
-      # 1. LOOP THROUGH PROJECTS AND CHECK INDIVIDUAL VERSIONS
-      - name: Pack New Versions Only
+      - name: Process Projects
         run: |
           for file in src/**/*.csproj; do
             PROJECT_NAME=$(basename "$file" .csproj)
 
-            # Use dotnet msbuild to EVALUATE the property. 
-            # This solves the $(AssemblyVersion) variable issue.
+            # Evaluate the version (handles variables like $(AssemblyVersion))
             VERSION=$(dotnet msbuild "$file" --getProperty:VersionPrefix --nologo | xargs)
-
-            # Fallback: if VersionPrefix is empty, try Version
             if [ -z "$VERSION" ]; then
               VERSION=$(dotnet msbuild "$file" --getProperty:Version --nologo | xargs)
             fi
 
             if [ -z "$VERSION" ] || [ "$VERSION" == "0.0.0" ]; then
-              echo ">> SKIPPING $PROJECT_NAME: Could not evaluate a valid version."
+              echo ">> SKIPPING $PROJECT_NAME: No valid version found."
               continue
             fi
 
-            echo "--- Checking $PROJECT_NAME (Evaluated Version: $VERSION) ---"
+            echo "--- Checking $PROJECT_NAME (Version: $VERSION) ---"
 
-            # NuGet API Check
             LOWER_NAME=$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]')
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://api.nuget.org/v3-flatcontainer/$LOWER_NAME/$VERSION/$LOWER_NAME.nuspec")
 
             if [ "$STATUS" == "200" ]; then
               echo ">> $PROJECT_NAME version $VERSION already exists. Skipping."
             else
-              echo ">> $PROJECT_NAME version $VERSION is new! (Status $STATUS). Packing..."
+              echo ">> $PROJECT_NAME version $VERSION is new! Packing..."
               dotnet pack "$file" -c Release --no-restore -o .nuget/
             fi
           done
 
-      # 2. PUSH ONLY WHAT WAS PACKED
       - name: Push to NuGet
         run: |
           if [ -d ".nuget" ] && [ "$(ls -A .nuget/*.nupkg 2>/dev/null)" ]; then
