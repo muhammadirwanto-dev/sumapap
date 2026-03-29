@@ -1,0 +1,65 @@
+name: Publish Sumapap NuGet Packages
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ closed ]
+
+jobs:
+  publish:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x' # Use your preferred stable version
+
+      - name: Cleanup NuGet Output Folder
+        run: rm -rf .nuget/
+
+      - name: Restore Dependencies
+        run: dotnet restore src/
+
+      # 1. LOOP THROUGH PROJECTS AND PROCESS INDIVIDUALLY
+      - name: Pack New Versions Only
+        run: |
+          # Extract the shared version from Directory.Build.props
+          VERSION=$(grep -oPm1 "(?<=<VersionPrefix>)[^<]+" src/Directory.Build.props)
+          echo "Detected Shared Version: $VERSION"
+
+          for file in src/**/*.csproj; do
+            # Extract project name (e.g., Sumapap.Ddd)
+            PROJECT_NAME=$(basename "$file" .csproj)
+            echo "--- Checking $PROJECT_NAME ---"
+
+            # Check NuGet API for this specific package and version
+            # NuGet package IDs in the URL must be lowercase
+            LOWER_NAME=$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]')
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://api.nuget.org/v3-flatcontainer/$LOWER_NAME/$VERSION/$LOWER_NAME.nuspec")
+
+            if [ "$STATUS" == "200" ]; then
+              echo ">> $PROJECT_NAME version $VERSION already exists. Skipping."
+            else
+              echo ">> $PROJECT_NAME version $VERSION is new! Packing..."
+              dotnet pack "$file" -c Release --no-restore
+            fi
+          done
+
+      # 2. PUSH ONLY WHAT WAS PACKED
+      - name: Push to NuGet
+        # If no new packages were packed, the folder will be empty/non-existent
+        # We use a shell check to avoid errors if there's nothing to push
+        run: |
+          if [ -d ".nuget" ] && [ "$(ls -A .nuget/*.nupkg 2>/dev/null)" ]; then
+            dotnet nuget push ".nuget/*.nupkg" \
+              --api-key ${{ secrets.NUGET_API_KEY }} \
+              --source https://api.nuget.org/v3/index.json \
+              --skip-duplicate
+          else
+            echo "No new packages to push."
+          fi
