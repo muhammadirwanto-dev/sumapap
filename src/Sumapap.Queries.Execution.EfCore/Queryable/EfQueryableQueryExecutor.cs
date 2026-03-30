@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Sumapap.Queries.Execution.Abstraction;
 using Sumapap.Queries.Execution.Cursor;
 using Sumapap.Queries.Execution.EfCore.Expressions;
+using Sumapap.Queries.Execution.Extensions;
 using Sumapap.Queries.Filtering;
 using Sumapap.Queries.Paging;
 using Sumapap.Queries.Sorting;
@@ -27,57 +28,62 @@ namespace Sumapap.Queries.Execution.EfCore.Queryable
             return ApplyPagingAsync(source, query, cancellationToken);
         }
 
-        private static IQueryable<T> ApplyFiltering(IQueryable<T> source, FilterOptions filters)
+        private static IQueryable<T> ApplyFiltering(IQueryable<T> source, FilterOptions options)
         {
-            foreach (var filter in filters.Filters)
+            if (options?.RootGroup == null)
             {
-                source = filter.Operator switch
-                {
-                    FilterOperator.Equals =>
-                        source.Where(ComparisonExpression.Build<T>(
-                            filter.Field, filter.Value, ExpressionType.Equal)),
-
-                    FilterOperator.NotEquals =>
-                        source.Where(ComparisonExpression.Build<T>(
-                            filter.Field, filter.Value, ExpressionType.NotEqual)),
-
-                    FilterOperator.GreaterThan =>
-                        source.Where(ComparisonExpression.Build<T>(
-                            filter.Field, filter.Value, ExpressionType.GreaterThan)),
-
-                    FilterOperator.GreaterThanOrEqual =>
-                        source.Where(ComparisonExpression.Build<T>(
-                            filter.Field, filter.Value, ExpressionType.GreaterThanOrEqual)),
-
-                    FilterOperator.LessThan =>
-                        source.Where(ComparisonExpression.Build<T>(
-                            filter.Field, filter.Value, ExpressionType.LessThan)),
-
-                    FilterOperator.LessThanOrEqual =>
-                        source.Where(ComparisonExpression.Build<T>(
-                            filter.Field, filter.Value, ExpressionType.LessThanOrEqual)),
-
-                    FilterOperator.Contains =>
-                        source.Where(StringMethodExpression.Build<T>(
-                            filter.Field, filter.Value, nameof(string.Contains))),
-
-                    FilterOperator.StartsWith =>
-                        source.Where(StringMethodExpression.Build<T>(
-                            filter.Field, filter.Value, nameof(string.StartsWith))),
-
-                    FilterOperator.EndsWith =>
-                        source.Where(StringMethodExpression.Build<T>(
-                            filter.Field, filter.Value, nameof(string.EndsWith))),
-
-                    FilterOperator.In =>
-                        source.Where(InExpression.Build<T>(
-                            filter.Field, filter.Value)),
-
-                    _ => source
-                };
+                return source;
             }
 
-            return source;
+            // One parameter to rule them all: 'x'
+            var parameter = Expression.Parameter(typeof(T), "x");
+            var body = BuildGroupExpression(options.RootGroup, parameter);
+
+            if (body == null)
+            {
+                return source;
+            }
+
+            var lambda = Expression.Lambda<Func<T, bool>>(body, parameter);
+
+            return source.Where(lambda);
+        }
+
+        private static Expression? BuildGroupExpression(FilterGroup group, ParameterExpression parameter)
+        {
+            Expression? combined = null;
+
+            foreach (var filter in group.Filters)
+            {
+                var leaf = BuildLeafExpression(filter, parameter);
+                combined = combined.Combine(leaf, group.Operator);
+            }
+
+            foreach (var subGroup in group.SubGroups)
+            {
+                var subExpr = BuildGroupExpression(subGroup, parameter);
+                combined = combined.Combine(subExpr, group.Operator);
+            }
+
+            return combined;
+        }
+
+        private static Expression BuildLeafExpression(FilterDescriptor filter, ParameterExpression parameter)
+        {
+            return filter.Operator switch
+            {
+                FilterOperator.Equals => ComparisonExpression.Build<T>(filter.Field, filter.Value, ExpressionType.Equal, parameter),
+                FilterOperator.NotEquals => ComparisonExpression.Build<T>(filter.Field, filter.Value, ExpressionType.NotEqual, parameter),
+                FilterOperator.GreaterThan => ComparisonExpression.Build<T>(filter.Field, filter.Value, ExpressionType.GreaterThan, parameter),
+                FilterOperator.GreaterThanOrEqual => ComparisonExpression.Build<T>(filter.Field, filter.Value, ExpressionType.GreaterThanOrEqual, parameter),
+                FilterOperator.LessThan => ComparisonExpression.Build<T>(filter.Field, filter.Value, ExpressionType.LessThan, parameter),
+                FilterOperator.LessThanOrEqual => ComparisonExpression.Build<T>(filter.Field, filter.Value, ExpressionType.LessThanOrEqual, parameter),
+                FilterOperator.Contains => StringMethodExpression.Build<T>(filter.Field, filter.Value, nameof(string.Contains), parameter),
+                FilterOperator.StartsWith => StringMethodExpression.Build<T>(filter.Field, filter.Value, nameof(string.StartsWith), parameter),
+                FilterOperator.EndsWith => StringMethodExpression.Build<T>(filter.Field, filter.Value, nameof(string.EndsWith), parameter),
+                FilterOperator.In => InExpression.Build<T>(filter.Field, filter.Value, parameter),
+                _ => Expression.Constant(true)
+            };
         }
 
         private static IQueryable<T> ApplySorting(IQueryable<T> source, SortOptions? sort)

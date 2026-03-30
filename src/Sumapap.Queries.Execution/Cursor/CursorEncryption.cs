@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Sumapap.Queries.Execution.Cursor
 {
-    internal static class CursorEncryption
+    public static class CursorEncryption
     {
         public static string EncodeCursor(object value)
         {

@@ -65,7 +65,7 @@ namespace Sumapap.Queries.Execution.EfCore.Paging
 
             return (IQueryable<T>)generic.Invoke(
                 null,
-                new object[] { source, lambda })!;
+                [source, lambda])!;
         }
     }
 }

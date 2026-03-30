@@ -8,14 +8,15 @@ namespace Sumapap.Queries.Execution.EfCore.Expressions
         public static Expression<Func<T, bool>> Build<T>(
             string field,
             object? value,
-            ExpressionType comparisonType)
+            ExpressionType comparisonType,
+            ParameterExpression? parameter = null)
         {
-            var parameter = Expression.Parameter(typeof(T), "p");
+            var param = parameter ?? Expression.Parameter(typeof(T), "p");
             var property = Expression.Call(
                 typeof(EF),
                 nameof(EF.Property),
                 [typeof(object)],
-                parameter,
+                param,
                 Expression.Constant(field));
 
             var constant = Expression.Constant(value);
@@ -26,8 +27,7 @@ namespace Sumapap.Queries.Execution.EfCore.Expressions
                 Expression.Convert(property, property.Type),
                 converted);
 
-            return Expression.Lambda<Func<T, bool>>(body, parameter);
+            return Expression.Lambda<Func<T, bool>>(body, param);
         }
-
     }
 }

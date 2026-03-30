@@ -1,10 +1,11 @@
 ﻿using System.Linq.Expressions;
+using Sumapap.Queries.Execution.Extensions;
 using Sumapap.Queries.Execution.Internals;
 using Sumapap.Queries.Filtering;
 
 namespace Sumapap.Queries.Execution.Queryable
 {
-    internal static class QueryableFailtering
+    internal static class QueryableFiltering
     {
         public static IQueryable<T> Apply<T>(IQueryable<T> source, FilterOptions options)
         {
@@ -33,28 +34,16 @@ namespace Sumapap.Queries.Execution.Queryable
             foreach (var filter in group.Filters)
             {
                 var leafExpr = ExpressionCache.GetFilterExpression<T>(filter, parameter);
-                rootExpression = Combine(rootExpression, leafExpr, group.Operator);
+                rootExpression = rootExpression.Combine(leafExpr, group.Operator);
             }
 
             foreach (var subGroup in group.SubGroups)
             {
                 var subExpr = BuildGroupExpression<T>(subGroup, parameter);
-                rootExpression = Combine(rootExpression, subExpr, group.Operator);
+                rootExpression = rootExpression.Combine(subExpr, group.Operator);
             }
 
             return rootExpression;
-        }
-
-        private static Expression? Combine(Expression? left, Expression? right, CompositeOperator op)
-        {
-            if (left == null)
-                return right;
-            if (right == null)
-                return left;
-
-            return op == CompositeOperator.And
-                ? Expression.AndAlso(left, right)
-                : Expression.OrElse(left, right);
         }
     }
 }

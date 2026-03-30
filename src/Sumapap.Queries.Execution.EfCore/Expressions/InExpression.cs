@@ -8,19 +8,20 @@ namespace Sumapap.Queries.Execution.EfCore.Expressions
     {
         public static Expression<Func<T, bool>> Build<T>(
             string field,
-            object? value)
+            object? value,
+            ParameterExpression? parameter = null)
         {
             if (value is not IEnumerable values)
             {
                 throw new InvalidOperationException("FilterOperator.In requires IEnumerable value.");
             }
 
-            var parameter = Expression.Parameter(typeof(T), "p");
+            var param = parameter ?? Expression.Parameter(typeof(T), "p");
             var property = Expression.Call(
                 typeof(EF),
                 nameof(EF.Property),
                 [typeof(object)],
-                parameter,
+                param,
                 Expression.Constant(field));
 
             var list = values.Cast<object?>().ToList();
@@ -31,7 +32,7 @@ namespace Sumapap.Queries.Execution.EfCore.Expressions
 
             var body = Expression.Call(constant, containsMethod, property);
 
-            return Expression.Lambda<Func<T, bool>>(body, parameter);
+            return Expression.Lambda<Func<T, bool>>(body, param);
         }
     }
 }
