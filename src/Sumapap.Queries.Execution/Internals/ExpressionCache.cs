@@ -11,17 +11,20 @@ namespace Sumapap.Queries.Execution.Internals
 
         public static Expression<Func<T, bool>>? GetFilterExpression<T>(
             FilterDescriptor filter)
-        {
+            =>
             // simplified: build typed expression like discussed earlier
             // cache by (Type + Field + Operator)
-            return DynamicExpressionBuilder.BuildPredicate<T>(filter);
-        }
+            DynamicExpressionBuilder.BuildPredicate<T>(filter);
+
+        public static Expression<Func<T, bool>>? GetFilterExpression<T>(
+            FilterDescriptor filter,
+            ParameterExpression parameter)
+            => DynamicExpressionBuilder.BuildPredicate<T>(filter, parameter);
 
         public static IOrderedQueryable<T> ApplyOrdering<T>(
             IQueryable<T> source,
-            SortDescriptor sort)
-        {
-            return DynamicExpressionBuilder.ApplyOrder(source, sort);
-        }
+            SortDescriptor sort,
+            bool isFirst)
+            => DynamicExpressionBuilder.ApplyOrder(source, sort, isFirst);
     }
 }

@@ -7,13 +7,14 @@ namespace Sumapap.Queries.Execution.Internals
     public static class DynamicExpressionBuilder
     {
         public static Expression<Func<T, bool>>? BuildPredicate<T>(
-            FilterDescriptor filter)
+            FilterDescriptor filter,
+            ParameterExpression? parameter = null)
         {
             var prop = ReflectionCache.GetProperty<T>(filter.Field);
             if (prop == null)
                 return null;
 
-            var param = Expression.Parameter(typeof(T), "e");
+            var param = parameter ?? Expression.Parameter(typeof(T), "e");
             var left = Expression.Property(param, prop);
             var right = Expression.Constant(
                 Convert.ChangeType(filter.Value, prop.PropertyType),
@@ -54,30 +55,43 @@ namespace Sumapap.Queries.Execution.Internals
 
         public static IOrderedQueryable<T> ApplyOrder<T>(
             IQueryable<T> source,
-            SortDescriptor sort)
+            SortDescriptor sort,
+            bool isFirst = true,
+            ParameterExpression? parameter = null)
         {
             var prop = ReflectionCache.GetProperty<T>(sort.Field)
                 ?? throw new InvalidOperationException(
                     $"Sort field '{sort.Field}' not found.");
 
-            var param = Expression.Parameter(typeof(T), "e");
+            var param = parameter ?? Expression.Parameter(typeof(T), "e");
             var body = Expression.Property(param, prop);
             var lambda = Expression.Lambda(body, param);
 
-            var methodName = sort.Direction == SortDirection.Asc
-                ? nameof(System.Linq.Queryable.OrderBy)
-                : nameof(System.Linq.Queryable.OrderByDescending);
+            string methodName;
+
+            if (isFirst)
+            {
+                methodName = sort.Direction == SortDirection.Asc
+                    ? nameof(System.Linq.Queryable.OrderBy)
+                    : nameof(System.Linq.Queryable.OrderByDescending);
+            }
+            else
+            {
+                methodName = sort.Direction == SortDirection.Asc
+                    ? nameof(System.Linq.Queryable.ThenBy)
+                    : nameof(System.Linq.Queryable.ThenByDescending);
+            }
 
             var method = typeof(System.Linq.Queryable)
                 .GetMethods()
                 .Single(m =>
                     m.Name == methodName &&
+                    m.IsGenericMethodDefinition &&
                     m.GetParameters().Length == 2);
 
             return (IOrderedQueryable<T>)method
                 .MakeGenericMethod(typeof(T), prop.PropertyType)
-                .Invoke(null, new object[] { source, lambda })!;
+                .Invoke(null, [source, lambda])!;
         }
     }
-
 }

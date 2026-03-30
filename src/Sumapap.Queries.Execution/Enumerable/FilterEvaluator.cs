@@ -8,7 +8,8 @@ namespace Sumapap.Queries.Execution.Enumerable
         public static bool Evaluate(
             object? value,
             object? filterValue,
-            FilterOperator op) => op switch
+            FilterOperator op)
+            => op switch
             {
                 FilterOperator.Equals =>
                     Equals(value, filterValue),
@@ -70,8 +71,7 @@ namespace Sumapap.Queries.Execution.Enumerable
         private static bool StringMatch(
             object? value,
             object? filterValue,
-            Func<string, string, bool> matcher) => value != null && filterValue != null && matcher(
-                value.ToString()!,
-                filterValue.ToString()!);
+            Func<string, string, bool> matcher)
+            => value != null && filterValue != null && matcher(value.ToString()!, filterValue.ToString()!);
     }
 }

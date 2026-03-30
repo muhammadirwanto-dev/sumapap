@@ -14,8 +14,6 @@ namespace Sumapap.Queries.Execution.Enumerable
         }
 
         public Task<QueryResult<T>> ExecuteAsync(Query query, IEnumerable<T> source, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(Execute(query, source));
-        }
+            => Task.FromResult(Execute(query, source));
     }
 }

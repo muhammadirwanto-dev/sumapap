@@ -2,7 +2,6 @@
 
 namespace Sumapap.Queries.Execution.Queryable
 {
-
     public sealed class QueryableQueryExecutor<T>
         : IQueryExecutor<IQueryable<T>, T>
     {

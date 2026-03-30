@@ -9,9 +9,8 @@ namespace Sumapap.Queries.Execution.Internals
 
         public static PropertyInfo? GetProperty<T>(string name)
         {
-            var key = $"{typeof(T).FullName}.{name}";
             return Cache.GetOrAdd(
-                key,
+                $"{typeof(T).FullName}.{name}",
                 _ => typeof(T).GetProperty(name));
         }
     }

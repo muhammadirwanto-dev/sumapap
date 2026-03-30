@@ -13,12 +13,16 @@ namespace Sumapap.Queries.Execution.Queryable
                 return source;
 
             IOrderedQueryable<T>? ordered = null;
+            bool isFirst = true;
 
             foreach (var s in sort.Sorts)
             {
                 ordered = ExpressionCache.ApplyOrdering(
                     ordered ?? source,
-                    s);
+                    s,
+                    isFirst);
+
+                isFirst = false;
             }
 
             return ordered ?? source;
