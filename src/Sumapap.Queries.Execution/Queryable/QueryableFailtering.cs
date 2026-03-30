@@ -4,7 +4,7 @@ using Sumapap.Queries.Filtering;
 
 namespace Sumapap.Queries.Execution.Queryable
 {
-    internal static class QueryableFiltering
+    internal static class QueryableFailtering
     {
         public static IQueryable<T> Apply<T>(IQueryable<T> source, FilterOptions options)
         {
