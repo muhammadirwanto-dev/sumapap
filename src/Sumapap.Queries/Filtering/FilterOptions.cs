@@ -2,11 +2,11 @@
 {
     public sealed class FilterOptions
     {
-        public FilterGroup RootGroup { get; } = new(CompositeOperator.And);
+        public FilterGroup RootGroup { get; } = new();
 
         public static FilterOptions Empty => new();
 
-        public FilterOptions()
+        private FilterOptions()
         {
         }
 
