@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
 
-namespace Sumapap.Queries.Execution.Internals
+namespace Sumapap.Queries.Execution.Common
 {
     public static class ReflectionCache
     {

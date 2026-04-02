@@ -1,14 +1,15 @@
 ﻿using System.Collections;
-using Sumapap.Queries.Execution.Internals;
+using Sumapap.Queries.Abstractions;
+using Sumapap.Queries.Execution.Common;
 using Sumapap.Queries.Paging;
 
-namespace Sumapap.Queries.Execution.Cursor
+namespace Sumapap.Queries.Execution.Enumerable
 {
-    internal static class CursorPaging
+    internal static class EnumerableCursorPaging
     {
-        public static QueryResult<T> Apply<T>(
+        public static IQueryResult<T> Apply<T>(
             IEnumerable<T> source,
-            Query query)
+            IQuery query)
         {
             var paging = query.CursorPaging!;
             var prop = ReflectionCache.GetProperty<T>(paging.CursorField)

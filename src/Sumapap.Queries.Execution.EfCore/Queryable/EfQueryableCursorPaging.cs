@@ -1,11 +1,12 @@
 ﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using Sumapap.Queries.Abstractions;
 using Sumapap.Queries.Execution.Common;
 using Sumapap.Queries.Paging;
 
-namespace Sumapap.Queries.Execution.Queryable
+namespace Sumapap.Queries.Execution.EfCore.Queryable
 {
-    internal static class QueryableCursorPaging
+    internal static class EfQueryableCursorPaging
     {
         public static IQueryResult<T> Apply<T>(IQueryable<T> source, IQuery query)
         {
@@ -44,45 +45,39 @@ namespace Sumapap.Queries.Execution.Queryable
             IQueryable<T> source,
             CursorPaginationOptions paging)
         {
-            var prop = ReflectionCache.GetProperty<T>(paging.CursorField)!;
-            var param = Expression.Parameter(typeof(T), "e");
-            var body = Expression.Property(param, prop);
-            var lambda = Expression.Lambda(body, param);
-
-            var methodName = paging.Direction == CursorDirection.Forward
-                ? nameof(System.Linq.Queryable.OrderBy)
-                : nameof(System.Linq.Queryable.OrderByDescending);
-
-            var method = typeof(System.Linq.Queryable)
-                .GetMethods()
-                .Single(m =>
-                    m.Name == methodName &&
-                    m.GetParameters().Length == 2);
-
-            return (IQueryable<T>)method
-                .MakeGenericMethod(typeof(T), prop.PropertyType)
-                .Invoke(null, [source, lambda])!;
+            return paging.Direction == CursorDirection.Forward
+                ? source.OrderBy(e => EF.Property<object>(e!, paging.CursorField))
+                : source.OrderByDescending(e => EF.Property<object>(e!, paging.CursorField));
         }
 
         private static IQueryable<T> ApplyCursorFiltering<T>(
             IQueryable<T> source,
             CursorPaginationOptions paging)
         {
-            var prop = ReflectionCache.GetProperty<T>(paging.CursorField)!;
+            var entityType = typeof(T);
+
+            var propertyInfo = entityType.GetProperty(paging.CursorField)
+                ?? throw new InvalidOperationException(
+                    $"Cursor field '{paging.CursorField}' not found on type '{entityType.Name}'.");
+
             var cursorValue = CursorEncryption.DecodeCursor(
                 paging.Cursor!,
-                prop.PropertyType);
+                propertyInfo.PropertyType);
 
-            var param = Expression.Parameter(typeof(T), "e");
-            var left = Expression.Property(param, prop);
-            var right = Expression.Constant(cursorValue, prop.PropertyType);
+            var parameter = Expression.Parameter(entityType, "e");
 
+            // e.CursorField
+            var propertyAccess = Expression.Property(parameter, propertyInfo);
+
+            // constant(cursorValue) with correct type
+            var constant = Expression.Constant(cursorValue, propertyInfo.PropertyType);
+
+            // e.CursorField > cursorValue  (or <)
             var comparison = paging.Direction == CursorDirection.Forward
-                ? Expression.GreaterThan(left, right)
-                : Expression.LessThan(left, right);
+                ? Expression.GreaterThan(propertyAccess, constant)
+                : Expression.LessThan(propertyAccess, constant);
 
-            var lambda = Expression.Lambda<Func<T, bool>>(comparison, param);
-            return source.Where(lambda);
+            return source.Where(Expression.Lambda<Func<T, bool>>(comparison, parameter));
         }
     }
 }

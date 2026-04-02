@@ -1,4 +1,4 @@
-﻿using Sumapap.Queries.Execution.Internals;
+﻿using Sumapap.Queries.Execution.Evaluators;
 using Sumapap.Queries.Sorting;
 
 namespace Sumapap.Queries.Execution.Enumerable
@@ -14,19 +14,9 @@ namespace Sumapap.Queries.Execution.Enumerable
 
             IOrderedEnumerable<T>? ordered = null;
 
-            foreach (var s in sort.Sorts)
+            foreach (var descriptor in sort.Sorts)
             {
-                var prop = ReflectionCache.GetProperty<T>(s.Field);
-                if (prop == null)
-                    continue;
-
-                ordered = ordered == null
-                    ? s.Direction == SortDirection.Asc
-                        ? source.OrderBy(x => prop.GetValue(x))
-                        : source.OrderByDescending(x => prop.GetValue(x))
-                    : s.Direction == SortDirection.Asc
-                        ? ordered.ThenBy(x => prop.GetValue(x))
-                        : ordered.ThenByDescending(x => prop.GetValue(x));
+                SortEvaluator.EvaluateDescriptor(descriptor, source, ref ordered);
             }
 
             return ordered ?? source;

@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 
-namespace Sumapap.Queries.Execution.Cursor
+namespace Sumapap.Queries.Execution.Common
 {
     public static class CursorEncryption
     {

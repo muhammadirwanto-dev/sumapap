@@ -1,30 +1,34 @@
-﻿using Sumapap.Queries.Execution.Enumerable;
+﻿using Sumapap.Queries.Abstractions;
+using Sumapap.Queries.Execution.Enumerable;
 using Sumapap.Queries.Execution.Queryable;
 
 namespace Sumapap.Queries.Execution.Extensions
 {
     public static class QueryExecutionExtensions
     {
-        public static QueryResult<T> Execute<T>(
-            this Query query,
-            IEnumerable<T> source)
-            => new EnumerableQueryExecutor<T>().Execute(query, source);
+        private static class Cache<T>
+        {
+            internal static readonly EnumerableQueryExecutor<T> EnumerableExecutor = new();
+            internal static readonly QueryableQueryExecutor<T> QueryableExecutor = new();
+        }
 
-        public static Task<QueryResult<T>> ExecuteAsync<T>(
-            this Query query,
-            IEnumerable<T> source,
-            CancellationToken cancellationToken = default)
-            => new EnumerableQueryExecutor<T>().ExecuteAsync(query, source, cancellationToken);
+        extension(IQuery query)
+        {
+            public IQueryResult<T> Execute<T>(IEnumerable<T> source)
+                => Cache<T>.EnumerableExecutor.Execute(query, source);
 
-        public static QueryResult<T> Execute<T>(
-            this Query query,
-            IQueryable<T> source)
-            => new QueryableQueryExecutor<T>().Execute(query, source);
+            public Task<IQueryResult<T>> ExecuteAsync<T>(
+                IEnumerable<T> source,
+                CancellationToken cancellationToken = default)
+                => Cache<T>.EnumerableExecutor.ExecuteAsync(query, source, cancellationToken);
 
-        public static Task<QueryResult<T>> ExecuteAsync<T>(
-            this Query query,
-            IQueryable<T> source,
-            CancellationToken cancellationToken = default)
-            => new QueryableQueryExecutor<T>().ExecuteAsync(query, source, cancellationToken);
+            public IQueryResult<T> Execute<T>(IQueryable<T> source)
+                => Cache<T>.QueryableExecutor.Execute(query, source);
+
+            public Task<IQueryResult<T>> ExecuteAsync<T>(
+                IQueryable<T> source,
+                CancellationToken cancellationToken = default)
+                => Cache<T>.QueryableExecutor.ExecuteAsync(query, source, cancellationToken);
+        }
     }
 }

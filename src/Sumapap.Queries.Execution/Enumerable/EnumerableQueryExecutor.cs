@@ -1,11 +1,12 @@
-﻿using Sumapap.Queries.Execution.Abstraction;
+﻿using Sumapap.Queries.Abstractions;
+using Sumapap.Queries.Execution.Abstraction;
 
 namespace Sumapap.Queries.Execution.Enumerable
 {
     public sealed class EnumerableQueryExecutor<T>
         : IQueryExecutor<IEnumerable<T>, T>
     {
-        public QueryResult<T> Execute(Query query, IEnumerable<T> source)
+        public IQueryResult<T> Execute(IQuery query, IEnumerable<T> source)
         {
             var filtered = EnumerableFiltering.Apply(source, query.Filters);
             var sorted = EnumerableSorting.Apply(filtered, query.Sort);
@@ -13,7 +14,7 @@ namespace Sumapap.Queries.Execution.Enumerable
             return EnumerablePaging.Apply(sorted, query);
         }
 
-        public Task<QueryResult<T>> ExecuteAsync(Query query, IEnumerable<T> source, CancellationToken cancellationToken = default)
+        public Task<IQueryResult<T>> ExecuteAsync(IQuery query, IEnumerable<T> source, CancellationToken cancellationToken = default)
             => Task.FromResult(Execute(query, source));
     }
 }

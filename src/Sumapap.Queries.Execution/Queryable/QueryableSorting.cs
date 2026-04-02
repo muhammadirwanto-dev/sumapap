@@ -1,4 +1,4 @@
-﻿using Sumapap.Queries.Execution.Internals;
+﻿using Sumapap.Queries.Execution.Evaluators;
 using Sumapap.Queries.Sorting;
 
 namespace Sumapap.Queries.Execution.Queryable
@@ -9,20 +9,14 @@ namespace Sumapap.Queries.Execution.Queryable
             IQueryable<T> source,
             SortOptions sort)
         {
-            if (sort.Sorts.Count == 0)
+            if (sort == null || sort.Sorts.Count == 0)
                 return source;
 
             IOrderedQueryable<T>? ordered = null;
-            bool isFirst = true;
 
-            foreach (var s in sort.Sorts)
+            foreach (var descriptor in sort.Sorts)
             {
-                ordered = ExpressionCache.ApplyOrdering(
-                    ordered ?? source,
-                    s,
-                    isFirst);
-
-                isFirst = false;
+                SortEvaluator.EvaluateDescriptor(descriptor, source, ref ordered);
             }
 
             return ordered ?? source;

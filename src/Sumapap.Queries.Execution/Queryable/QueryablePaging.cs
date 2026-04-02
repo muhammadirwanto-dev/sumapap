@@ -1,16 +1,17 @@
-﻿using Sumapap.Queries.Execution.Cursor;
+﻿using Sumapap.Queries.Abstractions;
+using Sumapap.Queries.Paging;
 
 namespace Sumapap.Queries.Execution.Queryable
 {
     internal static class QueryablePaging
     {
-        public static QueryResult<T> Apply<T>(
+        public static IQueryResult<T> Apply<T>(
             IQueryable<T> source,
-            Query query)
+            IQuery query)
         {
             if (query.UsesCursorPaging)
             {
-                return CursorPaging.Apply(source, query);
+                return QueryableCursorPaging.Apply(source, query);
             }
 
             var total = source.Count();
@@ -23,7 +24,10 @@ namespace Sumapap.Queries.Execution.Queryable
                     .Take(page.PageSize)
                     .ToList();
 
-                return new QueryResult<T>(items, total);
+                return new QueryResult<T>(items, total, new PageInfo(
+                    hasNextPage: page.Offset + page.PageSize < total,
+                    hasPreviousPage: page.Offset > 0)
+                    );
             }
 
             return new QueryResult<T>([.. source], total);

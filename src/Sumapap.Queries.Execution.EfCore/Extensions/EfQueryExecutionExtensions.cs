@@ -1,19 +1,25 @@
-﻿using Sumapap.Queries.Execution.EfCore.Queryable;
+﻿using Sumapap.Queries.Abstractions;
+using Sumapap.Queries.Execution.EfCore.Queryable;
 
 namespace Sumapap.Queries.Execution.EfCore.Extensions
 {
     public static class EfQueryExecutionExtensions
     {
-        extension(Query query)
+        private static class Cache<T>
         {
-            public QueryResult<T> Execute<T>(
-                IQueryable<T> source)
-                => new EfQueryableQueryExecutor<T>().Execute(query, source);
+            internal static readonly EfQueryableQueryExecutor<T> EfQueryableExecutor = new();
+        }
 
-            public Task<QueryResult<T>> ExecuteAsync<T>(
+        extension(IQuery query)
+        {
+            public IQueryResult<T> Execute<T>(
+                IQueryable<T> source)
+                => Cache<T>.EfQueryableExecutor.Execute(query, source);
+
+            public Task<IQueryResult<T>> ExecuteAsync<T>(
                 IQueryable<T> source,
                 CancellationToken cancellationToken = default)
-                => new EfQueryableQueryExecutor<T>().ExecuteAsync(query, source, cancellationToken);
+                => Cache<T>.EfQueryableExecutor.ExecuteAsync(query, source, cancellationToken);
         }
     }
 }
