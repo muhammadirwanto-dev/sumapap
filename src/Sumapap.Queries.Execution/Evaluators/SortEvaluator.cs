@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using Sumapap.Queries.Execution.Common;
+using Sumapap.Queries.Execution.Utils;
 using Sumapap.Queries.Sorting;
 
 namespace Sumapap.Queries.Execution.Evaluators
