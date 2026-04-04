@@ -5,24 +5,27 @@ using Sumapap.Queries.Sorting;
 
 namespace Sumapap.Queries
 {
-    public sealed class Query : IQuery
+    public sealed class Query(
+        FilterOptions filters,
+        SortOptions sort,
+        OffsetPaginationOptions? offsetPaging = null,
+        CursorPaginationOptions? cursorPaging = null) : IQuery
     {
-        public FilterOptions Filters { get; }
+        public FilterOptions Filters { get; } = filters;
 
-        public SortOptions Sort { get; }
+        public SortOptions Sort { get; } = sort;
 
-        public OffsetPaginationOptions? OffsetPaging { get; }
+        public OffsetPaginationOptions? OffsetPaging { get; } = offsetPaging;
 
-        public CursorPaginationOptions? CursorPaging { get; }
+        public CursorPaginationOptions? CursorPaging { get; } = cursorPaging;
 
         public bool UsesCursorPaging => CursorPaging != null;
 
         public bool UsesOffsetPaging => OffsetPaging != null;
 
         public Query()
+            : this(FilterOptions.Empty, SortOptions.Empty, null, null)
         {
-            Filters = FilterOptions.Empty;
-            Sort = SortOptions.Empty;
         }
 
         public Query(
@@ -51,18 +54,6 @@ namespace Sumapap.Queries
             CursorPaginationOptions? cursorPaging = null)
             : this(filters, SortOptions.Empty, offsetPaging, cursorPaging)
         {
-        }
-
-        public Query(
-            FilterOptions filters,
-            SortOptions sort,
-            OffsetPaginationOptions? offsetPaging = null,
-            CursorPaginationOptions? cursorPaging = null)
-        {
-            Filters = filters;
-            Sort = sort;
-            OffsetPaging = offsetPaging;
-            CursorPaging = cursorPaging;
         }
     }
 }

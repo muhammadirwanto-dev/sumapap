@@ -4,7 +4,7 @@ namespace Sumapap.Queries.Abstractions
 {
     public interface IQueryResult<out T>
     {
-        IReadOnlyList<T> Items { get; }
+        IEnumerable<T> Items { get; }
 
         int TotalDataCount { get; }
 

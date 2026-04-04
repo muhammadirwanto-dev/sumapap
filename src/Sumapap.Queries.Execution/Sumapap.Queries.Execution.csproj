@@ -3,16 +3,16 @@
   <PropertyGroup>
     <TargetFrameworks>net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>1.3.2</AssemblyVersion>
-    <FileVersion>1.3.2.0404</FileVersion>
+    <AssemblyVersion>1.4.2</AssemblyVersion>
+    <FileVersion>1.4.2.0404</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
   </PropertyGroup>
 
   <!--NuGet properties-->
   <PropertyGroup>
-    <Title>Sumapap.Queries</Title>
-    <PackageId>Sumapap.Queries</PackageId>
-    <PackageTags>Sumapap;Queries</PackageTags>
+    <Title>Sumapap.Queries.Execution</Title>
+    <PackageId>Sumapap.Queries.Execution</PackageId>
+    <PackageTags>Sumapap;Queries;Execution</PackageTags>
     <Description>
       Utility for building dynamic queries, filtering, and sorting logic within the persistence layer.
     </Description>
@@ -21,6 +21,10 @@
 
   <ItemGroup>
     <None Include="..\..\docs\Sumapap.Queries.md" Pack="true" PackagePath="docs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sumapap.Queries\Sumapap.Queries.csproj" />
   </ItemGroup>
 
 </Project>

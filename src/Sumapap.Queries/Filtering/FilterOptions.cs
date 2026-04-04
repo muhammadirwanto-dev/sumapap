@@ -2,7 +2,7 @@
 {
     public sealed class FilterOptions
     {
-        public IReadOnlyList<FilterDescriptor> Filters { get; } = [];
+        public FilterGroup RootGroup { get; } = new();
 
         public static FilterOptions Empty => new();
 
@@ -10,9 +10,9 @@
         {
         }
 
-        public FilterOptions(IReadOnlyList<FilterDescriptor> filters)
+        public FilterOptions(FilterGroup rootGroup)
         {
-            Filters = filters;
+            RootGroup = rootGroup;
         }
     }
 }

@@ -2,23 +2,31 @@
 {
     public sealed class SortOptions
     {
-        public IReadOnlyList<SortDescriptor> Sorts { get; } = [];
-
         public static SortOptions Empty => new();
 
-        public static SortOptions By(string field, SortDirection direction = SortDirection.Asc)
-            => new(
-            [
-                new SortDescriptor(field, direction),
-            ]);
+        public IList<SortDescriptor> Sorts { get; private set; } = [];
 
         public SortOptions()
         {
         }
 
-        public SortOptions(IReadOnlyList<SortDescriptor> sorts)
+        public SortOptions(IList<SortDescriptor> sorts)
         {
             Sorts = sorts;
+        }
+
+        public SortOptions By(string field, SortDirection direction = SortDirection.Asc)
+        {
+            Sorts = [new SortDescriptor(field, direction)];
+
+            return this;
+        }
+
+        public SortOptions ThenBy(string field, SortDirection direction = SortDirection.Asc)
+        {
+            Sorts.Add(new SortDescriptor(field, direction));
+
+            return this;
         }
     }
 }

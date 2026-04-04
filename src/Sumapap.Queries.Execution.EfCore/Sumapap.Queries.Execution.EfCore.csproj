@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <AssemblyVersion>1.4.2</AssemblyVersion>
+    <FileVersion>1.4.2.0402</FileVersion>
+    <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
+  </PropertyGroup>
+
+  <!--NuGet properties-->
+  <PropertyGroup>
+    <Title>Sumapap.Queries.Execution.EfCore</Title>
+    <PackageId>Sumapap.Queries.Execution.EfCore</PackageId>
+    <PackageTags>Sumapap;Queries;Execution;EfCore</PackageTags>
+    <Description>
+      EntityFrameworkCore implementation for building Query.
+    </Description>
+    <PackageReadmeFile>docs\Sumapap.Queries.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\Sumapap.Queries.md" Pack="true" PackagePath="docs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sumapap.Queries.Execution\Sumapap.Queries.Execution.csproj" />
+  </ItemGroup>
+
+</Project>
