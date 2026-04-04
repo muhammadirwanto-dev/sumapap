@@ -10,7 +10,10 @@ This repository contains several .NET libraries that can be used with `.NET 8` a
 
 | Package | Description | Latest Version | Download |
 | --- | --- | --- | --- |
-| [Sumapap.Common](https://github.com/muhirwanto-dev/sumapap/blob/main/docs/Sumapap.Common.md) | Shared core utilities, constants, and basic helpers used across the `Sumapap`ecosystem. | [![NuGet](https://img.shields.io/nuget/v/Sumapap.Common)](https://www.nuget.org/packages/Sumapap.Common/) | ![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Common) |
+| [Sumapap.Ddd](https://github.com/muhirwanto-dev/sumapap/blob/main/docs/Sumapap.Ddd.md) | A lightweight Domain-Driven Design (DDD) abstractions focuses on core building blocks used to model rich domains. | [![NuGet](https://img.shields.io/nuget/v/Sumapap.Ddd)](https://www.nuget.org/packages/Sumapap.Ddd/) | ![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Ddd) |
+| [Sumapap.Ddd.Dispatcher](https://github.com/muhirwanto-dev/sumapap/blob/main/docs/Sumapap.Ddd.Dispatcher.md) | Provides a simple mechanism to publish batches of `IDomainEvent` instances to their corresponding `IDomainEventHandler<TEvent>` implementations. | [![NuGet](https://img.shields.io/nuget/v/Sumapap.Ddd.Dispatcher)](https://www.nuget.org/packages/Sumapap.Ddd.Dispatcher/) | ![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Ddd.Dispatcher) |
+| [Sumapap.Ddd.Mediator](https://github.com/muhirwanto-dev/sumapap/blob/main/docs/Sumapap.Ddd.Mediator.md) | Adapts domain events to a [`Mediator`](https://github.com/martinothamar/Mediator) pipeline so your domain layer remains free from `Mediator` dependencies while allowing application-level `Mediator` handlers to process domain events. | [![NuGet](https://img.shields.io/nuget/v/Sumapap.Ddd.Mediator)](https://www.nuget.org/packages/Sumapap.Ddd.Mediator/) | ![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Ddd.Mediator) | 
+| [Sumapap.Persistence](https://github.com/muhirwanto-dev/sumapap/blob/main/docs/Sumapap.Persistence.md) | Set of persistence abstractions and utilities intended to simplify implementing repositories, specifications and unit-of-work patterns across different data access technologies | [![NuGet](https://img.shields.io/nuget/v/Sumapap.Persistence)](https://www.nuget.org/packages/Sumapap.Persistence/) | ![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Persistence) | 
 
 # ⭐ Naming Convention
 
@@ -29,11 +32,11 @@ The diagram is arranged **vertically (bottom → top)** to show dependency direc
 - Bottom = **most foundational**
 - Top = **application-level usage**
 
-# **🚀 Getting Started**
+# 🚀 Getting Started
 
 Please read the documentation for each respective library in the [/docs](https://github.com/muhirwanto-dev/sumapap/tree/main/docs) folder.
 
-# **💪 Support**
+# 💪 Support
 
 If you like this project and want to support it, you can [buy me a coffee︎](https://buymeacoffee.com/muhirwanto.dev). Your coffee will keep me awake while developing this project ☕.
 

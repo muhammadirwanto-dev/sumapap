@@ -8,112 +8,176 @@
 [![GitHub Forks](https://img.shields.io/github/forks/muhirwanto-dev/sumapap?style=flat-square)](https://github.com/muhirwanto-dev/sumapap/network/members)
 [![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg?style=flat-square)](https://github.com/muhirwanto-dev/sumapap/pulls)
 
-## Overview
+## 💡 Overview
 
-`Sumapap.Persistence` is a C# .NET library providing core abstractions and building blocks for the **data persistence layer** of your applications. It aims to promote cleaner architecture, testability, and flexibility by offering common interfaces and patterns for interacting with data sources. While it facilitates the implementation of patterns like **Repository** and **Unit of Work**, its scope extends to general persistence concerns, providing a solid base for your data access strategy.
+`Sumapap.Persistence` provides a thin, opinionated set of persistence abstractions and helper utilities intended to simplify implementing repositories, specifications and unit-of-work patterns across different data access technologies (`EF Core`, `Dapper`, etc.). The package focuses on:
 
-## Key Features
+- Common repository contracts (read, write, read/write)
+- Unit of Work abstraction for transactional scope
+- Specification pattern helpers (filtering, includes, paging)
+- DI helpers for registering repository implementations easily
 
-* **Core Abstractions for Data Persistence:** Provides fundamental interfaces and potentially base classes relevant to various data persistence tasks.
-* **Facilitates Data Access Patterns:** Simplifies the implementation of common patterns like Repository and Unit of Work.
-* **Generic `IReadWriteRepository<TEntity>`:** Defines standard data access operations (Add, Update, Delete, GetAll, Find, etc.) adaptable for any entity.
-* **`IUnitOfWork` Interface:** Offers a mechanism for managing atomic operations and coordinating changes across multiple data operations within a single transaction.
-* **Promotes Separation of Concerns:** Helps isolate data access logic from your domain and application layers.
-* **Dependency Injection Friendly:** Designed for seamless integration with standard .NET dependency injection containers.
+The goal is to let your domain and application layers depend on a consistent persistence surface while keeping concrete implementations swappable.
 
-## Installation
+## ✨ Why use `Sumapap.Persistence`?
 
-This library primarily provides **abstractions**. You will typically need to implement the provided interfaces based on your chosen data access technology (e.g., Entity Framework Core, Dapper, NHibernate, etc.), or potentially use a separate companion implementation package if available.
+- Provides clear separation between domain and data access layers via small interfaces.
+- Encourages use of the Specification pattern to centralize query logic.
+- Standardizes repository and unit-of-work surface across different persistence engines.
+- Includes convenience DI helpers to register repository implementations with correct lifetimes and service mappings.
 
-Install the abstractions package via NuGet:
+## 🚀 Quick start
 
-**Package Manager Console:**
+1. Add the package to your project (when published on NuGet):
 
-```powershell
-Install-Package Sumapap.Persistence
-```
-
-**.NET CLI**
 ```bash
-dotnet add package Sumapap.Persistence
+ dotnet add package Sumapap.Persistence
 ```
 
-## Usage
-
-This library provides several abstractions for persistence. Below is an example demonstrating how to use the `IReadWriteRepository<TEntity>` and `IUnitOfWork` interfaces, which are common components facilitated by this library. You might find other useful interfaces or base classes within the library depending on your specific persistence needs.
-
-**Define Your Entity**
-
-Implement your entity with `IEntity<TKey>` interface.
+2. Implement your entity (must implement `IEntity` or `IEntity<TKey>`):
 
 ```csharp
-public class Product : IEntity<int>
+public class Order : IEntity<Guid>
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public decimal Price { get; set; }
+    public Guid Id { get; set; }
 }
 ```
 
-**Implement `IReadWriteRepository<TEntity>` and `IUnitOfWork`**
+3. Implement a repository for your persistence technology (read/write):
 
 ```csharp
-// Read-Write repository
-public class YourRwRepository<TEntity> : IReadWriteRepository<TEntity>
-    where TEntity : class, IEntity
-{   
-}
-
-// Read-Only repository
-public class YourRoRepository<TEntity> : IReadRepository<TEntity>
-    where TEntity : class, IEntity
+public class EfOrderRepository : IReadWriteRepository<Order>
 {
-}
-
-// Unit of work
-public class YourUnitOfWork<TContext> : IUnitOfWork<TContext>
-    where TContext : DbContext
-{
-}
-
-public class YourUnitOfWork : IUnitOfWork
-{
+    // implement methods using your DbContext
 }
 ```
 
-[`Sumapap.Persistence.EFCore`](https://github.com/muhirwanto-dev/sumapap/tree/main/source/Sumapap.Persistence.EfCore)
-already have the implementation of both `IReadWriteRepository` and `IUnitOfWork` specific to `EntityFrameworkCore`.
-
-**Configure Dependency Injection**
+4. Register repository in DI using provided helpers:
 
 ```csharp
-// Inject the services in Program.cs
+// when implementing EfOrderRepository as concrete implementation
+services.AddScopedRepository<EfOrderRepository, Order>();
 
-services.AddScoped<IReadWriteRepository<Entity>, YourRwRepository<Entity>>();
-services.AddScoped<IReadRepository<Entity>, YourRoRepository<Entity>>();
-services.AddScoped<IUnitOfWork<DbContext>, YourUnitOfWork<DbContext>>();
+// or if you have an interface abstraction IOrderRepository
+services.AddScopedRepository<IOrderRepository, EfOrderRepository, Order>();
 ```
 
-## Contributions
+5. Use repository and unit of work in your services:
+
+```csharp
+var repo = unitOfWork.GetRepository<Order>();
+var orders = await repo.GetAllAsync();
+await unitOfWork.SaveChangesAsync();
+```
+
+## 🛠  Features and usage
+
+### Repository interfaces
+- `IRepository` / `IRepository<TEntity>` — marker base interfaces.
+- `IReadRepository<TEntity>` — rich read-only API supporting synchronous and asynchronous queries, streaming, specification-based queries and paging via `IQuery`.
+- `IWriteRepository<TEntity>` — mutation API (`Add`, `Update`, `Delete`) with synchronous and asynchronous variants and Save/SaveAsync.
+- `IReadWriteRepository<TEntity>` — combination of read and write APIs (not explicitly shown in code but used as returned type in `IUnitOfWork`).
+
+Common patterns:
+- Use `Find`, `FirstOrDefault`, `SingleOrDefault`, `Where` or `GetAll` for synchronous reads.
+- Prefer the async variants in application code (e.g., `GetAllAsync`, `FirstOrDefaultAsync`).
+- Use streaming (`IAsyncEnumerable<T>`) for large result sets to reduce memory pressure.
+
+### Unit of Work
+- `IUnitOfWork` provides scoped coordination across repositories and transactional control methods (`BeginTransactionAsync`, `CommitTransactionAsync`, `RollbackTransactionAsync`).
+- Use `GetRepository<TEntity>()` to obtain a repository instance that participates in the unit of work.
+- Call `SaveChangesAsync()` to persist changes and optionally control transactions explicitly when needed.
+
+Example:
+
+```csharp
+await using var uow = serviceScope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+uow.ExecuteAsync(c =>
+{
+  var repo = uow.GetRepository<Order>();
+  repo.Add(newOrder);
+}, cancellationToken);
+```
+
+### Specification pattern
+- `ISpecification<T>` encapsulates query criteria (`Expression<Func<T,bool>>? Criteria`), includes (list of navigation paths) and optional `IQuery` (paging and sorting options).
+- `BaseSpecification<T>` provides helpers for building specifications and storing includes and query options.
+- `IncludeSpecification<T>` is a simple specialization to specify only Includes (or includes+criteria).
+- `PagingSpecification<T>` is a helper that sets paging (Offset or Cursor) and sorting via `IQuery` wrappers.
+
+Usage example:
+
+```csharp
+var spec = new PagingSpecification<Order>(o => o.CustomerId == customerId, new OffsetPaginationOptions(0, 20));
+var page = await repo.GetAllAsync(spec);
+```
+
+### Dependency injection helpers
+- `DependencyInjection` exposes extension methods to register repository implementations with correct service mappings and lifetimes:
+  - `AddScopedRepository<TImpl, TEntity>()` — registers implementation and maps it to `IReadRepository<TEntity>`, `IWriteRepository<TEntity>`, `IReadWriteRepository<TEntity>` and `IRepository<TEntity>` when applicable.
+  - `AddScopedRepository<TService, TImpl, TEntity>()` — same as above plus registers a service abstraction.
+  - Equivalent `AddTransientRepository` overloads for transient lifetime.
+
+This helps avoid repetitive registration code and ensures repositories are available via multiple abstraction types.
+
+## ⚠️ Notes & best practices
+
+- Prefer the async APIs throughout your application to avoid thread starvation in server scenarios.
+- Keep specifications focused and composable. Specifications should describe the "what" (filter, includes, query options) and not the persistence mechanism.
+- Dispatch domain events (if using) only after the unit-of-work completes to avoid notifying stakeholders about rolled-back changes.
+- Decide repository lifetime (Scoped vs Transient) based on your persistence technology (`EF Core`: Scoped; `Dapper`: typically Transient).
+- Implement concrete repositories to honor the contracts — e.g., `DetatchFromTracking` should detach entities when using `EF Core` to prevent unintended state tracking.
+
+#### Example
+
+```csharp
+// Specification
+public class OrdersByCustomerSpec : BaseSpecification<Order>
+{
+    public OrdersByCustomerSpec(Guid customerId)
+        : base(o => o.CustomerId == customerId)
+    {
+        AddInclude("OrderItems.Product");
+    }
+}
+
+// Registration
+services.AddScopedRepository<IOrderRepository, EfOrderRepository, Order>();
+
+// Usage in app service
+var repo = unitOfWork.GetRepository<Order>();
+var orders = await repo.GetAllAsync(new OrdersByCustomerSpec(customerId));
+await unitOfWork.SaveChangesAsync();
+```
+
+## 💪 Contributions
 
 Contributions are welcome! If you encounter a bug, have a suggestion, or want to contribute code, please follow these steps:
 
-1.  Check the [GitHub Issues](https://github.com/muhirwanto-dev/sumapap/issues) to see if your issue or idea has already been reported.
-2.  If not, open a new issue to describe the bug or feature request.
-3.  **For code contributions:**
-    * Fork the Project repository.
-    * Create your Feature Branch (`git checkout -b feature/YourAmazingFeature`).
-    * Commit your Changes (`git commit -m 'Add YourAmazingFeature'`). Adhere to conventional commit messages if possible.
-    * Push to the Branch (`git push origin feature/YourAmazingFeature`).
-    * Open a Pull Request against the `main` branch of the original repository.
-4.  Please try to follow the existing coding style and include unit tests for new or modified functionality.
+1. Check the [GitHub Issues](https://github.com/muhirwanto-dev/sumapap/issues) to see if your issue or idea has already been reported.
+2. If not, open a new issue to describe the bug or feature request.
+3. For code contributions:
+   * Fork the Project repository.
+   * Create your Feature Branch (`git checkout -b feature/YourAmazingFeature`).
+   * Commit your Changes. Adhere to conventional commit messages if possible.
+   * Push to the Branch and open a Pull Request against `main`.
+4. Please try to follow the existing coding style and include unit tests for new or modified functionality.
 
-## License
+## ⭐ License
 
 Distributed under the [MIT License](https://github.com/muhirwanto-dev/sumapap/tree/main?tab=MIT-1-ov-file#readme). See the `LICENSE` file in the repository for more information.
 
-## Contact
+## 🚩 Contact
 
-[@muhirwanto-dev](https://github.com/muhirwanto-dev)
+`GitHub` [@muhirwanto-dev](https://github.com/muhirwanto-dev)  
+`Project Url` https://github.com/muhirwanto-dev/sumapap/tree/main/source/Sumapap.Persistence
 
-Project link: [https://github.com/muhirwanto-dev/sumapap/tree/main/source/Sumapap.Persistence](https://github.com/muhirwanto-dev/sumapap/tree/main/source/Sumapap.Persistence)
+# 💪 Support
+
+If you like this project and want to support it, you can [buy me a coffee︎](https://buymeacoffee.com/muhirwanto.dev). Your coffee will keep me awake while developing this project ☕.
+
+<br />
+<div align="center">
+<a href="https://buymeacoffee.com/muhirwanto.dev"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=muhirwanto.dev&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff" /></a>
+</div>
