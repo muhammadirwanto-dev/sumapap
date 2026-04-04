@@ -16,7 +16,7 @@
     <Description>
       `Sumapap.Persistence.EfCore` implements ReadWriteRepository and Unit of Work abstraction using `EntityFrameworkCore`.
     </Description>
-    <PackageReadmeFile>docs\Sumapap.Persistence.md</PackageReadmeFile>
+    <PackageReadmeFile>docs\Sumapap.Persistence.EfCore.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
