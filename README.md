@@ -2,7 +2,7 @@
 
 Sumapap is **not a framework** — It is a set of opinionated adapters and composition helpers that integrate best-in-class .NET libraries into consistent, production-ready application architectures.
 
-> [`Sumapap`](https://github.com/muhirwanto-dev/singlescope-plugins/tree/main) is no longer maintained and has been replaced by `Sumapap`.
+> [`SingleScope`](https://github.com/muhirwanto-dev/singlescope-plugins/tree/main) is no longer maintained and has been replaced by `Sumapap`.
 
 ## 🤔 What is included in this repository?
 
