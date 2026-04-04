@@ -6,7 +6,7 @@
 
         public static FilterOptions Empty => new();
 
-        private FilterOptions()
+        public FilterOptions()
         {
         }
 

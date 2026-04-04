@@ -23,6 +23,11 @@ namespace Sumapap.Queries
 
         public bool UsesOffsetPaging => OffsetPaging != null;
 
+        public Query()
+            : this(FilterOptions.Empty, SortOptions.Empty, null, null)
+        {
+        }
+
         public Query(
             OffsetPaginationOptions offsetPaging)
             : this(FilterOptions.Empty, SortOptions.Empty, offsetPaging, null)

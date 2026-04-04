@@ -6,7 +6,7 @@
 
         public IList<SortDescriptor> Sorts { get; private set; } = [];
 
-        private SortOptions()
+        public SortOptions()
         {
         }
 
