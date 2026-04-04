@@ -26,7 +26,6 @@ namespace Sumapap.Queries.Execution.Executors
 
         protected override IQueryResult<T> ApplyPaging(IEnumerable<T> source, IQuery query)
         {
-
             if (query.UsesCursorPaging)
             {
                 return ApplyCursorPaging(source, query);
@@ -39,8 +38,7 @@ namespace Sumapap.Queries.Execution.Executors
                 var page = query.OffsetPaging!;
                 var items = source
                     .Skip(page.Offset)
-                    .Take(page.PageSize)
-                    .ToList();
+                    .Take(page.PageSize);
 
                 return new QueryResult<T>(items, total, new PageInfo(
                     hasNextPage: page.Offset + page.PageSize < total,

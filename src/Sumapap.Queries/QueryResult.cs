@@ -4,11 +4,11 @@ using Sumapap.Queries.Paging;
 namespace Sumapap.Queries
 {
     public sealed class QueryResult<T>(
-        IReadOnlyList<T> items,
+        IEnumerable<T> items,
         int totalDataCount = 0,
         PageInfo? pageInfo = null) : IQueryResult<T>
     {
-        public IReadOnlyList<T> Items { get; } = items;
+        public IEnumerable<T> Items { get; } = items;
 
         public int TotalDataCount { get; } = totalDataCount;
 

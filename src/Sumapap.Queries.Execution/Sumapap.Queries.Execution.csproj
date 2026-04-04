@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>1.4.1</AssemblyVersion>
-    <FileVersion>1.4.1.0404</FileVersion>
+    <AssemblyVersion>1.4.2</AssemblyVersion>
+    <FileVersion>1.4.2.0404</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
   </PropertyGroup>
 

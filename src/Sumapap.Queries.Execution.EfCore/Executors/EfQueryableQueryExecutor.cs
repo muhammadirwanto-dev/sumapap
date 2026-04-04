@@ -36,11 +36,11 @@ namespace Sumapap.Queries.Execution.EfCore.Executors
                 source = ApplyCursorFiltering(source, paging);
             }
 
-            var items = source.Take(paging.Limit + 1).ToList();
-            var hasNext = items.Count > paging.Limit;
-            var result = items.Take(paging.Limit).ToList();
+            var items = source.Take(paging.Limit + 1);
+            var hasNext = items.Count() > paging.Limit;
+            var result = items.Take(paging.Limit);
 
-            var endCursor = result.Count > 0
+            var endCursor = result.Any()
                 ? CursorEncryption.EncodeCursor(
                     ReflectionCache
                         .GetProperty<T>(paging.CursorField)!
@@ -85,8 +85,7 @@ namespace Sumapap.Queries.Execution.EfCore.Executors
             {
                 var paged = source
                     .Skip(query.OffsetPaging!.Offset)
-                    .Take(query.OffsetPaging!.PageSize)
-                    .ToList();
+                    .Take(query.OffsetPaging!.PageSize);
 
                 return new QueryResult<T>(paged, total, new PageInfo(
                     hasNextPage: query.OffsetPaging.Offset + query.OffsetPaging.PageSize < total,
