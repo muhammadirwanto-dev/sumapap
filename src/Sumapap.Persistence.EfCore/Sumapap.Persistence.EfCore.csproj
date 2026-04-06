@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0404</FileVersion>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1.0404</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
   </PropertyGroup>
 
@@ -16,7 +16,7 @@
     <Description>
       `Sumapap.Persistence.EfCore` implements ReadWriteRepository and Unit of Work abstraction using `EntityFrameworkCore`.
     </Description>
-    <PackageReadmeFile>docs\Sumapap.Persistence.md</PackageReadmeFile>
+    <PackageReadmeFile>docs\Sumapap.Persistence.EfCore.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>

@@ -29,7 +29,7 @@ namespace Sumapap.Queries.Tests
 
             var result = executor.Execute(query, data);
 
-            Assert.Equal(2, result.Items.Count);
+            Assert.Equal(2, result.Items.Count());
             Assert.All(result.Items, i => Assert.Equal("Alice", i.Name));
         }
 
@@ -54,7 +54,7 @@ namespace Sumapap.Queries.Tests
 
             var result = executor.Execute(query, data);
 
-            Assert.Equal(2, result.Items.Count);
+            Assert.Equal(2, result.Items.Count());
             Assert.Contains(result.Items, i => i.Name == "Bob");
             Assert.Contains(result.Items, i => i.Name == "Charlie");
         }
@@ -78,15 +78,15 @@ namespace Sumapap.Queries.Tests
 
             var result = executor.Execute(query, data);
 
-            Assert.Equal(3, result.Items.Count);
+            Assert.Equal(3, result.Items.Count());
             // Ages: 25,30,30
-            Assert.Equal(25, result.Items[0].Age);
-            Assert.Equal(30, result.Items[1].Age);
-            Assert.Equal(30, result.Items[2].Age);
+            Assert.Equal(25, result.Items.ElementAt(0).Age);
+            Assert.Equal(30, result.Items.ElementAt(1).Age);
+            Assert.Equal(30, result.Items.ElementAt(2).Age);
             // For same Age, Name desc -> Bob before Alice
-            Assert.Equal("Charlie", result.Items[0].Name);
-            Assert.Equal("Bob", result.Items[1].Name);
-            Assert.Equal("Alice", result.Items[2].Name);
+            Assert.Equal("Charlie", result.Items.ElementAt(0).Name);
+            Assert.Equal("Bob", result.Items.ElementAt(1).Name);
+            Assert.Equal("Alice", result.Items.ElementAt(2).Name);
         }
 
         [Fact]
@@ -100,12 +100,12 @@ namespace Sumapap.Queries.Tests
             var result = executor.Execute(query, data);
 
             Assert.NotNull(result.PageInfo);
-            Assert.Equal(3, result.Items.Count);
+            Assert.Equal(3, result.Items.Count());
             Assert.Equal(10, result.TotalDataCount);
             // Items should be 4,5,6
-            Assert.Equal(4, result.Items[0].Id);
-            Assert.Equal(5, result.Items[1].Id);
-            Assert.Equal(6, result.Items[2].Id);
+            Assert.Equal(4, result.Items.ElementAt(0).Id);
+            Assert.Equal(5, result.Items.ElementAt(1).Id);
+            Assert.Equal(6, result.Items.ElementAt(2).Id);
         }
 
         [Fact]
@@ -119,7 +119,7 @@ namespace Sumapap.Queries.Tests
             var result = executor.Execute(query, data);
 
             Assert.NotNull(result.PageInfo);
-            Assert.Equal(2, result.Items.Count);
+            Assert.Equal(2, result.Items.Count());
             Assert.True(result.PageInfo.HasNextPage);
             Assert.False(result.PageInfo.HasPreviousPage);
             Assert.NotNull(result.PageInfo.EndCursor);
@@ -139,7 +139,7 @@ namespace Sumapap.Queries.Tests
 
             var result = executor.Execute(query, data);
 
-            Assert.Equal(2, result.Items.Count);
+            Assert.Equal(2, result.Items.Count());
         }
     }
 }

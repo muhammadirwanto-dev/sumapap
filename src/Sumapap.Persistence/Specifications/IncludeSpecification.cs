@@ -1,7 +1,6 @@
 ﻿using System.Linq.Expressions;
-using Sumapap.Persistence.Specifications;
 
-namespace Sumapap.Persistence.Specification
+namespace Sumapap.Persistence.Specifications
 {
     public class IncludeSpecification<T> : BaseSpecification<T>
     {
