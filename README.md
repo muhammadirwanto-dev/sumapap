@@ -6,7 +6,7 @@ Sumapap is **not a framework** — It is a set of opinionated adapters and compo
 
 ## 🤔 What is included in this repository?
 
-This repository contains several .NET libraries that can be used with `.NET 8` and can be expanded to support additional frameworks and platforms. I also use these libraries in my own applications and keep improving them as new ideas come up during development.
+This repository contains several .NET libraries that can be used with `.NET 10` and can be expanded to support additional frameworks and platforms. I also use these libraries in my own applications and keep improving them as new ideas come up during development.
 
 | Package | Description | Latest Version | Download |
 | --- | --- | --- | --- |
@@ -41,7 +41,8 @@ Please read the documentation for each respective library in the [/docs](https:
 
 If you like this project and want to support it, you can [buy me a coffee︎](https://buymeacoffee.com/muhirwanto.dev). Your coffee will keep me awake while developing this project ☕.
 
-<br />
-<div align="center">
-<a href="https://buymeacoffee.com/muhirwanto.dev"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=muhirwanto.dev&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff" /></a>
-</div>
+<p align="center">
+  <a href="https://buymeacoffee.com/muhirwanto.dev">
+    <img src="https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=&slug=muhirwanto.dev&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff" alt="Buy Me A Coffee">
+  </a>
+</p>
