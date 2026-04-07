@@ -1,8 +1,11 @@
 # 💡 Sumapap
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Open Issues](https://img.shields.io/github/issues/muhirwanto-dev/sumapap.svg)](https://github.com/muhirwanto-dev/sumapap/issues)
-[![Build & Publish](https://github.com/muhirwanto-dev/sumapap/actions/workflows/publish.yml/badge.svg)](https://github.com/muhirwanto-dev/sumapap/actions/workflows/publish.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![GitHub Issues](https://img.shields.io/github/issues/muhirwanto-dev/sumapap?style=flat-square)](https://github.com/muhirwanto-dev/sumapap/issues)
+[![GitHub Stars](https://img.shields.io/github/stars/muhirwanto-dev/sumapap?style=flat-square)](https://github.com/muhirwanto-dev/sumapap/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/muhirwanto-dev/sumapap?style=flat-square)](https://github.com/muhirwanto-dev/sumapap/network/members)
+[![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg?style=flat-square)](https://github.com/muhirwanto-dev/sumapap/pulls)
+[![Build & Publish](https://github.com/muhirwanto-dev/sumapap/actions/workflows/publish.yml/badge.svg?style=flat-square)](https://github.com/muhirwanto-dev/sumapap/actions/workflows/publish.yml)
 
 `Sumapap` is an evolving ecosystem of .NET libraries born from real-world development challenges. It reflects my continuous journey as a software engineer — moving away from "perfect" abstractions toward practical, production-ready systems.
 
