@@ -1,23 +1,29 @@
 # 💡 Sumapap
 
-Sumapap is **not a framework** — It is a set of opinionated adapters and composition helpers that integrate best-in-class .NET libraries into consistent, production-ready application architectures.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Open Issues](https://img.shields.io/github/issues/muhirwanto-dev/sumapap.svg)](https://github.com/muhirwanto-dev/sumapap/issues)
+[![Build & Publish](https://github.com/muhirwanto-dev/sumapap/actions/workflows/publish.yml/badge.svg)](https://github.com/muhirwanto-dev/sumapap/actions/workflows/publish.yml)
 
-> [`SingleScope`](https://github.com/muhirwanto-dev/singlescope-plugins/tree/main) is no longer maintained and has been replaced by `Sumapap`.
+`Sumapap` is an evolving ecosystem of .NET libraries born from real-world development challenges. It reflects my continuous journey as a software engineer — moving away from "perfect" abstractions toward practical, production-ready systems.
+
+> [!IMPORTANT]
+> `Sumapap` supersedes [`SingleScope`](https://github.com/muhirwanto-dev/singlescope-plugins/tree/main) as my primary project, incorporating years of real-world lessons into an evolving ecosystem of .NET libraries.
 
 ## 🤔 What is included in this repository?
 
-This repository contains several .NET libraries that can be used with `.NET 10` and can be expanded to support additional frameworks and platforms. I also use these libraries in my own applications and keep improving them as new ideas come up during development.
+This repository contains modular .NET libraries designed for `.NET 10`. These tools focus on decoupling domain logic from infrastructure while maintaining high performance and developer productivity.
 
 | Package | Description | Latest Version | Download |
 | --- | --- | --- | --- |
-| [Sumapap.Ddd](https://github.com/muhirwanto-dev/sumapap/blob/main/docs/Sumapap.Ddd.md) | A lightweight Domain-Driven Design (DDD) abstractions focuses on core building blocks used to model rich domains. | [![NuGet](https://img.shields.io/nuget/v/Sumapap.Ddd)](https://www.nuget.org/packages/Sumapap.Ddd/) | ![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Ddd) |
-| [Sumapap.Ddd.Dispatcher](https://github.com/muhirwanto-dev/sumapap/blob/main/docs/Sumapap.Ddd.Dispatcher.md) | Provides a simple mechanism to publish batches of `IDomainEvent` instances to their corresponding `IDomainEventHandler<TEvent>` implementations. | [![NuGet](https://img.shields.io/nuget/v/Sumapap.Ddd.Dispatcher)](https://www.nuget.org/packages/Sumapap.Ddd.Dispatcher/) | ![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Ddd.Dispatcher) |
-| [Sumapap.Ddd.Mediator](https://github.com/muhirwanto-dev/sumapap/blob/main/docs/Sumapap.Ddd.Mediator.md) | Adapts domain events to a [`Mediator`](https://github.com/martinothamar/Mediator) pipeline so your domain layer remains free from `Mediator` dependencies while allowing application-level `Mediator` handlers to process domain events. | [![NuGet](https://img.shields.io/nuget/v/Sumapap.Ddd.Mediator)](https://www.nuget.org/packages/Sumapap.Ddd.Mediator/) | ![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Ddd.Mediator) | 
-| [Sumapap.Persistence](https://github.com/muhirwanto-dev/sumapap/blob/main/docs/Sumapap.Persistence.md) | Set of persistence abstractions and utilities intended to simplify implementing repositories, specifications and unit-of-work patterns across different data access technologies | [![NuGet](https://img.shields.io/nuget/v/Sumapap.Persistence)](https://www.nuget.org/packages/Sumapap.Persistence/) | ![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Persistence) | 
-| [Sumapap.Persistence.EfCore](https://github.com/muhirwanto-dev/sumapap/blob/main/docs/Sumapap.Persistence.EfCore.md) | EF Core-based implementations of the persistence abstractions defined in `Sumapap.Persistence`. | [![NuGet](https://img.shields.io/nuget/v/Sumapap.Persistence.EfCore)](https://www.nuget.org/packages/Sumapap.Persistence.EfCore/) | ![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Persistence.EfCore) | 
+| [Sumapap.Ddd](https://github.com/muhirwanto-dev/sumapap/blob/main/docs/Sumapap.Ddd.md) | Lightweight DDD abstractions (Aggregates, Value Objects, Domain Events). | [![NuGet](https://img.shields.io/nuget/v/Sumapap.Ddd)](https://www.nuget.org/packages/Sumapap.Ddd/) | ![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Ddd) |
+| [Sumapap.Ddd.Dispatcher](https://github.com/muhirwanto-dev/sumapap/blob/main/docs/Sumapap.Ddd.Dispatcher.md) | In-memory batch publishing for `IDomainEvent` instances. | [![NuGet](https://img.shields.io/nuget/v/Sumapap.Ddd.Dispatcher)](https://www.nuget.org/packages/Sumapap.Ddd.Dispatcher/) | ![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Ddd.Dispatcher) |
+| [Sumapap.Ddd.Mediator](https://github.com/muhirwanto-dev/sumapap/blob/main/docs/Sumapap.Ddd.Mediator.md) | Adapts domain events to [Mediator](https://github.com/martinothamar/Mediator) pipelines. | [![NuGet](https://img.shields.io/nuget/v/Sumapap.Ddd.Mediator)](https://www.nuget.org/packages/Sumapap.Ddd.Mediator/) | ![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Ddd.Mediator) | 
+| [Sumapap.Persistence](https://github.com/muhirwanto-dev/sumapap/blob/main/docs/Sumapap.Persistence.md) | Abstractions for Repositories, Specifications, and Unit of Work. | [![NuGet](https://img.shields.io/nuget/v/Sumapap.Persistence)](https://www.nuget.org/packages/Sumapap.Persistence/) | ![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Persistence) | 
+| [Sumapap.Persistence.EfCore](https://github.com/muhirwanto-dev/sumapap/blob/main/docs/Sumapap.Persistence.EfCore.md) | Entity Framework Core implementation of persistence patterns defined in `Sumapap.Persistence`. | [![NuGet](https://img.shields.io/nuget/v/Sumapap.Persistence.EfCore)](https://www.nuget.org/packages/Sumapap.Persistence.EfCore/) | ![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Persistence.EfCore) | 
 
 # ⭐ Naming Convention
 
+We follow a strict capability-technology hierarchy:
 ```jsx
 Sumapap.<Capability>.<Technology>
 ```
@@ -28,10 +34,11 @@ Sumapap.<Capability>.<Technology>
 
 The image is a **layered architecture diagram** showing how different libraries and modules are organized and layered to support a scalable system.
 
-The diagram is arranged **vertically (bottom → top)** to show dependency direction:
+> [!TIP]
+> **The Dependency Rule:** Dependencies always flow downward. Foundational abstractions (bottom) are technology-agnostic, while implementation layers (top) handle specific frameworks.
 
-- Bottom = **most foundational**
-- Top = **application-level usage**
+# 🛡️ Disclaimer
+This project is an honest reflection of my professional journey. While it is used in production environments, I encourage users to **review the source code against their specific performance and security requirements**. `Sumapap` is not a "perfect" framework — it is a set of tools that continues to evolve as I learn and grow.
 
 # 🚀 Getting Started
 
