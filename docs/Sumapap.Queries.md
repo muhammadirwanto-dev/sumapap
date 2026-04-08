@@ -1,100 +1,97 @@
-# Sumapap.Reporting
+# Sumapap.Queries
 
-[![NuGet Version](https://img.shields.io/nuget/v/Sumapap.Reporting.svg?style=flat-square)](https://www.nuget.org/packages/Sumapap.Reporting/)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Reporting.svg?style=flat-square)](https://www.nuget.org/packages/Sumapap.Reporting/)
+[![NuGet Version](https://img.shields.io/nuget/v/Sumapap.Queries.svg?style=flat-square)](https://www.nuget.org/packages/Sumapap.Queries/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Queries.svg?style=flat-square)](https://www.nuget.org/packages/Sumapap.Queries/)
 [![License](https://img.shields.io/github/license/muhirwanto-dev/sumapap?style=flat-square)](LICENSE)
 [![GitHub Issues](https://img.shields.io/github/issues/muhirwanto-dev/sumapap?style=flat-square)](https://github.com/muhirwanto-dev/sumapap/issues)
 [![GitHub Stars](https://img.shields.io/github/stars/muhirwanto-dev/sumapap?style=flat-square)](https://github.com/muhirwanto-dev/sumapap/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/muhirwanto-dev/sumapap?style=flat-square)](https://github.com/muhirwanto-dev/sumapap/network/members)
 [![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg?style=flat-square)](https://github.com/muhirwanto-dev/sumapap/pulls)
 
-## Overview
+## 💡 Overview
 
-A lightweight, extensible **error and exception reporting pipeline** for .NET applications.
+`Sumapap.Queries` delivers a composable query metadata model that unifies filtering, sorting, and pagination concerns for repositories, APIs, and UI layers. By centralizing query intent into transport-friendly objects, it keeps persistence logic focused on translating declarative inputs instead of parsing ad-hoc request contracts.
 
-`Sumapap.Reporting` captures runtime errors and forwards them to configurable reporting targets (called *sinks*), such as logging systems, UI dialogs, databases, or external services.
+## ✨ Why use `Sumapap.Queries`?
 
-## ✨ Why Sumapap.Reporting?
+- Normalize query requests across REST, gRPC, or messaging endpoints using the same abstraction.
+- Avoid leaking ORM-specific semantics by mapping generic descriptors to provider-specific implementations.
+- Support both offset and cursor pagination strategies without duplicating state handling.
+- Compose, reuse, and test filter logic independently from persistence execution code.
 
-Most applications handle errors in scattered places:
-- some log to files
-- some show dialogs
-- some swallow exceptions
-- some crash the app
+## 🚀 Quick start
 
-`Sumapap.Reporting` centralizes this responsibility into a **single reporting pipeline**.
+1. Add the package (once published on NuGet):
 
-You decide:
-- **what** to report
-- **where** it goes
-- **how much detail** is included
+    ```bash
+    dotnet add package Sumapap.Queries
+    ```
 
-## 🎯 Design Goals
+2. Build a declarative query from incoming DTOs:
 
-- Cross-platform (MAUI, Web, Console, Worker)
-- No UI or platform dependencies in the core
-- Pluggable output destinations (sinks)
-- Async-friendly and safe
-- Clear separation of concerns
+    ```csharp
+    using Sumapap.Queries;
+    using Sumapap.Queries.Filtering;
+    using Sumapap.Queries.Paging;
+    using Sumapap.Queries.Sorting;
 
-## 🚦 Reporting Modes
+    var filters = new FilterOptions(
+        new FilterGroup()
+            .WithFilters([
+                new FilterDescriptor("Status", FilterOperator.Equals, "Pending"),
+                new FilterDescriptor("Total", FilterOperator.GreaterThanOrEqual, 1000M)
+            ]));
 
-Reporting behavior is controlled via `ReportingMode` flags:
+    var sort = new SortOptions()
+        .By("CreatedAt", SortDirection.Desc)
+        .ThenBy("Id");
 
-```csharp
-    [Flags]
-    public enum ReportingMode : uint
-    {
-        None = 0,
+    var query = new Query(filters, sort, new OffsetPaginationOptions(page: 1, pageSize: 25));
+    ```
 
-        /// <summary>
-        /// Suppresses all user-facing reporting.
-        /// Sinks may still process the report (e.g. logging).
-        /// </summary>
-        Silent = 1 << 0,
+3. Pass the query to your repository/service and wrap the response:
 
-        /// <summary>
-        /// Include full exception stack trace in the report.
-        /// </summary>
-        IncludeStackTrace = 1 << 1,
+    ```csharp
+    var data = await orderRepository.ExecuteAsync(query, cancellationToken);
 
-        /// <summary>
-        /// Indicates the report originates from a background process.
-        /// UI sinks should ignore this.
-        /// </summary>
-        Background = 1 << 2,
+    return new QueryResult<OrderDto>(
+        data.Items,
+        data.TotalDataCount,
+        data.PageInfo);
+    ```
 
-        /// <summary>
-        /// Indicates the error is user-actionable and may require attention.
-        /// UI sinks may emphasize this.
-        /// </summary>
-        UserActionRequired = 1 << 3,
+## 🛠 Features and usage
 
-        /// <summary>
-        /// Default reporting behavior.
-        /// </summary>
-        Default = IncludeStackTrace
-    }
-```
+### Query abstractions
+- `IQuery` exposes normalized access to filters, sort descriptors, and pagination payloads with helper flags (`UsesOffsetPaging`, `UsesCursorPaging`) so repositories can branch logic safely.
+- `Query` provides multiple constructor overloads to support common scenarios (filters-only, sort-only, pagination-only) while defaulting to `FilterOptions.Empty` and `SortOptions.Empty` when not provided.
+- `IQueryResult<T>` and `QueryResult<T>` hold the actual data items, total counts, and optional cursor metadata so callers can return rich responses without bespoke DTOs.
 
-## 🔧 Basic Usage
+### Filtering
+- `FilterDescriptor` pairs a field name, operator, and optional value; use enums in your domain to avoid magic strings.
+- `FilterGroup` composes descriptors with `CompositeOperator` (`And`/`Or`) and supports nested groups via `HasSubGroups`, enabling complex boolean expressions.
+- `FilterOptions` wraps the root group and offers the `Empty` singleton for cases with no filters.
 
-```csharp
-    // inject to container
-    builder.Services.AddSumapapReporting()
-        .AddLogReporting()      // report as logging
-        .AddDialogReporting();  // report as dialog
+### Sorting
+- `SortDescriptor` keeps a field + direction (`Asc`/`Desc`); use multiple descriptors for deterministic ordering.
+- `SortOptions` exposes fluent helpers `By` and `ThenBy` to build sorting chains, and its default constructor starts with an empty list to avoid accidental null checks.
 
-    // use somewhere in your code
-    try
-    {
-        // application code
-    }
-    catch (Exception ex)
-    {
-        await reportingService.ReportAsync(ex);
-    }
-```
+### Pagination
+- `OffsetPaginationOptions` covers traditional page/pageSize workflows and exposes a computed `Offset` for SQL `OFFSET` queries.
+- `CursorPaginationOptions` supports cursor-based pagination with explicit cursor field, opaque token, limit, and direction (`Forward`/`Backward`).
+- Repositories can branch on `UsesCursorPaging` vs `UsesOffsetPaging` to decide which strategy to execute while sharing the same query pipeline.
+
+### Result packaging
+- `PageInfo` stores `HasNextPage`, `HasPreviousPage`, and cursor boundaries (`StartCursor`, `EndCursor`) so UI layers can continue pagination confidently.
+- Overloaded `QueryResult<T>` constructors make it easy to return empty results or total-count-only payloads without allocating collections.
+
+## ⚠️ Notes & best practices
+
+- Align `FilterDescriptor.Field` values with the names your persistence translator understands (columns, properties, or aliases).
+- Validate and sanitize external inputs before turning them into descriptors to prevent injection or unexpected operator usage.
+- Prefer cursor pagination for continuously mutating datasets (activity feeds, infinite scroll) to reduce duplicate or missing records.
+- Reuse `FilterOptions.Empty`, `SortOptions.Empty`, and lightweight constructors to avoid unnecessary allocations in hot paths.
+- Keep mapping between application-specific query DTOs and `Sumapap.Queries` types in a dedicated mapper to ensure consistency across endpoints.
 
 # ⭐ License
 

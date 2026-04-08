@@ -70,7 +70,7 @@ var orders = await repo.GetAllAsync();
 await unitOfWork.SaveChangesAsync();
 ```
 
-## 🛠  Features and usage
+## 🛠 Features and usage
 
 ### Repository interfaces
 - `IRepository` / `IRepository<TEntity>` — marker base interfaces.
