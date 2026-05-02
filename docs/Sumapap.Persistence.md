@@ -70,7 +70,7 @@ var orders = await repo.GetAllAsync();
 await unitOfWork.SaveChangesAsync();
 ```
 
-## 🛠  Features and usage
+## 🛠 Features and usage
 
 ### Repository interfaces
 - `IRepository` / `IRepository<TEntity>` — marker base interfaces.
@@ -151,33 +151,21 @@ var orders = await repo.GetAllAsync(new OrdersByCustomerSpec(customerId));
 await unitOfWork.SaveChangesAsync();
 ```
 
-## 💪 Contributions
-
-Contributions are welcome! If you encounter a bug, have a suggestion, or want to contribute code, please follow these steps:
-
-1. Check the [GitHub Issues](https://github.com/muhirwanto-dev/sumapap/issues) to see if your issue or idea has already been reported.
-2. If not, open a new issue to describe the bug or feature request.
-3. For code contributions:
-   * Fork the Project repository.
-   * Create your Feature Branch (`git checkout -b feature/YourAmazingFeature`).
-   * Commit your Changes. Adhere to conventional commit messages if possible.
-   * Push to the Branch and open a Pull Request against `main`.
-4. Please try to follow the existing coding style and include unit tests for new or modified functionality.
-
-## ⭐ License
+# ⭐ License
 
 Distributed under the [MIT License](https://github.com/muhirwanto-dev/sumapap/tree/main?tab=MIT-1-ov-file#readme). See the `LICENSE` file in the repository for more information.
 
-## 🚩 Contact
+# 🚩 Contact
 
 `GitHub` [@muhirwanto-dev](https://github.com/muhirwanto-dev)  
 `Project Url` https://github.com/muhirwanto-dev/sumapap/tree/main/source/Sumapap.Persistence
 
-# 💪 Support
+# ☕ Support
 
-If you like this project and want to support it, you can [buy me a coffee︎](https://buymeacoffee.com/muhirwanto.dev). Your coffee will keep me awake while developing this project ☕.
+If you like this project and want to support it, you can [buy me a coffee︎](https://buymeacoffee.com/muhirwanto.dev). Your coffee will keep me awake while developing this project ☕.
 
-<br />
-<div align="center">
-<a href="https://buymeacoffee.com/muhirwanto.dev"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=muhirwanto.dev&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff" /></a>
-</div>
+<p align="center">
+  <a href="https://buymeacoffee.com/muhirwanto.dev">
+    <img src="https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=&slug=muhirwanto.dev&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff" alt="Buy Me A Coffee">
+  </a>
+</p>

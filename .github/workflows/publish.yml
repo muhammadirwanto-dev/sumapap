@@ -6,6 +6,12 @@ on:
     branches: [ main ]
     types: [ closed ]
 
+# Required for GitHub Artifact Attestations (The "Free Sign")
+permissions:
+  id-token: write
+  contents: read
+  attestations: write
+
 jobs:
   publish:
     if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
@@ -26,12 +32,11 @@ jobs:
       - name: Restore Dependencies
         run: dotnet restore src/
 
-      # Fix for NU5026: Build the binaries before attempting to pack
       - name: Build Projects
         run: dotnet build src/ -c Release --no-restore
 
       - name: Process and Pack Projects
-        id: pack_step
+        id: pack_step # Crucial for referencing outputs
         run: |
           SUCCESS_PACKS=()
           FAILED_PACKS=()
@@ -40,10 +45,8 @@ jobs:
           for file in src/**/*.csproj; do
             PROJECT_NAME=$(basename "$file" .csproj)
             
-            # Explicitly pass -p:Configuration=Release to ensure MSBuild evaluates Directory.Build.props
+            # Evaluate Directory.Build.props
             GENERATE_PACKAGE=$(dotnet msbuild "$file" --getProperty:GeneratePackageOnBuild -p:Configuration=Release --nologo | xargs | tr '[:upper:]' '[:lower:]')
-            
-            echo ">> [DEBUG] $PROJECT_NAME GeneratePackageOnBuild: '$GENERATE_PACKAGE'"
             
             if [ "$GENERATE_PACKAGE" == "false" ]; then
               SKIPPED_PACKS+=("$PROJECT_NAME (Disabled)")
@@ -65,7 +68,6 @@ jobs:
               SKIPPED_PACKS+=("$PROJECT_NAME ($VERSION) - Existing")
             else
               echo ">> Attempting to pack $PROJECT_NAME ($VERSION)..."
-              # Added --no-build because we built in the previous step
               if dotnet pack "$file" -c Release --no-build --no-restore -o .nuget/; then
                 SUCCESS_PACKS+=("$PROJECT_NAME ($VERSION)")
               else
@@ -75,26 +77,36 @@ jobs:
             fi
           done
 
-          # Use pipe delimiter to prevent string splitting on spaces in project names
+          # Set Outputs for subsequent steps
+          echo "has_success=${#SUCCESS_PACKS[@]}" >> $GITHUB_OUTPUT
+          
+          # Set Env for the Final Summary step
           echo "SUCCESS_LIST=$(printf "|%s" "${SUCCESS_PACKS[@]}")" >> $GITHUB_ENV
           echo "FAILED_LIST=$(printf "|%s" "${FAILED_PACKS[@]}")" >> $GITHUB_ENV
           echo "SKIPPED_LIST=$(printf "|%s" "${SKIPPED_PACKS[@]}")" >> $GITHUB_ENV
 
+      - name: Generate Artifact Attestations
+        # Only run if at least one package was successfully created
+        if: steps.pack_step.outputs.has_success > 0
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: '.nuget/*.nupkg'
+
       - name: Push to NuGet
+        # Only run if at least one package was successfully created
+        if: steps.pack_step.outputs.has_success > 0
         run: |
-          if [ -d ".nuget" ] && [ "$(ls -A .nuget/*.nupkg 2>/dev/null)" ]; then
-            dotnet nuget push ".nuget/*.nupkg" \
-              --api-key ${{ secrets.NUGET_API_KEY }} \
-              --source https://api.nuget.org/v3/index.json \
-              --skip-duplicate
-          fi
+          dotnet nuget push ".nuget/*.nupkg" \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
 
       - name: Final Summary
         run: |
+          echo "-- Final Summary"
           echo "--------------------------------------------------"
-          
           if [ ! -z "$SUCCESS_LIST" ]; then
-            echo "✅ SUCCESSFULLY UPLOADED:"
+            echo "✅ SUCCESSFULLY UPLOADED & ATTESTED:"
             IFS='|' read -ra ADDR <<< "$SUCCESS_LIST"
             for i in "${ADDR[@]}"; do [ -z "$i" ] || echo "  - $i"; done
             echo ""
@@ -108,9 +120,8 @@ jobs:
           fi
           
           if [ ! -z "$SKIPPED_LIST" ]; then
-            echo "⏭️ SKIPPED (EXISTING, NO VERSION, OR DISABLED):"
+            echo "⏭️ SKIPPED:"
             IFS='|' read -ra ADDR <<< "$SKIPPED_LIST"
             for i in "${ADDR[@]}"; do [ -z "$i" ] || echo "  - $i"; done
           fi
-          
           echo "--------------------------------------------------"
