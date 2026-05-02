@@ -7,8 +7,8 @@
     <Company>Sumapap Software Development</Company>
     <Copyright>Copyright © $([System.DateTime]::Now.Year) Sumapap</Copyright>
 
-    <PackageProjectUrl>https://github.com/muhirwanto-dev/sumapap</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/muhirwanto-dev/sumapap.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/muhammadirwanto-dev/sumapap</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/muhammadirwanto-dev/sumapap.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 
