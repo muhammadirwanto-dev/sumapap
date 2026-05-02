@@ -55,7 +55,7 @@ namespace Sumapap.Queries.Execution.Executors
         }
 
         protected override IQueryable<T> ApplyFiltering(IQueryable<T> source, IQuery query)
-            => source.Where(item => FilterEvaluator.EvaluateGroup(query.Filters.RootGroup, item));
+            => source.Where(item => FilterEvaluator.EvaluateGroup(query.Filters, item));
 
         protected override IQueryResult<T> ApplyPaging(IQueryable<T> source, IQuery query)
         {
@@ -84,7 +84,7 @@ namespace Sumapap.Queries.Execution.Executors
 
         protected override IQueryable<T> ApplySorting(IQueryable<T> source, IQuery query)
         {
-            SortOptions sort = query.Sort;
+            SortConfiguration sort = query.Sort;
 
             if (sort == null || sort.Sorts.Count == 0)
                 return source;
@@ -101,18 +101,18 @@ namespace Sumapap.Queries.Execution.Executors
 
         private static IQueryable<T> ApplyCursorOrdering(
             IQueryable<T> source,
-            CursorPaginationOptions paging)
+            CursorPaginationConfiguration paging)
         {
             var prop = ReflectionCache.GetProperty<T>(paging.CursorField)!;
-            var param = Expression.Parameter(typeof(T), "e");
+            var param = ExpressionCache<T>.Param;
             var body = Expression.Property(param, prop);
             var lambda = Expression.Lambda(body, param);
 
             var methodName = paging.Direction == CursorDirection.Forward
-                ? nameof(System.Linq.Queryable.OrderBy)
-                : nameof(System.Linq.Queryable.OrderByDescending);
+                ? nameof(Queryable.OrderBy)
+                : nameof(Queryable.OrderByDescending);
 
-            var method = typeof(System.Linq.Queryable)
+            var method = typeof(Queryable)
                 .GetMethods()
                 .Single(m =>
                     m.Name == methodName &&
@@ -125,14 +125,14 @@ namespace Sumapap.Queries.Execution.Executors
 
         private static IQueryable<T> ApplyCursorFiltering(
             IQueryable<T> source,
-            CursorPaginationOptions paging)
+            CursorPaginationConfiguration paging)
         {
             var prop = ReflectionCache.GetProperty<T>(paging.CursorField)!;
             var cursorValue = CursorEncryption.DecodeCursor(
                 paging.Cursor!,
                 prop.PropertyType);
 
-            var param = Expression.Parameter(typeof(T), "e");
+            var param = ExpressionCache<T>.Param;
             var left = Expression.Property(param, prop);
             var right = Expression.Constant(cursorValue, prop.PropertyType);
 

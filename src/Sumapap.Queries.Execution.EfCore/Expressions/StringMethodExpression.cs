@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Sumapap.Queries.Execution.Utils;
 
 namespace Sumapap.Queries.Execution.EfCore.Expressions
 {
@@ -11,7 +12,7 @@ namespace Sumapap.Queries.Execution.EfCore.Expressions
             string methodName,
             ParameterExpression? parameter = null)
         {
-            var param = parameter ?? Expression.Parameter(typeof(T), "p");
+            var param = parameter ?? ExpressionCache<T>.Param;
             var property = Expression.Call(
                 typeof(EF),
                 nameof(EF.Property),

@@ -1,12 +1,12 @@
 ﻿namespace Sumapap.Queries.Filtering
 {
-    public sealed class FilterGroup
+    public class FilterGroup
     {
         public CompositeOperator Operator { get; private set; } = CompositeOperator.And;
 
         public IEnumerable<FilterDescriptor> Filters { get; private set; } = [];
 
-        public IEnumerable<FilterGroup> SubGroups { get; private set; } = [];
+        public IEnumerable<FilterConfiguration> SubGroups { get; private set; } = [];
 
         public FilterGroup WithOperator(CompositeOperator @operator)
         {
@@ -22,7 +22,7 @@
             return this;
         }
 
-        public FilterGroup HasSubGroups(List<FilterGroup> subGroups)
+        public FilterGroup HavingSubGroups(List<FilterConfiguration> subGroups)
         {
             SubGroups = subGroups;
 

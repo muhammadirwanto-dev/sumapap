@@ -1,6 +1,6 @@
 ﻿namespace Sumapap.Queries.Paging
 {
-    public sealed class CursorPaginationOptions(
+    public sealed class CursorPaginationConfiguration(
         string cursorField,
         string? cursor = null,
         int limit = 20,

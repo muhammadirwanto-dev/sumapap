@@ -60,9 +60,8 @@ namespace Sumapap.Queries.Execution.EfCore.Executors
 
         protected override IQueryable<T> ApplyFiltering(IQueryable<T> source, IQuery query)
         {
-            // One parameter to rule them all: 'x'
-            var parameter = Expression.Parameter(typeof(T), "x");
-            var body = BuildGroupExpression(query.Filters.RootGroup, parameter);
+            var parameter = ExpressionCache<T>.Param;
+            var body = BuildGroupExpression(query.Filters, parameter);
 
             if (body == null)
             {
@@ -119,7 +118,6 @@ namespace Sumapap.Queries.Execution.EfCore.Executors
             return ordered ?? source;
         }
 
-
         private static Expression? BuildGroupExpression(FilterGroup group, ParameterExpression parameter)
         {
             Expression? combined = null;
@@ -159,7 +157,7 @@ namespace Sumapap.Queries.Execution.EfCore.Executors
 
         private static IQueryable<T> ApplyCursorOrdering(
             IQueryable<T> source,
-            CursorPaginationOptions paging)
+            CursorPaginationConfiguration paging)
         {
             return paging.Direction == CursorDirection.Forward
                 ? source.OrderBy(e => EF.Property<object>(e!, paging.CursorField))
@@ -168,7 +166,7 @@ namespace Sumapap.Queries.Execution.EfCore.Executors
 
         private static IQueryable<T> ApplyCursorFiltering(
             IQueryable<T> source,
-            CursorPaginationOptions paging)
+            CursorPaginationConfiguration paging)
         {
             var entityType = typeof(T);
 
@@ -180,7 +178,7 @@ namespace Sumapap.Queries.Execution.EfCore.Executors
                 paging.Cursor!,
                 propertyInfo.PropertyType);
 
-            var parameter = Expression.Parameter(entityType, "e");
+            var parameter = ExpressionCache<T>.Param;
 
             // e.CursorField
             var propertyAccess = Expression.Property(parameter, propertyInfo);

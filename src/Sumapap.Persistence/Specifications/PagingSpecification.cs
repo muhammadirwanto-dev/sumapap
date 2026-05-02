@@ -11,7 +11,9 @@ namespace Sumapap.Persistence.Specifications
         public PagingSpecification(int page, int pageSize, SortDirection sortDirection = SortDirection.Asc, IList<string>? includes = null)
             : base(includes ?? [])
         {
-            var query = new Query(offsetPaging: new OffsetPaginationOptions(page, pageSize));
+            var query = new QueryBuilder()
+                .UseOffsetPaging(page, pageSize)
+                .Build();
 
             if (typeof(IEntity<>).IsAssignableFrom(typeof(T)))
             {
@@ -27,7 +29,9 @@ namespace Sumapap.Persistence.Specifications
             IList<string>? includes = null)
             : base(includes ?? [])
         {
-            var query = new Query(cursorPaging: new CursorPaginationOptions(cursorField, cursor, limit, direction));
+            var query = new QueryBuilder()
+                .UseCursorPaging(cursorField, cursor, limit, direction)
+                .Build();
 
             if (typeof(IEntity<>).IsAssignableFrom(typeof(T)))
             {
@@ -38,18 +42,24 @@ namespace Sumapap.Persistence.Specifications
             SetQuery(query);
         }
 
-        public PagingSpecification(Expression<Func<T, bool>> criteria, OffsetPaginationOptions options, SortOptions? sort = null,
+        public PagingSpecification(Expression<Func<T, bool>> criteria, OffsettPaginationConfiguration options, SortConfiguration? sort = null,
             IList<string>? includes = null)
             : base(criteria, includes ?? [])
         {
-            SetQuery(new Query(sort ?? SortOptions.Empty, offsetPaging: options));
+            SetQuery(new QueryBuilder()
+                .UseOffsetPaging(options)
+                .WithOptionalSort(sort)
+                .Build());
         }
 
-        public PagingSpecification(Expression<Func<T, bool>> criteria, CursorPaginationOptions options, SortOptions? sort = null,
+        public PagingSpecification(Expression<Func<T, bool>> criteria, CursorPaginationConfiguration options, SortConfiguration? sort = null,
             IList<string>? includes = null)
             : base(criteria, includes ?? [])
         {
-            SetQuery(new Query(sort ?? SortOptions.Empty, cursorPaging: options));
+            SetQuery(new QueryBuilder()
+                .UseCursorPaging(options)
+                .WithOptionalSort(sort)
+                .Build());
         }
     }
 }

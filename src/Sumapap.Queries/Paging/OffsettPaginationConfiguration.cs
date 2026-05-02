@@ -1,6 +1,6 @@
 ﻿namespace Sumapap.Queries.Paging
 {
-    public sealed class OffsetPaginationOptions(
+    public sealed class OffsettPaginationConfiguration(
         int page = 1,
         int pageSize = 20)
     {

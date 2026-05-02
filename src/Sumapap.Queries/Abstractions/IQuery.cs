@@ -6,13 +6,13 @@ namespace Sumapap.Queries.Abstractions
 {
     public interface IQuery
     {
-        FilterOptions Filters { get; }
+        FilterConfiguration Filters { get; }
 
-        SortOptions Sort { get; }
+        SortConfiguration Sort { get; }
 
-        OffsetPaginationOptions? OffsetPaging { get; }
+        OffsettPaginationConfiguration? OffsetPaging { get; }
 
-        CursorPaginationOptions? CursorPaging { get; }
+        CursorPaginationConfiguration? CursorPaging { get; }
 
         bool UsesCursorPaging { get; }
 

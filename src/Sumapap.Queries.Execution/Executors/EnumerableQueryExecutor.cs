@@ -22,7 +22,7 @@ namespace Sumapap.Queries.Execution.Executors
             => Task.FromResult(Execute(query, source));
 
         protected override IEnumerable<T> ApplyFiltering(IEnumerable<T> source, IQuery query)
-            => source.Where(item => FilterEvaluator.EvaluateGroup(query.Filters.RootGroup, item));
+            => source.Where(item => FilterEvaluator.EvaluateGroup(query.Filters, item));
 
         protected override IQueryResult<T> ApplyPaging(IEnumerable<T> source, IQuery query)
         {
@@ -93,7 +93,7 @@ namespace Sumapap.Queries.Execution.Executors
 
         protected override IEnumerable<T> ApplySorting(IEnumerable<T> source, IQuery query)
         {
-            SortOptions sort = query.Sort;
+            SortConfiguration sort = query.Sort;
 
             if (sort.Sorts.Count == 0)
                 return source;

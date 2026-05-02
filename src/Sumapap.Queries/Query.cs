@@ -6,53 +6,25 @@ using Sumapap.Queries.Sorting;
 namespace Sumapap.Queries
 {
     public sealed class Query(
-        FilterOptions filters,
-        SortOptions sort,
-        OffsetPaginationOptions? offsetPaging = null,
-        CursorPaginationOptions? cursorPaging = null) : IQuery
+        FilterConfiguration filters,
+        SortConfiguration sort,
+        OffsettPaginationConfiguration? offsetPaging = null,
+        CursorPaginationConfiguration? cursorPaging = null) : IQuery
     {
-        public FilterOptions Filters { get; } = filters;
+        public FilterConfiguration Filters { get; } = filters;
 
-        public SortOptions Sort { get; } = sort;
+        public SortConfiguration Sort { get; } = sort;
 
-        public OffsetPaginationOptions? OffsetPaging { get; } = offsetPaging;
+        public OffsettPaginationConfiguration? OffsetPaging { get; } = offsetPaging;
 
-        public CursorPaginationOptions? CursorPaging { get; } = cursorPaging;
+        public CursorPaginationConfiguration? CursorPaging { get; } = cursorPaging;
 
         public bool UsesCursorPaging => CursorPaging != null;
 
         public bool UsesOffsetPaging => OffsetPaging != null;
 
         public Query()
-            : this(FilterOptions.Empty, SortOptions.Empty, null, null)
-        {
-        }
-
-        public Query(
-            OffsetPaginationOptions offsetPaging)
-            : this(FilterOptions.Empty, SortOptions.Empty, offsetPaging, null)
-        {
-        }
-
-        public Query(
-            CursorPaginationOptions cursorPaging)
-            : this(FilterOptions.Empty, SortOptions.Empty, null, cursorPaging)
-        {
-        }
-
-        public Query(
-            SortOptions sort,
-            OffsetPaginationOptions? offsetPaging = null,
-            CursorPaginationOptions? cursorPaging = null)
-            : this(FilterOptions.Empty, sort, offsetPaging, cursorPaging)
-        {
-        }
-
-        public Query(
-            FilterOptions filters,
-            OffsetPaginationOptions? offsetPaging = null,
-            CursorPaginationOptions? cursorPaging = null)
-            : this(filters, SortOptions.Empty, offsetPaging, cursorPaging)
+            : this(FilterConfiguration.Empty, SortConfiguration.Empty, null, null)
         {
         }
     }
