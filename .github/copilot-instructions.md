@@ -186,6 +186,36 @@ Each package requires:
 - **Package documentation** in `/docs/` folder
 - **Architecture diagrams** in `/assets/` (use Mermaid or PNG)
 
+
+#### Documentation File Structure
+Each library **must** have a corresponding documentation file in `/docs/` folder following this structure:
+
+**Naming Convention:**
+- File name must match project name: `/src/Sumapap.{Capability}.{Technology}` → `/docs/Sumapap.{Capability}.{Technology}.md`
+- Example: `/src/Sumapap.Ddd.Dispatcher` → `/docs/Sumapap.Ddd.Dispatcher.md`
+
+**Required Sections (in order):**
+1. **Title** (# Package Name)
+2. **Badges** - NuGet version, downloads, license, GitHub issues/stars/forks, contributions welcome
+3. **Overview** (## 💡 Overview) - Brief description of what the package does and its core focus areas
+4. **Why?** (## ✨ Why use `Package.Name`?) - Value proposition and benefits
+5. **Quick Start** (## 🚀 Quick start) - Step-by-step installation and basic usage (numbered list)
+6. **Features and Usage** (## 🛠 Features and usage) - Detailed feature documentation with code examples
+7. **Notes & Best Practices** (## ⚠️ Notes & best practices) - Important considerations, gotchas, and recommendations
+8. **License** (# ⭐ License) - MIT License reference
+9. **Contact** (# 🚩 Contact) - GitHub profile and project URL
+10. **Support** (# ☕ Support) - Buy me a coffee section with button
+
+**Content Guidelines:**
+- Use emojis for section headers to match existing docs
+- Include practical code examples in Features and Usage section
+- Keep Quick Start concise and actionable (5 steps or less)
+- Reference other Sumapap packages using relative links when applicable
+- Use `<see langword="null"/>` style formatting for technical terms when appropriate
+
+**References**
+- /docs/Sumapap.Persistence.md as the template example
+
 ### Code Comments
 - Use comments to explain **why**, not **what**
 - Avoid obvious comments (`// Set name` is useless)
