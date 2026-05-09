@@ -1,0 +1,337 @@
+# Sumapap Project Development Guidelines
+
+> "READMEs for AI" — Instructions that guide both humans and GitHub Copilot
+
+## 🏗️ Technology Stack & Architecture
+
+### Core Framework
+- **Target Framework**: .NET 10 (C# 14.0)
+- **Language**: C# with nullable reference types enabled
+- **Project Type**: Class libraries (modular ecosystem)
+- **Architecture**: Clean Architecture / DDD (Domain-Driven Design)
+
+### Key Libraries
+- **Persistence**: Entity Framework Core
+- **Mediator Pattern**: [Mediator by martinothamar](https://github.com/martinothamar/Mediator)
+- **Dependency Injection**: Microsoft.Extensions.DependencyInjection
+- **Testing**: xUnit (preferred), NUnit (acceptable)
+
+### Architectural Layers (The Dependency Rule)
+Dependencies **always flow downward**. Upper layers depend on lower layers, never the reverse.
+
+```
+┌─────────────────────────────────────────────────┐
+│ Infrastructure (EF Core, External Services)     │
+├─────────────────────────────────────────────────┤
+│ Application Layer (Use Cases, Commands/Queries) │
+├─────────────────────────────────────────────────┤
+│ Domain Layer (Entities, Value Objects, Events)  │
+└─────────────────────────────────────────────────┘
+```
+
+**Critical Rule**: Domain layer must never reference infrastructure. Infrastructure implements domain abstractions.
+
+## 📝 Naming Conventions
+
+### Strict Hierarchy
+Follow the **capability-technology** naming pattern:
+```
+Sumapap.<Capability>.<Technology>
+```
+
+**Examples:**
+- ✅ `Sumapap.Persistence.EfCore`
+- ✅ `Sumapap.Ddd.Mediator`
+- ❌ `Sumapap.EfCore` (missing capability)
+- ❌ `Sumapap.DatabaseAccess` (not following pattern)
+
+### Code Naming Rules
+- **Classes/Interfaces**: PascalCase (`UserRepository`, `IRepository<T>`)
+- **Methods/Properties**: PascalCase (`GetByIdAsync`, `FirstName`)
+- **Local variables/parameters**: camelCase (`userId`, `entityName`)
+- **Private fields**: camelCase with underscore prefix (`_dbContext`, `_logger`)
+- **Constants**: PascalCase or UPPER_SNAKE_CASE for magic numbers
+- **Async methods**: Must end with `Async` suffix
+
+### File Organization
+- One public type per file
+- File name matches primary type name
+- Abstractions in `Abstractions/` folder
+- Tests in separate test projects with `.Tests` suffix
+
+## 🎯 Coding Standards
+
+### C# Style
+- **Indent**: 4 spaces (no tabs)
+- **Line length**: Soft limit at 120 characters
+- **Null handling**: Use nullable reference types (`?`), avoid `null!` suppression without justification
+- **String literals**: Prefer double quotes (`"text"`)
+- **Usings**: Place inside namespace declaration
+- **Explicit typing**: Use `var` only when type is obvious from right-hand side
+
+### Preferred Patterns
+```csharp
+// ✅ Good: Explicit type when not obvious
+IEnumerable<User> users = await _repository.GetAllAsync();
+
+// ✅ Good: var when obvious
+var user = new User("John", "Doe");
+
+// ❌ Avoid: var when type unclear
+var result = SomeMethod(); // What is result?
+```
+
+### Required Practices
+- **Always** include XML documentation for public APIs
+- **Always** implement proper `IDisposable` pattern for unmanaged resources
+- **Always** use `ConfigureAwait(false)` in library code (not UI)
+- **Always** validate public method parameters (throw `ArgumentNullException`, `ArgumentException`)
+- **Never** use `async void` except for event handlers
+- **Never** catch exceptions without handling or logging
+
+### Repository Pattern
+```csharp
+// ✅ Correct: Async all the way
+public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+{
+	return await _dbContext.Users
+		.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+}
+
+// ❌ Incorrect: Mixing sync/async
+public User? GetById(Guid id)
+{
+	return _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id).Result; // Deadlock risk
+}
+```
+
+## 🏛️ Domain-Driven Design Principles
+
+### Entities & Aggregates
+- Entities have unique identity (`IEntity<TKey>`)
+- Aggregates manage consistency boundaries
+- Domain events (`IDomainEvent`) capture state changes
+- Use value objects for concepts without identity
+
+### Domain Events
+```csharp
+// ✅ Correct: Immutable record for domain events
+public record OrderPlacedEvent(Guid OrderId, DateTime OccurredAt) : IDomainEvent;
+
+// Usage in aggregate
+public class Order : DomainEntity
+{
+	public void Place()
+	{
+		// Business logic
+		AddDomainEvent(new OrderPlacedEvent(Id, DateTime.UtcNow));
+	}
+}
+```
+
+### Persistence Abstractions
+- Use `IRepository<TEntity>` for CRUD operations
+- Use `IReadRepository<TEntity>` for read-only scenarios
+- Use `ISpecification<TEntity>` for complex queries
+- Use `IUnitOfWork` for transactional consistency
+
+## 🔌 Dependency Injection Philosophy
+
+### Extension Point Architecture
+Sumapap uses the **ISumapapBuilder** pattern for fluent DI configuration:
+
+```csharp
+// Entry point
+services.AddSumapap(builder => 
+{
+	// Each library extends ISumapapBuilder
+	builder.AddScopedRepository<UserRepository, User>();
+	builder.AddScopedRepository<ProductRepository, Product>()
+		.UseCache();
+
+	// Global caching
+	builder.UseCaches(opts => opts.DefaultExpirationSeconds = 600);
+});
+```
+
+### Key Principles
+- **No circular dependencies**: DI project depends on nothing except abstractions
+- **Each library registers itself**: `Sumapap.Persistence` extends `ISumapapBuilder`, not the other way around
+- **Fluent API**: Chain methods for readability
+- **Scoped by default**: Use `AddScoped` for repositories (per-request lifecycle)
+
+### Builder Pattern
+- Core abstraction: `ISumapapBuilder` in `Sumapap.DependencyInjection`
+- Extension methods: Each library provides its own registration methods
+- No direct `IServiceCollection` exposure in fluent API (accessed via `builder.Services` when needed)
+
+## 📚 Documentation Standards
+
+### XML Documentation
+Required for all public APIs:
+```csharp
+/// <summary>
+/// Retrieves a user by unique identifier.
+/// </summary>
+/// <param name="id">The unique identifier of the user.</param>
+/// <param name="cancellationToken">Token to cancel the operation.</param>
+/// <returns>The user if found; otherwise <see langword="null"/>.</returns>
+/// <exception cref="ArgumentException">Thrown when <paramref name="id"/> is empty.</exception>
+public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+```
+
+### Markdown Documentation
+Each package requires:
+- **README.md** at project root (if applicable)
+- **Package documentation** in `/docs/` folder
+- **Architecture diagrams** in `/assets/` (use Mermaid or PNG)
+
+### Code Comments
+- Use comments to explain **why**, not **what**
+- Avoid obvious comments (`// Set name` is useless)
+- Use `TODO:`, `FIXME:`, `NOTE:` markers for future work
+
+## 🧪 Testing Standards
+
+### Test Project Naming
+- Unit tests: `<ProjectName>.Tests`
+- Integration tests: `<ProjectName>.Integration.Tests`
+
+### Test Method Naming
+Use the **Given-When-Then** or **MethodName_Scenario_ExpectedResult** pattern:
+```csharp
+[Fact]
+public async Task GetByIdAsync_WhenUserExists_ReturnsUser()
+{
+	// Arrange
+	var userId = Guid.NewGuid();
+	var expected = new User(userId, "John", "Doe");
+
+	// Act
+	var actual = await _repository.GetByIdAsync(userId);
+
+	// Assert
+	Assert.NotNull(actual);
+	Assert.Equal(expected.Id, actual.Id);
+}
+```
+
+### Test Coverage
+- Aim for **80%+ coverage** for domain logic
+- **100% coverage** for critical paths (authentication, authorization, payment)
+- Mock external dependencies (databases, APIs)
+- Use `ITestOutputHelper` for test logging
+
+## 🚨 Error Handling
+
+### Exception Guidelines
+- Use built-in exceptions when appropriate (`ArgumentException`, `InvalidOperationException`)
+- Create custom exceptions for domain-specific errors
+- Always include meaningful error messages
+- Never swallow exceptions silently
+
+```csharp
+// ✅ Good: Informative exception
+if (string.IsNullOrWhiteSpace(email))
+	throw new ArgumentException("Email cannot be null or whitespace.", nameof(email));
+
+// ❌ Bad: Generic exception
+if (string.IsNullOrWhiteSpace(email))
+	throw new Exception("Invalid input");
+```
+
+### Async Exception Handling
+```csharp
+try
+{
+	await SomeAsyncOperation();
+}
+catch (DbUpdateException ex)
+{
+	_logger.LogError(ex, "Failed to save entity {EntityType}", typeof(TEntity).Name);
+	throw new RepositoryException("Database update failed", ex);
+}
+```
+
+## 🔗 External References
+
+For detailed library-specific guidance, refer to:
+- [Sumapap.Ddd](docs/Sumapap.Ddd.md) - Domain-driven design patterns
+- [Sumapap.Persistence](docs/Sumapap.Persistence.md) - Repository and Unit of Work
+- [Sumapap.Persistence.EfCore](docs/Sumapap.Persistence.EfCore.md) - EF Core implementations
+- [Sumapap.DependencyInjection](docs/Sumapap.DependencyInjection.md) - Fluent builder pattern
+
+## 🎓 Philosophy & Mindset
+
+### Core Values
+1. **Pragmatism over Perfection**: Ship working code, iterate based on feedback
+2. **Clarity over Cleverness**: Readable code > clever tricks
+3. **Explicitness over Magic**: Prefer obvious implementations
+4. **Evolvability**: Design for change, not eternal stability
+
+### When Generating Code
+- **Ask clarifying questions** instead of guessing when requirements are unclear
+- **Follow existing patterns** in the codebase rather than inventing new ones
+- **Reference related files** using `#file:path/to/file.cs` syntax when suggesting changes
+- **Specify target file names** when outputting code suggestions
+- **Validate assumptions** by checking existing implementations before proposing alternatives
+
+### Code Review Mindset
+When reviewing or generating code:
+1. Does it follow the **Dependency Rule**?
+2. Does it maintain **separation of concerns**?
+3. Is it **testable** without mocking the entire world?
+4. Does it **handle edge cases** (null, empty, errors)?
+5. Is it **performant** for expected scale?
+
+## 📦 Package Management
+
+### Versioning
+- Follow [Semantic Versioning 2.0.0](https://semver.org/)
+- Update `AssemblyVersion` and `FileVersion` in `.csproj`
+- Document breaking changes in release notes
+
+### NuGet Properties
+Each project must define:
+```xml
+<PropertyGroup>
+  <Title>Sumapap.ProjectName</Title>
+  <PackageId>Sumapap.ProjectName</PackageId>
+  <Description>Clear, concise description</Description>
+  <PackageTags>Sumapap;DDD;Persistence</PackageTags>
+  <PackageReadmeFile>docs\Sumapap.ProjectName.md</PackageReadmeFile>
+</PropertyGroup>
+```
+
+## 🚀 Performance Considerations
+
+### Database Queries
+- **Always use async** methods (`ToListAsync`, `FirstOrDefaultAsync`)
+- **Prefer projections** over loading full entities when possible
+- **Use pagination** for large result sets
+- **Avoid N+1 queries** (use `Include` or projections)
+
+### Memory Management
+- Dispose `DbContext` properly (use `using` statements)
+- Avoid holding large collections in memory
+- Use `IAsyncEnumerable<T>` for streaming scenarios
+
+## 🛠️ Development Workflow
+
+### Before Committing
+1. Run `dotnet build` (ensure no warnings)
+2. Run `dotnet test` (all tests passing)
+3. Review changes for sensitive data (secrets, connection strings)
+4. Update documentation if public API changed
+
+### Pull Request Guidelines
+- Title: `[Category] Brief description` (e.g., `[Persistence] Add caching decorator`)
+- Description: Explain **why** the change is needed
+- Link related issues
+- Request review from relevant maintainers
+
+---
+
+**Remember**: This is a living document. When patterns emerge that improve code quality, propose updates to these guidelines.
+
+**Last Updated**: March 2026 (Aligned with .NET 10 and GitHub Copilot best practices)
