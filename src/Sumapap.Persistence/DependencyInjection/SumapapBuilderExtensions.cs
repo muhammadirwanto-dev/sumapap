@@ -1,24 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Sumapap.DependencyInjection.Abstractions;
+﻿using Sumapap.DependencyInjection.Builder;
+using Sumapap.Persistence.DependencyInjection.Builder;
 
 namespace Sumapap.Persistence.DependencyInjection
 {
     public static class SumapapBuilderExtensions
     {
-        extension(ISumapapBuilder builder)
+        extension(SumapapServiceBuilder builder)
         {
             /// <summary>
             /// Adds persistence services to the Sumapap builder.
             /// </summary>
             /// <param name="builder">The Sumapap builder.</param>
             /// <returns>The same builder for chaining.</returns>
-            public ISumapapBuilder WithRepositories()
+            public SumapapServiceBuilder WithRepositories(Action<RepositoryServiceBuilder> configuration)
             {
-                // This method is intentionally left blank.
-                // It serves as an entry point for persistence-related registrations
-                // which are handled by extension methods in PersistenceBuilderExtensions.
+                configuration.Invoke(new RepositoryServiceBuilder(builder));
+
                 return builder;
             }
         }
