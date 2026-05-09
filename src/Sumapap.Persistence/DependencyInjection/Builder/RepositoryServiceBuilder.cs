@@ -10,6 +10,8 @@ namespace Sumapap.Persistence.DependencyInjection.Builder
         private readonly IServiceCollection _services = _builder.Build();
         private readonly List<RepositoryRegistration> _registrations = [];
 
+        public IServiceCollection Services => _services;
+
         public SumapapServiceBuilder Build()
         {
             foreach (var registration in _registrations)
