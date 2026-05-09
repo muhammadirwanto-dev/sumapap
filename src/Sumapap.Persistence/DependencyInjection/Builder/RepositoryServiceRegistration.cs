@@ -1,8 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Sumapap.Persistence.DependencyInjection
+namespace Sumapap.Persistence.DependencyInjection.Builder
 {
-    internal sealed record RepositoryRegistration(
+    internal sealed record RepositoryServiceRegistration(
         ServiceLifetime ServiceLifetime,
         Type AbstractType,
         Type ImplType,

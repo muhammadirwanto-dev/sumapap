@@ -8,7 +8,7 @@ namespace Sumapap.Persistence.DependencyInjection.Builder
     public sealed class RepositoryServiceBuilder(SumapapServiceBuilder _builder) : IBuilder<SumapapServiceBuilder>
     {
         private readonly IServiceCollection _services = _builder.Build();
-        private readonly List<RepositoryRegistration> _registrations = [];
+        private readonly List<RepositoryServiceRegistration> _registrations = [];
 
         public IServiceCollection Services => _services;
 
@@ -27,7 +27,7 @@ namespace Sumapap.Persistence.DependencyInjection.Builder
             where TImpl : class, TService
             where TEntity : class, IEntity
         {
-            _registrations.Add(new RepositoryRegistration(
+            _registrations.Add(new RepositoryServiceRegistration(
                 ServiceLifetime.Scoped,
                 typeof(TService),
                 typeof(TImpl),
@@ -42,7 +42,7 @@ namespace Sumapap.Persistence.DependencyInjection.Builder
             where TImpl : class
             where TEntity : class, IEntity
         {
-            _registrations.Add(new RepositoryRegistration(
+            _registrations.Add(new RepositoryServiceRegistration(
                 ServiceLifetime.Scoped,
                 typeof(TImpl),
                 typeof(TImpl),
@@ -58,7 +58,7 @@ namespace Sumapap.Persistence.DependencyInjection.Builder
             where TImpl : class, TService
             where TEntity : class, IEntity
         {
-            _registrations.Add(new RepositoryRegistration(
+            _registrations.Add(new RepositoryServiceRegistration(
                 ServiceLifetime.Transient,
                 typeof(TService),
                 typeof(TImpl),
@@ -73,7 +73,7 @@ namespace Sumapap.Persistence.DependencyInjection.Builder
             where TImpl : class
             where TEntity : class, IEntity
         {
-            _registrations.Add(new RepositoryRegistration(
+            _registrations.Add(new RepositoryServiceRegistration(
                 ServiceLifetime.Transient,
                 typeof(TImpl),
                 typeof(TImpl),
@@ -84,7 +84,7 @@ namespace Sumapap.Persistence.DependencyInjection.Builder
             return this;
         }
 
-        private void RegisterRepository(RepositoryRegistration registration)
+        private void RegisterRepository(RepositoryServiceRegistration registration)
         {
             switch (registration.ServiceLifetime)
             {

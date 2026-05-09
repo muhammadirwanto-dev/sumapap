@@ -3,7 +3,7 @@ using Sumapap.Persistence.DependencyInjection.Builder;
 
 namespace Sumapap.Persistence.DependencyInjection
 {
-    public static class SumapapBuilderExtensions
+    public static class SumapapServiceBuilderExtensions
     {
         extension(SumapapServiceBuilder builder)
         {

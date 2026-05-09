@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sumapap.Persistence\Sumapap.Persistence.csproj" />
+    <ProjectReference Include="..\Sumapap.Queries.Execution\Sumapap.Queries.Execution.csproj" />
   </ItemGroup>
 
 </Project>
