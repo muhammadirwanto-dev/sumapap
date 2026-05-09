@@ -5,10 +5,10 @@ namespace Sumapap.Queries.Execution.Utils
 {
     public static class ReflectionCache
     {
-        private static readonly ConcurrentDictionary<string, PropertyInfo?> Cache = new();
+        private static readonly ConcurrentDictionary<string, PropertyInfo?> _cache = new();
 
         public static PropertyInfo? GetProperty<T>(string name)
-            => Cache.GetOrAdd(
+            => _cache.GetOrAdd(
                 $"{typeof(T).FullName}.{name}",
                 _ => typeof(T).GetProperty(name));
     }

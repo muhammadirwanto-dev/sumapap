@@ -29,7 +29,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sumapap.Persistence\Sumapap.Persistence.csproj" />
-    <ProjectReference Include="..\Sumapap.Queries.Execution.EfCore\Sumapap.Queries.Execution.EfCore.csproj" />
   </ItemGroup>
 
 </Project>

@@ -5,7 +5,9 @@ namespace Sumapap.Queries.Execution.Factories
 {
     public class ExecutorFactory
     {
-        public static readonly ExecutorFactory Default = new();
+        public static readonly ExecutorFactory Instance = new();
+
+        private ExecutorFactory() { }
 
 #pragma warning disable CA1822 // Mark members as static
         public IQueryExecutor<TSource, TResult> Create<TSource, TResult>()
