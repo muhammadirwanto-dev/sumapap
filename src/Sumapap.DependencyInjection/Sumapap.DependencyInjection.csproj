@@ -4,7 +4,7 @@
     <TargetFrameworks>net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0505</FileVersion>
+    <FileVersion>1.0.0.0510</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
   </PropertyGroup>
 
@@ -26,4 +26,12 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.7" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Sumapap.Caching" />
+    <InternalsVisibleTo Include="Sumapap.Persistence" />
+    <InternalsVisibleTo Include="Sumapap.Persistence.DependencyInjection" />
+    <InternalsVisibleTo Include="Sumapap.Persistence.EfCore" />
+    <InternalsVisibleTo Include="Sumapap.Tests" />
+  </ItemGroup>
+  
 </Project>

@@ -5,6 +5,8 @@ namespace Sumapap.DependencyInjection.Builder
 {
     public sealed class SumapapServiceBuilder(IServiceCollection _services) : IBuilder<IServiceCollection>
     {
+        internal IServiceCollection Services => _services;
+
         public IServiceCollection Build() => _services;
     }
 }

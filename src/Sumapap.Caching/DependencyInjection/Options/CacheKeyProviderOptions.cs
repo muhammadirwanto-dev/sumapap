@@ -1,6 +1,6 @@
-﻿namespace Sumapap.Caching.DependencyInjection.Builder
+﻿namespace Sumapap.Caching.DependencyInjection.Options
 {
-    public class CachingServiceBuilderOptions
+    public class CacheKeyProviderOptions
     {
         public string? Tenant { get; set; }
 

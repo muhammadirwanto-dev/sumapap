@@ -1,15 +1,15 @@
 ﻿using System.Text;
 using Microsoft.Extensions.Options;
 using Sumapap.Caching.Abstractions;
-using Sumapap.Caching.DependencyInjection.Builder;
+using Sumapap.Caching.DependencyInjection.Options;
 
 namespace Sumapap.Caching
 {
     internal class DefaultCacheKeyProvider(
-        IOptions<CachingServiceBuilderOptions> options
+        IOptions<CacheKeyProviderOptions> options
         ) : ICacheKeyProvider
     {
-        private readonly CachingServiceBuilderOptions _options = options.Value;
+        private readonly CacheKeyProviderOptions _options = options.Value;
 
         public string CreateKey(string @object, params object[] parameters)
         {

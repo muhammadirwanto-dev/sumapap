@@ -68,6 +68,48 @@ Sumapap.<Capability>.<Technology>
 - **String literals**: Prefer double quotes (`"text"`)
 - **Usings**: Place inside namespace declaration
 - **Explicit typing**: Use `var` only when type is obvious from right-hand side
+- **Extension Methods**: **ALWAYS** use modern C# 14 extension syntax (`extension(Type variable) { }`) instead of classic static extensions (`this Type variable`)
+
+### Modern C# 14 Extension Syntax ⚡
+**CRITICAL**: This project uses C# 14 modern extension syntax exclusively.
+
+```csharp
+// ✅ CORRECT: Modern C# 14 extension syntax
+public static class MyExtensions
+{
+    extension(MyType instance)
+    {
+        public MyType DoSomething()
+        {
+            // implementation
+            return instance;
+        }
+
+        public MyType ChainAnother()
+        {
+            // multiple methods in one extension block
+            return instance;
+        }
+    }
+}
+
+// ❌ WRONG: Classic static extension (DO NOT USE)
+public static class MyExtensions
+{
+    public static MyType DoSomething(this MyType instance)
+    {
+        return instance;
+    }
+}
+```
+
+**Rules for Extension Methods:**
+1. **Always** use `extension(Type variable) { }` syntax
+2. **Never** use `public static ReturnType MethodName(this Type variable)` syntax
+3. Extension methods are declared inside `extension(...)` blocks
+4. The extended type is the parameter to `extension()`, method definitions go inside
+5. Multiple extension methods for the same type can be in one `extension()` block
+6. Use `ArgumentNullException.ThrowIfNull(parameter)` for null checks
 
 ### Preferred Patterns
 ```csharp
