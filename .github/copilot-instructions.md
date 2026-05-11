@@ -4,32 +4,10 @@
 
 ## 🏗️ Technology Stack & Architecture
 
-### Core Framework
 - **Target Framework**: .NET 10 (C# 14.0)
 - **Language**: C# with nullable reference types enabled
 - **Project Type**: Class libraries (modular ecosystem)
 - **Architecture**: Clean Architecture / DDD (Domain-Driven Design)
-
-### Key Libraries
-- **Persistence**: Entity Framework Core
-- **Mediator Pattern**: [Mediator by martinothamar](https://github.com/martinothamar/Mediator)
-- **Dependency Injection**: Microsoft.Extensions.DependencyInjection
-- **Testing**: xUnit (preferred), NUnit (acceptable)
-
-### Architectural Layers (The Dependency Rule)
-Dependencies **always flow downward**. Upper layers depend on lower layers, never the reverse.
-
-```
-┌─────────────────────────────────────────────────┐
-│ Infrastructure (EF Core, External Services)     │
-├─────────────────────────────────────────────────┤
-│ Application Layer (Use Cases, Commands/Queries) │
-├─────────────────────────────────────────────────┤
-│ Domain Layer (Entities, Value Objects, Events)  │
-└─────────────────────────────────────────────────┘
-```
-
-**Critical Rule**: Domain layer must never reference infrastructure. Infrastructure implements domain abstractions.
 
 ## 📝 Naming Conventions
 
@@ -53,10 +31,15 @@ Sumapap.<Capability>.<Technology>
 - **Constants**: PascalCase or UPPER_SNAKE_CASE for magic numbers
 - **Async methods**: Must end with `Async` suffix
 
+Any other naming rules not covered above should comply with the Microsoft C# identifier naming conventions:
+https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/identifier-names
+
 ### File Organization
 - One public type per file
-- File name matches primary type name
 - Abstractions in `Abstractions/` folder
+- Service injections and it's related classes are grouped under `DependencyInjection/` folder
+- File name matches primary type name
+- Files belonging to the same module are grouped under a same folder
 - Tests in separate test projects with `.Tests` suffix
 
 ## 🎯 Coding Standards
@@ -69,6 +52,9 @@ Sumapap.<Capability>.<Technology>
 - **Usings**: Place inside namespace declaration
 - **Explicit typing**: Use `var` only when type is obvious from right-hand side
 - **Extension Methods**: **ALWAYS** use modern C# 14 extension syntax (`extension(Type variable) { }`) instead of classic static extensions (`this Type variable`)
+
+Any other coding standards not specified above should adhere to the Microsoft C# coding conventions:
+https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions
 
 ### Modern C# 14 Extension Syntax ⚡
 **CRITICAL**: This project uses C# 14 modern extension syntax exclusively.
@@ -131,79 +117,30 @@ var result = SomeMethod(); // What is result?
 - **Never** use `async void` except for event handlers
 - **Never** catch exceptions without handling or logging
 
-### Repository Pattern
-```csharp
-// ✅ Correct: Async all the way
-public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
-{
-	return await _dbContext.Users
-		.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
-}
-
-// ❌ Incorrect: Mixing sync/async
-public User? GetById(Guid id)
-{
-	return _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id).Result; // Deadlock risk
-}
-```
-
-## 🏛️ Domain-Driven Design Principles
-
-### Entities & Aggregates
-- Entities have unique identity (`IEntity<TKey>`)
-- Aggregates manage consistency boundaries
-- Domain events (`IDomainEvent`) capture state changes
-- Use value objects for concepts without identity
-
-### Domain Events
-```csharp
-// ✅ Correct: Immutable record for domain events
-public record OrderPlacedEvent(Guid OrderId, DateTime OccurredAt) : IDomainEvent;
-
-// Usage in aggregate
-public class Order : DomainEntity
-{
-	public void Place()
-	{
-		// Business logic
-		AddDomainEvent(new OrderPlacedEvent(Id, DateTime.UtcNow));
-	}
-}
-```
-
-### Persistence Abstractions
-- Use `IRepository<TEntity>` for CRUD operations
-- Use `IReadRepository<TEntity>` for read-only scenarios
-- Use `ISpecification<TEntity>` for complex queries
-- Use `IUnitOfWork` for transactional consistency
 
 ## 🔌 Dependency Injection Philosophy
 
 ### Extension Point Architecture
-Sumapap uses the **ISumapapBuilder** pattern for fluent DI configuration:
+Sumapap uses the **SumapapServiceBuilder** pattern for fluent DI configuration:
 
 ```csharp
 // Entry point
 services.AddSumapap(builder => 
 {
-	// Each library extends ISumapapBuilder
+	// Each library extends SumapapServiceBuilder
 	builder.AddScopedRepository<UserRepository, User>();
 	builder.AddScopedRepository<ProductRepository, Product>()
 		.UseCache();
-
-	// Global caching
-	builder.UseCaches(opts => opts.DefaultExpirationSeconds = 600);
 });
 ```
 
 ### Key Principles
 - **No circular dependencies**: DI project depends on nothing except abstractions
-- **Each library registers itself**: `Sumapap.Persistence` extends `ISumapapBuilder`, not the other way around
+- **Each library registers itself**: `Sumapap.Persistence` extends `SumapapServiceBuilder`, not the other way around
 - **Fluent API**: Chain methods for readability
-- **Scoped by default**: Use `AddScoped` for repositories (per-request lifecycle)
 
 ### Builder Pattern
-- Core abstraction: `ISumapapBuilder` in `Sumapap.DependencyInjection`
+- Core abstraction: `SumapapServiceBuilder` in `Sumapap.DependencyInjection`
 - Extension methods: Each library provides its own registration methods
 - No direct `IServiceCollection` exposure in fluent API (accessed via `builder.Services` when needed)
 
@@ -224,10 +161,10 @@ public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationTok
 
 ### Markdown Documentation
 Each package requires:
-- **README.md** at project root (if applicable)
-- **Package documentation** in `/docs/` folder
-- **Architecture diagrams** in `/assets/` (use Mermaid or PNG)
-
+- All projects should be mentioned under **## 🤔 What is included in this repository?** section in `/README.md` file
+- All projects should have it's project-specific documentation in `/docs/` folder with name `<Project.Namespace>.md`
+- All raw images used in the documentations should be located in `/assets/` (use Mermaid or PNG)
+- No documentation files in `/src/` directory
 
 #### Documentation File Structure
 Each library **must** have a corresponding documentation file in `/docs/` folder following this structure:
@@ -241,7 +178,7 @@ Each library **must** have a corresponding documentation file in `/docs/` folder
 2. **Badges** - NuGet version, downloads, license, GitHub issues/stars/forks, contributions welcome
 3. **Overview** (## 💡 Overview) - Brief description of what the package does and its core focus areas
 4. **Why?** (## ✨ Why use `Package.Name`?) - Value proposition and benefits
-5. **Quick Start** (## 🚀 Quick start) - Step-by-step installation and basic usage (numbered list)
+5. **Quick Start** (## 🚀 Quick start) - Step-by-step installation and dependency injection setup (numbered list)
 6. **Features and Usage** (## 🛠 Features and usage) - Detailed feature documentation with code examples
 7. **Notes & Best Practices** (## ⚠️ Notes & best practices) - Important considerations, gotchas, and recommendations
 8. **License** (# ⭐ License) - MIT License reference
@@ -259,7 +196,7 @@ Each library **must** have a corresponding documentation file in `/docs/` folder
 - /docs/Sumapap.Persistence.md as the template example
 
 ### Code Comments
-- Use comments to explain **why**, not **what**
+- Don't add any code comments, except for something should be adjusted later/ future work
 - Avoid obvious comments (`// Set name` is useless)
 - Use `TODO:`, `FIXME:`, `NOTE:` markers for future work
 
@@ -325,14 +262,6 @@ catch (DbUpdateException ex)
 }
 ```
 
-## 🔗 External References
-
-For detailed library-specific guidance, refer to:
-- [Sumapap.Ddd](docs/Sumapap.Ddd.md) - Domain-driven design patterns
-- [Sumapap.Persistence](docs/Sumapap.Persistence.md) - Repository and Unit of Work
-- [Sumapap.Persistence.EfCore](docs/Sumapap.Persistence.EfCore.md) - EF Core implementations
-- [Sumapap.DependencyInjection](docs/Sumapap.DependencyInjection.md) - Fluent builder pattern
-
 ## 🎓 Philosophy & Mindset
 
 ### Core Values
@@ -376,12 +305,6 @@ Each project must define:
 ```
 
 ## 🚀 Performance Considerations
-
-### Database Queries
-- **Always use async** methods (`ToListAsync`, `FirstOrDefaultAsync`)
-- **Prefer projections** over loading full entities when possible
-- **Use pagination** for large result sets
-- **Avoid N+1 queries** (use `Include` or projections)
 
 ### Memory Management
 - Dispose `DbContext` properly (use `using` statements)
