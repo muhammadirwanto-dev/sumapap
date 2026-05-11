@@ -1,4 +1,4 @@
-namespace Sumapap.Persistence.DependencyInjection
+namespace Sumapap.Persistence.Caching
 {
     /// <summary>
     /// Registry tracking all repository registrations with their cache configurations.

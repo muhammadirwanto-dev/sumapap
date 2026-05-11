@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using Sumapap.Persistence.Abstraction;
+using Sumapap.Persistence.Abstractions;
 using Sumapap.Queries.Abstractions;
 
 namespace Sumapap.Persistence.EfCore.Repositories

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Sumapap.Persistence.Abstraction;
+using Sumapap.Persistence.Abstractions;
+using Sumapap.Queries.Execution.Extensions;
 
 namespace Sumapap.Persistence.EfCore.Specifications
 {

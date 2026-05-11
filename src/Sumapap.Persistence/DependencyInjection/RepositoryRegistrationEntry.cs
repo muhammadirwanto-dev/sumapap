@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Sumapap.Persistence.Caching;
 
 namespace Sumapap.Persistence.DependencyInjection
 {

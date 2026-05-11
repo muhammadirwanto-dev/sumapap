@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Sumapap.Persistence.DependencyInjection
+namespace Sumapap.Persistence.Caching
 {
     /// <summary>
     /// Represents a single repository registration with cache configuration.

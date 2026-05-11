@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using Sumapap.Persistence.Abstraction;
+using Sumapap.Persistence.Abstractions;
 using Sumapap.Queries;
 using Sumapap.Queries.Paging;
 using Sumapap.Queries.Sorting;

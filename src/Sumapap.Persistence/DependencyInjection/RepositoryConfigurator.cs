@@ -1,4 +1,5 @@
-﻿using Sumapap.Persistence.Abstraction;
+﻿using Sumapap.Persistence.Abstractions;
+using Sumapap.Persistence.Caching;
 using Sumapap.Persistence.DependencyInjection.Builder;
 
 namespace Sumapap.Persistence.DependencyInjection

@@ -1,4 +1,4 @@
-﻿namespace Sumapap.Persistence.Abstraction
+﻿namespace Sumapap.Persistence.Abstractions
 {
     /// <summary>
     /// Represents the root entity of an aggregate in a domain-driven design context.

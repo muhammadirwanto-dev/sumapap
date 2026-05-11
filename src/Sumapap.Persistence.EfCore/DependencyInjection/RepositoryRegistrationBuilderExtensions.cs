@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Sumapap.Persistence.Abstraction;
-using Sumapap.Persistence.DependencyInjection;
+using Sumapap.Persistence.Abstractions;
+using Sumapap.Persistence.Caching;
 using Sumapap.Persistence.DependencyInjection.Builder;
 using Sumapap.Persistence.EfCore.Repositories;
 using Sumapap.Persistence.EfCore.UnitOfWork;

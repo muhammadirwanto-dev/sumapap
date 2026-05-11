@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Sumapap.Persistence.Abstraction;
+using Sumapap.Persistence.Abstractions;
 
 namespace Sumapap.Persistence.EfCore.Repositories
 {

@@ -14,13 +14,20 @@ namespace Sumapap.Caching.DependencyInjection.Builder
 
         public SumapapServiceBuilder Build() => _builder;
 
-        public CachingServiceBuilder AddKeyProvider(Action<CacheKeyProviderOptions>? configuration)
+        public CachingServiceBuilder AddKeyProvider()
+            => AddKeyProvider(_ => { });
+
+        public CachingServiceBuilder AddKeyProvider(Action<CacheKeyProviderOptions> configuration)
             => AddKeyProvider<DefaultCacheKeyProvider>(configuration);
 
-        public CachingServiceBuilder AddKeyProvider<TImpl>(Action<CacheKeyProviderOptions>? configuration)
+        public CachingServiceBuilder AddKeyProvider<TImpl>()
+            where TImpl : class, ICacheKeyProvider
+            => AddKeyProvider<TImpl>(_ => { });
+
+        public CachingServiceBuilder AddKeyProvider<TImpl>(Action<CacheKeyProviderOptions> configuration)
             where TImpl : class, ICacheKeyProvider
         {
-            _services.Configure(configuration ?? (opt => { }));
+            _services.Configure(configuration);
             _services.AddSingleton<ICacheKeyProvider, TImpl>();
 
             return this;

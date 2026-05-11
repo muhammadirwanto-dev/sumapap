@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Sumapap.DependencyInjection.Abstractions;
 using Sumapap.DependencyInjection.Builder;
-using Sumapap.Persistence.Abstraction;
+using Sumapap.Persistence.Abstractions;
+using Sumapap.Persistence.Caching;
 
 namespace Sumapap.Persistence.DependencyInjection.Builder
 {
