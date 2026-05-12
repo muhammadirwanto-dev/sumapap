@@ -8,5 +8,6 @@
   <Project Path="Sumapap.Caching/Sumapap.Caching.csproj" Id="193922d1-6773-4753-b740-4e569aa78c9f" />
   <Project Path="Sumapap.DependencyInjection/Sumapap.DependencyInjection.csproj" />
   <Project Path="Sumapap.Persistence.Abstractions/Sumapap.Persistence.Abstractions.csproj" />
+  <Project Path="Sumapap.Persistence.Caching/Sumapap.Persistence.Caching.csproj" />
   <Project Path="Sumapap.Persistence/Sumapap.Persistence.csproj" />
 </Solution>

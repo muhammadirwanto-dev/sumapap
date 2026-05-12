@@ -1,6 +1,6 @@
 ﻿using Sumapap.Persistence.Abstractions;
 
-namespace Sumapap.Persistence.Caching
+namespace Sumapap.Persistence.Caching.DependencyInjection
 {
     public sealed class CachedFunctionsMapping : Dictionary<string, bool>
     {

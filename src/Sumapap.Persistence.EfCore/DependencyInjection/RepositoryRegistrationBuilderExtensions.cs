@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Sumapap.Persistence.Abstractions;
-using Sumapap.Persistence.Caching;
-using Sumapap.Persistence.DependencyInjection.Builder;
+using Sumapap.Persistence.Caching.DependencyInjection;
 using Sumapap.Persistence.EfCore.Repositories;
 using Sumapap.Persistence.EfCore.UnitOfWork;
 
@@ -9,9 +8,9 @@ namespace Sumapap.Persistence.EfCore.DependencyInjection
 {
     public static class RepositoryRegistrationBuilderExtensions
     {
-        extension(RepositoryRegistrationBuilder builder)
+        extension(IRepositoryRegistrationBuilder builder)
         {
-            public RepositoryRegistrationBuilder AddGenericRepositories(ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
+            public IRepositoryRegistrationBuilder AddGenericRepositories(ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
             {
                 builder.AddGenericRepository(typeof(IReadWriteRepository<,>), typeof(ReadWriteRepository<,>), serviceLifetime);
                 builder.AddGenericRepository(typeof(IReadRepository<,>), typeof(ReadRepository<,>), serviceLifetime);
@@ -21,7 +20,7 @@ namespace Sumapap.Persistence.EfCore.DependencyInjection
                     .RegisterUnitOfWork(serviceLifetime);
             }
 
-            public RepositoryRegistrationBuilder AddCachedGenericRepositories(
+            public IRepositoryRegistrationBuilder AddCachedGenericRepositories(
                 ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
             {
                 builder.AddGenericRepository(typeof(IReadWriteRepository<,>), typeof(ReadWriteRepository<,>), serviceLifetime)
@@ -35,7 +34,7 @@ namespace Sumapap.Persistence.EfCore.DependencyInjection
                     .RegisterUnitOfWork(serviceLifetime);
             }
 
-            public RepositoryRegistrationBuilder AddCachedGenericRepositories(
+            public IRepositoryRegistrationBuilder AddCachedGenericRepositories(
                 Action<RepositoryCacheConfiguration> configuration,
                 ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
             {
@@ -50,15 +49,15 @@ namespace Sumapap.Persistence.EfCore.DependencyInjection
                     .RegisterUnitOfWork(serviceLifetime);
             }
 
-            private RepositoryRegistrationBuilder RegisterUnitOfWork(ServiceLifetime serviceLifetime)
+            private IRepositoryRegistrationBuilder RegisterUnitOfWork(ServiceLifetime serviceLifetime)
             {
                 if (serviceLifetime is ServiceLifetime.Scoped)
                 {
-                    builder._services.AddScoped(typeof(IUnitOfWork<>), typeof(UnitOfWork<>));
+                    builder.Services.AddScoped(typeof(IUnitOfWork<>), typeof(UnitOfWork<>));
                 }
                 else if (serviceLifetime is ServiceLifetime.Transient)
                 {
-                    builder._services.AddTransient(typeof(IUnitOfWork<>), typeof(UnitOfWork<>));
+                    builder.Services.AddTransient(typeof(IUnitOfWork<>), typeof(UnitOfWork<>));
                 }
                 else
                 {

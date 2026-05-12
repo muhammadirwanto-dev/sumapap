@@ -1,5 +1,5 @@
-﻿using Sumapap.DependencyInjection.Builder;
-using Sumapap.Persistence.DependencyInjection.Builder;
+﻿using Sumapap.DependencyInjection.Abstractions;
+using Sumapap.Persistence.Abstractions;
 
 namespace Sumapap.Persistence.DependencyInjection
 {
@@ -29,9 +29,9 @@ namespace Sumapap.Persistence.DependencyInjection
         ///     });
         /// </code>
         /// </example>
-        extension(SumapapServiceBuilder builder)
+        extension(ISumapapServiceBuilder builder)
         {
-            public SumapapServiceBuilder WithRepositories(Action<RepositoryRegistrationBuilder> configuration)
+            public ISumapapServiceBuilder WithRepositories(Action<IRepositoryRegistrationBuilder> configuration)
             {
                 ArgumentNullException.ThrowIfNull(configuration);
 

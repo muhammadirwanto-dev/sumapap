@@ -1,4 +1,4 @@
-﻿namespace Sumapap.Persistence.Caching
+﻿namespace Sumapap.Persistence.Caching.DependencyInjection
 {
     /// <summary>
     /// Configuration for repository caching behavior.

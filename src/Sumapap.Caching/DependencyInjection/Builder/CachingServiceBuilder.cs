@@ -2,17 +2,16 @@
 using Sumapap.Caching.Abstractions;
 using Sumapap.Caching.DependencyInjection.Options;
 using Sumapap.DependencyInjection.Abstractions;
-using Sumapap.DependencyInjection.Builder;
 
 namespace Sumapap.Caching.DependencyInjection.Builder
 {
-    public class CachingServiceBuilder(SumapapServiceBuilder _builder) : IBuilder<SumapapServiceBuilder>
+    public class CachingServiceBuilder(ISumapapServiceBuilder _builder) : IBuilder<ISumapapServiceBuilder>
     {
         private readonly IServiceCollection _services = _builder.Services;
 
         public IServiceCollection Services => _services;
 
-        public SumapapServiceBuilder Build() => _builder;
+        public ISumapapServiceBuilder Build() => _builder;
 
         public CachingServiceBuilder AddKeyProvider()
             => AddKeyProvider(_ => { });

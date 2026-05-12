@@ -4,7 +4,7 @@
     <TargetFrameworks>net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <AssemblyVersion>1.0.2</AssemblyVersion>
-    <FileVersion>1.0.2.0510</FileVersion>
+    <FileVersion>1.0.2.0512</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
   </PropertyGroup>
 
@@ -28,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sumapap.Persistence.Caching\Sumapap.Persistence.Caching.csproj" />
     <ProjectReference Include="..\Sumapap.Persistence\Sumapap.Persistence.csproj" />
     <ProjectReference Include="..\Sumapap.Queries.Execution\Sumapap.Queries.Execution.csproj" />
   </ItemGroup>

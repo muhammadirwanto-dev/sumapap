@@ -1,6 +1,4 @@
 ﻿using Sumapap.Persistence.Abstractions;
-using Sumapap.Persistence.Caching;
-using Sumapap.Persistence.DependencyInjection.Builder;
 
 namespace Sumapap.Persistence.DependencyInjection
 {
@@ -32,50 +30,8 @@ namespace Sumapap.Persistence.DependencyInjection
             _registrationIndex = registrationIndex;
         }
 
-        /// <summary>
-        /// Enables caching for this repository with detailed configuration.
-        /// </summary>
-        /// <param name="configure">Action to configure cache behavior, including which methods to cache.</param>
-        /// <returns>The same configurator for method chaining.</returns>
-        public RepositoryConfigurator AllowCaching(
-            Action<RepositoryCacheConfiguration> configure)
-        {
-            ArgumentNullException.ThrowIfNull(configure);
+        internal RepositoryRegistrationBuilder Builder => _builder;
 
-            var currentReg = _builder._registrations[_registrationIndex];
-            var cacheConfig = new RepositoryCacheConfiguration();
-
-            configure(cacheConfig);
-
-            _builder._registrations[_registrationIndex] = currentReg with
-            {
-                AllowCaching = true,
-                CachingConfiguration = cacheConfig
-            };
-
-            return this;
-        }
-
-        /// <summary>
-        /// Enables caching for this repository with default configuration.
-        /// All methods in CachedFunctionsMapping.Default will be cached.
-        /// </summary>
-        /// <returns>The same configurator for method chaining.</returns>
-        public RepositoryConfigurator AllowCaching()
-        {
-            return AllowCaching(config =>
-            {
-                // Use default method mappings
-                foreach (var kvp in CachedFunctionsMapping.Default)
-                {
-                    config.Methods[kvp.Key] = kvp.Value;
-                }
-            });
-        }
-
-        /// <summary>
-        /// Returns to the builder to add more repositories.
-        /// </summary>
-        public RepositoryRegistrationBuilder Builder => _builder;
+        internal int RegistrationIndex => _registrationIndex;
     }
 }

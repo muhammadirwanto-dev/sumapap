@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Sumapap.Persistence.Caching;
+using Sumapap.Persistence.Abstractions;
 
 namespace Sumapap.Persistence.DependencyInjection
 {
@@ -7,12 +7,12 @@ namespace Sumapap.Persistence.DependencyInjection
     /// Represents a repository service registration configuration.
     /// Supports both generic (open) and non-generic (closed) repository types.
     /// </summary>
-    internal sealed record RepositoryRegistrationEntry(
+    public sealed record RepositoryRegistrationEntry(
         ServiceLifetime ServiceLifetime,
         Type AbstractType,
         Type ImplType,
         Type? EntityType,
         bool IsGeneric,
         bool AllowCaching,
-        RepositoryCacheConfiguration? CachingConfiguration = null);
+        IRepositoryRegistrationEntryDecorator? Decorator);
 }

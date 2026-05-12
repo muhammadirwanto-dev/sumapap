@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Sumapap.DependencyInjection.Builder;
+using Sumapap.DependencyInjection.Abstractions;
 
 namespace Sumapap.DependencyInjection
 {
-    public static class ServiceExtensions
+    public static class SumapapServiceCollectionExtensions
     {
         extension(IServiceCollection services)
         {
@@ -12,11 +12,11 @@ namespace Sumapap.DependencyInjection
             /// </summary>
             /// <param name="services">The service collection.</param>
             /// <returns>The service collection for method chaining.</returns>
-            public SumapapServiceBuilder AddSumapap()
+            public ISumapapServiceBuilder AddSumapap()
             {
                 ArgumentNullException.ThrowIfNull(services);
 
-                return new(services);
+                return new SumapapServiceBuilder(services);
             }
         }
     }

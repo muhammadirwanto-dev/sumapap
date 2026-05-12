@@ -1,13 +1,13 @@
 ﻿using Sumapap.Caching.DependencyInjection.Builder;
-using Sumapap.DependencyInjection.Builder;
+using Sumapap.DependencyInjection.Abstractions;
 
 namespace Sumapap.Caching.DependencyInjection
 {
     public static class SumapapServiceBuilderExtensions
     {
-        extension(SumapapServiceBuilder builder)
+        extension(ISumapapServiceBuilder builder)
         {
-            public SumapapServiceBuilder WithCaching(Action<CachingServiceBuilder> configuration)
+            public ISumapapServiceBuilder WithCaching(Action<CachingServiceBuilder> configuration)
             {
                 configuration(new CachingServiceBuilder(builder));
 

@@ -1,21 +1,21 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Sumapap.DependencyInjection.Abstractions;
-using Sumapap.DependencyInjection.Builder;
 using Sumapap.Persistence.Abstractions;
-using Sumapap.Persistence.Caching;
 
-namespace Sumapap.Persistence.DependencyInjection.Builder
+namespace Sumapap.Persistence.DependencyInjection
 {
-    public class RepositoryRegistrationBuilder(SumapapServiceBuilder _builder)
-        : IBuilder<SumapapServiceBuilder>
+    internal class RepositoryRegistrationBuilder(ISumapapServiceBuilder _builder) : IRepositoryRegistrationBuilder
     {
-        internal readonly IServiceCollection _services = _builder.Services;
-        internal readonly List<RepositoryRegistrationEntry> _registrations = [];
+        private readonly IServiceCollection _services = _builder.Services;
+        private readonly List<RepositoryRegistrationEntry> _registrations = [];
+        private readonly List<IRepositoryRegistrationVisitor> _visitors = [];
 
-        public SumapapServiceBuilder Build()
+        internal IList<RepositoryRegistrationEntry> Registrations => _registrations;
+
+        IServiceCollection IBuilder<ISumapapServiceBuilder>.Services => _services;
+
+        public ISumapapServiceBuilder Build()
         {
-            var cacheRegistry = GetOrCreateCacheRegistry(_services);
-
             foreach (var registration in _registrations)
             {
                 if (registration.IsGeneric)
@@ -26,21 +26,14 @@ namespace Sumapap.Persistence.DependencyInjection.Builder
                 {
                     RegisterRepository(registration);
                 }
+            }
 
-                if (registration.AllowCaching && registration.CachingConfiguration != null)
+            // allow visitors to process registrations for cross-cutting concerns
+            foreach (var visitor in _visitors)
+            {
+                foreach (var registration in _registrations)
                 {
-                    var cacheEntry = new RepositoryCacheEntry
-                    {
-                        RepositoryType = registration.ImplType,
-                        EntityType = registration.EntityType,
-                        Lifetime = registration.ServiceLifetime,
-                        Configuration = registration.CachingConfiguration,
-                        ServiceTypes = registration.IsGeneric
-                            ? GetGenericServiceTypes(registration)
-                            : GetServiceTypes(registration)
-                    };
-
-                    cacheRegistry.Register(cacheEntry);
+                    visitor.Visit(registration, _services);
                 }
             }
 
@@ -55,7 +48,8 @@ namespace Sumapap.Persistence.DependencyInjection.Builder
                 implType,
                 EntityType: null,
                 IsGeneric: true,
-                AllowCaching: false
+                AllowCaching: false,
+                Decorator: null
                 ));
 
             return new RepositoryConfigurator(this, _registrations.Count - 1);
@@ -77,7 +71,8 @@ namespace Sumapap.Persistence.DependencyInjection.Builder
                 typeof(TImpl),
                 typeof(TEntity),
                 IsGeneric: false,
-                AllowCaching: false
+                AllowCaching: false,
+                Decorator: null
                 ));
 
             return new RepositoryConfigurator<TImpl, TEntity>(this, _registrations.Count - 1);
@@ -99,30 +94,23 @@ namespace Sumapap.Persistence.DependencyInjection.Builder
                 typeof(TImpl),
                 typeof(TEntity),
                 IsGeneric: false,
-                AllowCaching: false
+                AllowCaching: false,
+                Decorator: null
                 ));
 
             return new RepositoryConfigurator<TImpl, TEntity>(this, _registrations.Count - 1);
         }
 
-        private static RepositoryCacheRegistry GetOrCreateCacheRegistry(IServiceCollection services)
+        public IRepositoryRegistrationBuilder AddVisitor(IRepositoryRegistrationVisitor visitor)
         {
-            var descriptor = services.FirstOrDefault(d =>
-                d.ServiceType == typeof(RepositoryCacheRegistry) &&
-                d.Lifetime == ServiceLifetime.Singleton);
+            ArgumentNullException.ThrowIfNull(visitor);
 
-            if (descriptor?.ImplementationInstance is RepositoryCacheRegistry existingRegistry)
-            {
-                return existingRegistry;
-            }
+            _visitors.Add(visitor);
 
-            var newRegistry = new RepositoryCacheRegistry();
-            services.AddSingleton(newRegistry);
-
-            return newRegistry;
+            return this;
         }
 
-        private static List<Type> GetServiceTypes(RepositoryRegistrationEntry registration)
+        internal static List<Type> GetServiceTypes(RepositoryRegistrationEntry registration)
         {
             var serviceTypes = new List<Type>();
             var entityType = registration.EntityType;
@@ -138,7 +126,7 @@ namespace Sumapap.Persistence.DependencyInjection.Builder
                 serviceTypes.Add(registration.AbstractType);
             }
 
-            foreach (var interf in GetInterfaceTypes(entityType))
+            foreach (var interf in GetRepositoryInterfaceTypes(entityType))
             {
                 if (interf.IsAssignableFrom(implType))
                 {
@@ -149,7 +137,7 @@ namespace Sumapap.Persistence.DependencyInjection.Builder
             return serviceTypes;
         }
 
-        private static List<Type> GetGenericServiceTypes(RepositoryRegistrationEntry registration)
+        internal static List<Type> GetGenericServiceTypes(RepositoryRegistrationEntry registration)
         {
             var serviceTypes = new List<Type>();
             if (registration.AbstractType != registration.ImplType)
@@ -216,7 +204,7 @@ namespace Sumapap.Persistence.DependencyInjection.Builder
         {
             services.AddScoped(implType);
 
-            foreach (var interf in GetInterfaceTypes(entityType))
+            foreach (var interf in GetRepositoryInterfaceTypes(entityType))
             {
                 if (interf.IsAssignableFrom(implType))
                 {
@@ -242,7 +230,7 @@ namespace Sumapap.Persistence.DependencyInjection.Builder
         {
             services.AddTransient(implType);
 
-            foreach (var interf in GetInterfaceTypes(entityType))
+            foreach (var interf in GetRepositoryInterfaceTypes(entityType))
             {
                 if (interf.IsAssignableFrom(implType))
                 {
@@ -251,7 +239,7 @@ namespace Sumapap.Persistence.DependencyInjection.Builder
             }
         }
 
-        private static IEnumerable<Type> GetInterfaceTypes(Type entityType) => [
+        private static IEnumerable<Type> GetRepositoryInterfaceTypes(Type entityType) => [
             typeof(IReadRepository<>).MakeGenericType(entityType),
             typeof(IWriteRepository<>).MakeGenericType(entityType),
             typeof(IReadWriteRepository<>).MakeGenericType(entityType),
