@@ -16,11 +16,11 @@
     <Description>
       Utility for building dynamic queries, filtering, and sorting logic within the persistence layer.
     </Description>
-    <PackageReadmeFile>docs\Sumapap.Queries.md</PackageReadmeFile>
+    <PackageReadmeFile>docs\Sumapap.Queries.Execution.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\docs\Sumapap.Queries.md" Pack="true" PackagePath="docs" />
+    <None Include="..\..\docs\Sumapap.Queries.Execution.md" Pack="true" PackagePath="docs" />
   </ItemGroup>
 
   <ItemGroup>

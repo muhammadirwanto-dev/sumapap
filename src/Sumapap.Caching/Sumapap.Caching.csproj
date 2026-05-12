@@ -6,7 +6,23 @@
     <Nullable>enable</Nullable>
     <AssemblyVersion>1.0.0.0512</AssemblyVersion>
     <FileVersion>1.0.0.0512</FileVersion>
+    <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
   </PropertyGroup>
+
+  <!--NuGet properties-->
+  <PropertyGroup>
+    <Title>Sumapap.Caching</Title>
+    <PackageId>Sumapap.Caching</PackageId>
+    <PackageTags>Sumapap;Caching;Cache;KeyProvider</PackageTags>
+    <Description>
+      Provider-agnostic cache key generation abstractions for Sumapap packages.
+    </Description>
+    <PackageReadmeFile>docs\Sumapap.Caching.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\Sumapap.Caching.md" Pack="true" PackagePath="docs" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Sumapap.DependencyInjection\Sumapap.DependencyInjection.csproj" />
