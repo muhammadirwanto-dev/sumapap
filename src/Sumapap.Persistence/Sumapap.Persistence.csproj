@@ -34,6 +34,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Sumapap.Persistence.Caching" />
+    <InternalsVisibleTo Include="Sumapap.Persistence.Caching.FusionCache" />
     <InternalsVisibleTo Include="Sumapap.Persistence.EfCore" />
   </ItemGroup>
 

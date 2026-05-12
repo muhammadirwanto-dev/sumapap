@@ -1,10 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFrameworks>net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>1.0.0.0512</AssemblyVersion>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0512</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
   </PropertyGroup>

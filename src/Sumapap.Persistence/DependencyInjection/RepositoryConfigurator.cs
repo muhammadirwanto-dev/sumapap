@@ -30,7 +30,7 @@ namespace Sumapap.Persistence.DependencyInjection
             _registrationIndex = registrationIndex;
         }
 
-        internal RepositoryRegistrationBuilder Builder => _builder;
+        internal IRepositoryRegistrationBuilder Builder => _builder;
 
         internal int RegistrationIndex => _registrationIndex;
     }

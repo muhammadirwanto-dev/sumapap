@@ -10,7 +10,7 @@ namespace Sumapap.Persistence.DependencyInjection
         private readonly List<RepositoryRegistrationEntry> _registrations = [];
         private readonly List<IRepositoryRegistrationVisitor> _visitors = [];
 
-        internal IList<RepositoryRegistrationEntry> Registrations => _registrations;
+        IList<RepositoryRegistrationEntry> IRepositoryRegistrationBuilder.Registrations => _registrations;
 
         IServiceCollection IBuilder<ISumapapServiceBuilder>.Services => _services;
 

@@ -29,6 +29,8 @@
   <ItemGroup>
     <InternalsVisibleTo Include="Sumapap.Caching" />
     <InternalsVisibleTo Include="Sumapap.Persistence" />
+    <InternalsVisibleTo Include="Sumapap.Persistence.Caching" />
+    <InternalsVisibleTo Include="Sumapap.Persistence.Caching.FusionCache" />
     <InternalsVisibleTo Include="Sumapap.Persistence.DependencyInjection" />
     <InternalsVisibleTo Include="Sumapap.Persistence.EfCore" />
     <InternalsVisibleTo Include="Sumapap.Tests" />

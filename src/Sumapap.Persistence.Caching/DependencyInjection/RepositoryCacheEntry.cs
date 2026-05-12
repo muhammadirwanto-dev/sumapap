@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace Sumapap.Persistence.Caching.DependencyInjection
+﻿namespace Sumapap.Persistence.Caching.DependencyInjection
 {
     /// <summary>
     /// Represents a single repository registration with cache configuration.
@@ -17,11 +15,6 @@ namespace Sumapap.Persistence.Caching.DependencyInjection
         /// Null for generic repositories that don't have a specific entity type.
         /// </summary>
         public required Type? EntityType { get; init; }
-
-        /// <summary>
-        /// Service lifetime of the repository.
-        /// </summary>
-        public required ServiceLifetime Lifetime { get; init; }
 
         /// <summary>
         /// Cache configuration for this repository.

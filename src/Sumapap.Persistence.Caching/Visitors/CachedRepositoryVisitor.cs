@@ -9,7 +9,7 @@ namespace Sumapap.Persistence.Caching.Visitors;
 /// Visitor that processes repository registrations with caching metadata
 /// and populates the RepositoryCacheRegistry for provider-specific decoration.
 /// </summary>
-public class CachingRepositoryVisitor : IRepositoryRegistrationVisitor
+public class CachedRepositoryVisitor : IRepositoryRegistrationVisitor
 {
     public void Visit(RepositoryRegistrationEntry entry, IServiceCollection services)
     {
@@ -19,12 +19,10 @@ public class CachingRepositoryVisitor : IRepositoryRegistrationVisitor
         }
 
         var cacheRegistry = GetOrCreateCacheRegistry(services);
-
         var cacheEntry = new RepositoryCacheEntry
         {
             RepositoryType = entry.ImplType,
             EntityType = entry.EntityType,
-            Lifetime = entry.ServiceLifetime,
             Configuration = cachedEntry.Configuration,
             ServiceTypes = entry.IsGeneric
                 ? RepositoryRegistrationBuilder.GetGenericServiceTypes(entry)
