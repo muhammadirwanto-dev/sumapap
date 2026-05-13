@@ -2,8 +2,10 @@
 {
     public interface ICacheKeyProvider
     {
-        string CreateKey(string @object, params object[] parameters);
+        string CreateKey<TObject>(TObject @object, params object[] parameters)
+            where TObject : class;
 
-        string CreateKey<TObject>(params object[] parameters);
+        string CreateKey<TObject>(params object[] parameters)
+            where TObject : class;
     }
 }

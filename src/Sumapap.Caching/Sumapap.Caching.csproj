@@ -4,7 +4,7 @@
     <TargetFrameworks>net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0512</FileVersion>
+    <FileVersion>1.0.0.0513</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
   </PropertyGroup>
 
@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sumapap.Common\Sumapap.Common.csproj" />
     <ProjectReference Include="..\Sumapap.DependencyInjection\Sumapap.DependencyInjection.csproj" />
   </ItemGroup>
 

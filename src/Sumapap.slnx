@@ -6,6 +6,7 @@
   <Project Path="D:/_dev/projects/sumapap/src/Sumapap.Queries.Execution/Sumapap.Queries.Execution.csproj" />
   <Project Path="D:/_dev/projects/sumapap/src/Sumapap.Queries/Sumapap.Queries.csproj" />
   <Project Path="Sumapap.Caching/Sumapap.Caching.csproj" Id="193922d1-6773-4753-b740-4e569aa78c9f" />
+  <Project Path="Sumapap.Common/Sumapap.Common.csproj" Id="298652f2-5cda-4205-a2aa-f02552829cad" />
   <Project Path="Sumapap.DependencyInjection/Sumapap.DependencyInjection.csproj" />
   <Project Path="Sumapap.Persistence.Abstractions/Sumapap.Persistence.Abstractions.csproj" />
   <Project Path="Sumapap.Persistence.Caching.FusionCache/Sumapap.Persistence.Caching.FusionCache.csproj" Id="659e56f2-92f4-4de9-a787-15727182a3f3" />
