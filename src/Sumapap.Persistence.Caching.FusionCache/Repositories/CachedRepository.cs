@@ -1,4 +1,5 @@
-﻿using Sumapap.Caching.Abstractions;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Sumapap.Caching.Abstractions;
 using Sumapap.Persistence.Abstractions;
 using Sumapap.Persistence.Caching.DependencyInjection;
 using Sumapap.Persistence.Caching.Extensions;
@@ -7,10 +8,13 @@ using ZiggyCreatures.Caching.Fusion;
 namespace Sumapap.Persistence.Caching.FusionCache.Repositories
 {
     internal abstract class CachedRepository(
-        IFusionCache _cache,
-        RepositoryCacheRegistry _registry
+        IServiceProvider _serviceProvider
         )
     {
+        protected readonly ICacheKeyProvider _keyProvider = _serviceProvider.GetRequiredService<ICacheKeyProvider>();
+        private readonly IFusionCache _cache = _serviceProvider.GetRequiredService<IFusionCache>();
+        private readonly RepositoryCacheRegistry _registry = _serviceProvider.GetRequiredService<RepositoryCacheRegistry>();
+
         protected TResult ExecuteGetOrSet<TResult, TEntity>(
             IRepository inner,
             string methodName,
@@ -45,44 +49,26 @@ namespace Sumapap.Persistence.Caching.FusionCache.Repositories
         }
 
         protected void ExecuteSet<TEntity>(
-            IRepository inner,
-            string methodName,
-            string cacheKey,
             string[] tags,
-            TEntity value,
-            Action<TEntity> operation)
+            Action operation)
             where TEntity : class, IEntity
         {
-            if (_registry.IsCached(inner, typeof(TEntity), methodName))
-            {
-                _cache.RemoveByTag(tags);
-                _cache.Set(cacheKey, value, tags: tags);
-            }
-
-            operation(value);
+            _cache.RemoveByTag(tags);
+            operation();
         }
 
         protected async Task ExecuteSetAsync<TEntity>(
-            IRepository inner,
-            string methodName,
-            string cacheKey,
             string[] tags,
-            TEntity value,
-            Func<TEntity, CancellationToken, Task> operation,
+            Func<CancellationToken, Task> operation,
             CancellationToken cancellationToken = default)
             where TEntity : class, IEntity
         {
-            if (_registry.IsCached(inner, typeof(TEntity), methodName))
-            {
-                await _cache.RemoveByTagAsync(tags, token: cancellationToken);
-                await _cache.SetAsync(cacheKey, value, tags: tags, token: cancellationToken);
-            }
-
-            await operation(value, cancellationToken);
+            await _cache.RemoveByTagAsync(tags, token: cancellationToken);
+            await operation(cancellationToken);
         }
 
-        protected static string GetAllItemTag<TEntity>(ICacheKeyProvider provider)
+        protected string GetAllItemTag<TEntity>()
             where TEntity : class, IEntity
-            => provider.CreateKey<TEntity>("*");
+            => _keyProvider.CreateKey<TEntity>("*");
     }
 }

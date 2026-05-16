@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sumapap.DependencyInjection.Abstractions;
 using Sumapap.Persistence.Abstractions;
+using Sumapap.Persistence.Extensions;
 
 namespace Sumapap.Persistence.DependencyInjection
 {
@@ -177,14 +179,54 @@ namespace Sumapap.Persistence.DependencyInjection
             switch (registration.ServiceLifetime)
             {
                 case ServiceLifetime.Scoped:
-                    _services.AddScoped(registration.AbstractType, registration.ImplType);
+                    if (registration.IsReadWriteRepository())
+                    {
+                        _services.TryAddScoped(sp => RegisterReadWriteRepository(registration, sp));
+                    }
+                    else
+                    {
+                        _services.TryAddScoped(registration.AbstractType, registration.ImplType);
+                    }
                     break;
                 case ServiceLifetime.Transient:
-                    _services.AddTransient(registration.AbstractType, registration.ImplType);
+                    if (registration.IsReadWriteRepository())
+                    {
+                        _services.TryAddTransient(sp => RegisterReadWriteRepository(registration, sp));
+                    }
+                    else
+                    {
+                        _services.TryAddTransient(registration.AbstractType, registration.ImplType);
+                    }
                     break;
                 default:
                     throw new NotSupportedException($"Service lifetime {registration.ServiceLifetime} is not supported for repository registration.");
             }
+        }
+
+        private object RegisterReadWriteRepository(
+            RepositoryRegistrationEntry registration,
+            IServiceProvider provider)
+        {
+            var typeArguments = registration.ImplType.GetGenericArguments();
+            var entityType = typeArguments.FirstOrDefault(x => typeof(IEntity).IsAssignableFrom(x)) ?? throw new InvalidOperationException("Entity type cannot be determined.");
+            var contextType = typeArguments.FirstOrDefault(x => !typeof(IEntity).IsAssignableFrom(x)) ?? throw new InvalidOperationException("Context type cannot be determined.");
+            var context = provider.GetRequiredService(contextType);
+
+            var readRepoInterfaceType = typeof(IReadRepository<,>).MakeGenericType(entityType, contextType);
+            var writeRepoInterfaceType = typeof(IWriteRepository<,>).MakeGenericType(entityType, contextType);
+
+            var readRepositoryImpl = provider.GetRequiredService(readRepoInterfaceType);
+            var writeRepositoryImpl = provider.GetRequiredService(writeRepoInterfaceType);
+            var closedReadWriteType = registration.ImplType.IsGenericTypeDefinition
+                ? registration.ImplType.MakeGenericType(entityType, contextType)
+                : registration.ImplType;
+
+            return Activator.CreateInstance(
+                closedReadWriteType,
+                context,
+                readRepositoryImpl,
+                writeRepositoryImpl
+            ) ?? throw new InvalidOperationException($"Failed to create an instance of {closedReadWriteType.Name}");
         }
 
         private static void AddScopedRepository(

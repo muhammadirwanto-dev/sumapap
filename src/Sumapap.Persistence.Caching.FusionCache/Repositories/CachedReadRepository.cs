@@ -1,18 +1,13 @@
 ﻿using System.Linq.Expressions;
-using Sumapap.Caching.Abstractions;
 using Sumapap.Persistence.Abstractions;
-using Sumapap.Persistence.Caching.DependencyInjection;
 using Sumapap.Queries.Abstractions;
-using ZiggyCreatures.Caching.Fusion;
 
 namespace Sumapap.Persistence.Caching.FusionCache.Repositories
 {
     internal class CachedReadRepository<TEntity, TContext>(
-        IReadRepository<TEntity, TContext> _inner,
-        ICacheKeyProvider _keyProvider,
-        IFusionCache _cache,
-        RepositoryCacheRegistry _registry
-        ) : CachedRepository(_cache, _registry), IReadRepository<TEntity, TContext>
+        IServiceProvider _serviceProvider,
+        IReadRepository<TEntity, TContext> _inner
+        ) : CachedRepository(_serviceProvider), IReadRepository<TEntity, TContext>
         where TEntity : class, IEntity
     {
         public long Count() => ExecuteGetOrSet<long, TEntity>(
@@ -108,6 +103,6 @@ namespace Sumapap.Persistence.Caching.FusionCache.Repositories
         public Task<List<TEntity>> WhereAsync(ISpecification<TEntity> specification, CancellationToken cancellation = default) => ExecuteGetOrSetAsync<List<TEntity>, TEntity>(
             _inner, "Where", _keyProvider.CreateKey<TEntity>("*", "Where", specification), tags: [GetAllItemTag()], () => _inner.WhereAsync(specification, cancellation), cancellation);
 
-        private string GetAllItemTag() => GetAllItemTag<TEntity>(_keyProvider);
+        private string GetAllItemTag() => GetAllItemTag<TEntity>();
     }
 }

@@ -1,174 +1,258 @@
-﻿using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Text;
 using Sumapap.Persistence.Abstractions;
 using Sumapap.Queries.Abstractions;
 
-namespace Sumapap.Persistence.EfCore.Repositories
+namespace Sumapap.Persistence.Caching.FusionCache.Repositories
 {
-    /// <summary>
-    /// Generic repository implementation using Entity Framework Core.
-    /// This class is designed to be inheritable by specific repositories in consuming applications.
-    /// </summary>
-    /// <typeparam name="TEntity">The entity type.</typeparam>
-    /// <typeparam name="TKey">The entity's primary key type.</typeparam>
-    /// <typeparam name="TContext">The DbContext type.</typeparam>
-    public class ReadWriteRepository<TEntity, TContext>(
-        TContext @context,
-        IReadRepository<TEntity, TContext> @read,
-        IWriteRepository<TEntity, TContext> @write
-        ) : IReadWriteRepository<TEntity, TContext>
+    internal class CachedReadWriteRepository<TEntity, TContext>() : IReadWriteRepository<TEntity, TContext>
         where TEntity : class, IEntity
-        where TContext : DbContext
     {
-        protected readonly TContext _context = context;
-        protected readonly IReadRepository<TEntity, TContext> _read = @read;
-        protected readonly IWriteRepository<TEntity, TContext> _write = @write;
-
         public void Add(TEntity entity)
-            => _write.Add(entity);
+        {
+            throw new NotImplementedException();
+        }
 
         public ValueTask AddAsync(TEntity entity, CancellationToken cancellationToken = default)
-            => _write.AddAsync(entity, cancellationToken);
+        {
+            throw new NotImplementedException();
+        }
 
         public void AddRange(IEnumerable<TEntity> entities)
-            => _write.AddRange(entities);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
-            => _write.AddRangeAsync(entities, cancellationToken);
+        {
+            throw new NotImplementedException();
+        }
 
         public long Count()
-            => _read.Count();
+        {
+            throw new NotImplementedException();
+        }
 
         public long Count(Expression<Func<TEntity, bool>> predicate)
-            => _read.Count(predicate);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<long> CountAsync(CancellationToken cancellation = default)
-            => _read.CountAsync(cancellation);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<long> CountAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellation = default)
-            => _read.CountAsync(predicate, cancellation);
+        {
+            throw new NotImplementedException();
+        }
 
         public void Delete(TEntity entity)
-            => _write.Delete(entity);
+        {
+            throw new NotImplementedException();
+        }
 
         public void Delete<TKey>(TKey id) where TKey : IEquatable<TKey>
-            => _write.Delete(id);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
-            => _write.DeleteAsync(entity, cancellationToken);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task DeleteAsync<TKey>(TKey id, CancellationToken cancellationToken = default) where TKey : IEquatable<TKey>
-            => _write.DeleteAsync(id, cancellationToken);
+        {
+            throw new NotImplementedException();
+        }
 
         public void DeleteRange(IEnumerable<TEntity> entities)
-            => _write.DeleteRange(entities);
+        {
+            throw new NotImplementedException();
+        }
 
         public void DeleteRange<TKey>(IEnumerable<TKey> ids) where TKey : IEquatable<TKey>
-            => _write.DeleteRange(ids);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task DeleteRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
-            => _write.DeleteRangeAsync(entities, cancellationToken);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task DeleteRangeAsync<TKey>(IEnumerable<TKey> ids, CancellationToken cancellationToken = default) where TKey : IEquatable<TKey>
-            => _write.DeleteRangeAsync(ids, cancellationToken);
+        {
+            throw new NotImplementedException();
+        }
 
         public void DetatchFromTracking(TEntity entity)
-            => _read.DetatchFromTracking(entity);
+        {
+            throw new NotImplementedException();
+        }
 
         public TEntity? Find<TKey>(TKey key) where TKey : IEquatable<TKey>
-            => _read.Find(key);
+        {
+            throw new NotImplementedException();
+        }
 
         public ValueTask<TEntity?> FindAsync<TKey>(TKey key, CancellationToken cancellation = default) where TKey : IEquatable<TKey>
-            => _read.FindAsync(key, cancellation);
+        {
+            throw new NotImplementedException();
+        }
 
         public TEntity? FirstOrDefault(Expression<Func<TEntity, bool>> predicate)
-            => _read.FirstOrDefault(predicate);
+        {
+            throw new NotImplementedException();
+        }
 
         public TEntity? FirstOrDefault(ISpecification<TEntity> specification)
-            => _read.FirstOrDefault(specification);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellation = default)
-            => _read.FirstOrDefaultAsync(predicate, cancellation);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<TEntity?> FirstOrDefaultAsync(ISpecification<TEntity> specification, CancellationToken cancellation = default)
-            => _read.FirstOrDefaultAsync(specification, cancellation);
+        {
+            throw new NotImplementedException();
+        }
 
         public IList<TEntity> GetAll()
-            => _read.GetAll();
+        {
+            throw new NotImplementedException();
+        }
 
         public IList<TEntity> GetAll(ISpecification<TEntity> specification)
-            => _read.GetAll(specification);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<List<TEntity>> GetAllAsync(CancellationToken cancellation = default)
-            => _read.GetAllAsync(cancellation);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<List<TEntity>> GetAllAsync(ISpecification<TEntity> specification, CancellationToken cancellation = default)
-            => _read.GetAllAsync(specification, cancellation);
+        {
+            throw new NotImplementedException();
+        }
 
         public bool IsExists(Expression<Func<TEntity, bool>> predicate)
-            => _read.IsExists(predicate);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<bool> IsExistsAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellation = default)
-            => _read.IsExistsAsync(predicate, cancellation);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<IQueryResult<TEntity>> QueryAsync(IQuery query, CancellationToken cancellation = default)
-            => _read.QueryAsync(query, cancellation);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<IQueryResult<TEntity>> QueryAsync(ISpecification<TEntity> specification, CancellationToken cancellation = default)
-            => _read.QueryAsync(specification, cancellation);
+        {
+            throw new NotImplementedException();
+        }
 
         public void Save()
-            => _write.Save();
+        {
+            throw new NotImplementedException();
+        }
 
         public Task SaveAsync(CancellationToken cancellationToken = default)
-            => _write.SaveAsync(cancellationToken);
+        {
+            throw new NotImplementedException();
+        }
 
         public TEntity? SingleOrDefault(Expression<Func<TEntity, bool>> predicate)
-            => _read.SingleOrDefault(predicate);
+        {
+            throw new NotImplementedException();
+        }
 
         public TEntity? SingleOrDefault(ISpecification<TEntity> specification)
-            => _read.SingleOrDefault(specification);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<TEntity?> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellation = default)
-            => _read.SingleOrDefaultAsync(predicate, cancellation);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<TEntity?> SingleOrDefaultAsync(ISpecification<TEntity> specification, CancellationToken cancellation = default)
-            => _read.SingleOrDefaultAsync(specification, cancellation);
+        {
+            throw new NotImplementedException();
+        }
 
         public IAsyncEnumerable<TEntity> StreamAllAsync()
-            => _read.StreamAllAsync();
+        {
+            throw new NotImplementedException();
+        }
 
         public IAsyncEnumerable<TEntity> StreamAllAsync(ISpecification<TEntity> specification)
-            => _read.StreamAllAsync(specification);
+        {
+            throw new NotImplementedException();
+        }
 
         public IAsyncEnumerable<TEntity> StreamWhereAsync(Expression<Func<TEntity, bool>> predicate)
-            => _read.StreamWhereAsync(predicate);
+        {
+            throw new NotImplementedException();
+        }
 
         public IAsyncEnumerable<TEntity> StreamWhereAsync(ISpecification<TEntity> specification)
-            => _read.StreamWhereAsync(specification);
+        {
+            throw new NotImplementedException();
+        }
 
         public void Update(TEntity entity)
-            => _write.Update(entity);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
-            => _write.UpdateAsync(entity, cancellationToken);
+        {
+            throw new NotImplementedException();
+        }
 
         public void UpdateRange(IEnumerable<TEntity> entities)
-            => _write.UpdateRange(entities);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task UpdateRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
-            => _write.UpdateRangeAsync(entities, cancellationToken);
+        {
+            throw new NotImplementedException();
+        }
 
         public IList<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
-            => _read.Where(predicate);
+        {
+            throw new NotImplementedException();
+        }
 
         public IList<TEntity> Where(ISpecification<TEntity> specification)
-            => _read.Where(specification);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<List<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellation = default)
-            => _read.WhereAsync(predicate, cancellation);
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<List<TEntity>> WhereAsync(ISpecification<TEntity> specification, CancellationToken cancellation = default)
-            => _read.WhereAsync(specification, cancellation);
+        {
+            throw new NotImplementedException();
+        }
     }
 }
