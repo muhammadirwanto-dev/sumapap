@@ -28,7 +28,7 @@ namespace Sumapap.Persistence.Caching.FusionCache.DependencyInjection
             {
                 foreach (var entry in entries)
                 {
-                    if (entry.IsGeneric)
+                    if (entry.AllowCaching)
                     {
                         builder.Services.Decorate(entry.AbstractType, GetCachedImplType(entry.ImplType));
                     }
@@ -37,22 +37,36 @@ namespace Sumapap.Persistence.Caching.FusionCache.DependencyInjection
 
             private static Type GetCachedImplType(Type implType)
             {
-                if (implType.IsGenericType)
-                {
-                    var typeArguments = implType.GetGenericArguments();
-                    var genericDefinition = implType.GetGenericTypeDefinition();
+                var rwInterface = implType.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IReadWriteRepository<,>));
+                var roInterface = implType.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IReadRepository<,>));
+                var woInterface = implType.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IWriteRepository<,>));
 
-                    if (genericDefinition == typeof(IReadRepository<,>))
-                    {
-                        return typeof(CachedReadRepository<,>).MakeGenericType(typeArguments);
-                    }
-                    else if (genericDefinition == typeof(IWriteRepository<,>))
-                    {
-                        //return typeof(CachedWriteRepository<,>).MakeGenericType(typeArguments);
-                    }
+                if (rwInterface == null &&
+                    roInterface == null &&
+                    woInterface == null)
+                {
+                    throw new InvalidOperationException("Repository should implements the corresponding interface");
                 }
 
-                throw new NotSupportedException($"Unsupported repository type: {implType.FullName}");
+                if (rwInterface != null)
+                {
+                    var typeArguments = rwInterface.GetGenericArguments();
+                    return typeof(CachedReadWriteRepository<,>).MakeGenericType(typeArguments);
+                }
+
+                if (roInterface != null)
+                {
+                    var typeArguments = roInterface.GetGenericArguments();
+                    return typeof(CachedReadRepository<,>).MakeGenericType(typeArguments);
+                }
+
+                if (woInterface != null)
+                {
+                    var typeArguments = woInterface.GetGenericArguments();
+                    return typeof(CachedWriteRepository<,>).MakeGenericType(typeArguments);
+                }
+
+                throw new InvalidOperationException();
             }
         }
     }

@@ -203,10 +203,15 @@ namespace Sumapap.Persistence.DependencyInjection
             }
         }
 
-        private object RegisterReadWriteRepository(
+        private static object RegisterReadWriteRepository(
             RepositoryRegistrationEntry registration,
             IServiceProvider provider)
         {
+            if (!registration.IsReadWriteRepository())
+            {
+                throw new InvalidOperationException("Registered instance should be read-write");
+            }
+
             var typeArguments = registration.ImplType.GetGenericArguments();
             var entityType = typeArguments.FirstOrDefault(x => typeof(IEntity).IsAssignableFrom(x)) ?? throw new InvalidOperationException("Entity type cannot be determined.");
             var contextType = typeArguments.FirstOrDefault(x => !typeof(IEntity).IsAssignableFrom(x)) ?? throw new InvalidOperationException("Context type cannot be determined.");
