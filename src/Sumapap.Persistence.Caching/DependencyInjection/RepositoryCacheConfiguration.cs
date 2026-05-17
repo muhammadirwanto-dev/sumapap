@@ -19,5 +19,7 @@
         /// Additional metadata for cache provider-specific configuration.
         /// </summary>
         public Dictionary<string, object> Metadata { get; } = [];
+
+        public bool IsCached(string key) => Methods.TryGetValue(key, out var cached) && cached;
     }
 }

@@ -23,9 +23,12 @@ namespace Sumapap.Persistence.Caching.FusionCache.Repositories
             Func<TResult> operation)
             where TEntity : class, IEntity
         {
-            if (_registry.IsCached(inner, typeof(TEntity), methodName))
+            if (_registry.GetCacheEntry(inner, typeof(TEntity)) is RepositoryCacheEntry entry
+                && entry.IsCached(methodName))
             {
-                return _cache.GetOrSet(cacheKey, _ => operation(), tags: tags);
+                return entry.Configuration.Duration.HasValue
+                    ? _cache.GetOrSet(cacheKey, _ => operation(), tags: tags, duration: entry.Configuration.Duration.Value)
+                    : _cache.GetOrSet(cacheKey, _ => operation(), tags: tags);
             }
 
             return operation();
@@ -40,9 +43,12 @@ namespace Sumapap.Persistence.Caching.FusionCache.Repositories
             CancellationToken cancellationToken = default)
             where TEntity : class, IEntity
         {
-            if (_registry.IsCached(inner, typeof(TEntity), methodName))
+            if (_registry.GetCacheEntry(inner, typeof(TEntity)) is RepositoryCacheEntry entry
+                && entry.IsCached(methodName))
             {
-                return await _cache.GetOrSetAsync(cacheKey, (ct) => operation(), tags: tags, token: cancellationToken);
+                return entry.Configuration.Duration.HasValue
+                    ? await _cache.GetOrSetAsync(cacheKey, (ct) => operation(), tags: tags, token: cancellationToken, duration: entry.Configuration.Duration.Value)
+                    : await _cache.GetOrSetAsync(cacheKey, (ct) => operation(), tags: tags, token: cancellationToken);
             }
 
             return await operation();

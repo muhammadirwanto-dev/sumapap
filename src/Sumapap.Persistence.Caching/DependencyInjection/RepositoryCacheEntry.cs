@@ -26,5 +26,7 @@
         /// E.g., IRepository&lt;User&gt;, IReadRepository&lt;User&gt;, etc.
         /// </summary>
         public List<Type> ServiceTypes { get; init; } = [];
+
+        public bool IsCached(string key) => Configuration.IsCached(key);
     }
 }

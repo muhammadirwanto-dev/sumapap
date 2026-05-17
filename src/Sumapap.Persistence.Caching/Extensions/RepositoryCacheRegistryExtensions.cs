@@ -27,7 +27,7 @@ namespace Sumapap.Persistence.Caching.Extensions
                     return false;
                 }
 
-                return entry.Configuration.Methods.TryGetValue(key, out var cached) && cached;
+                return entry.IsCached(key);
             }
         }
     }
