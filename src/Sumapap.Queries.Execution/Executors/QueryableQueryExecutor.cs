@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
 using Sumapap.Queries.Abstractions;
-using Sumapap.Queries.Execution.Evaluators;
 using Sumapap.Queries.Execution.Utils;
 using Sumapap.Queries.Paging;
 using Sumapap.Queries.Sorting;
@@ -10,26 +9,60 @@ namespace Sumapap.Queries.Execution.Executors
     public sealed class QueryableQueryExecutor<T>
         : QueryExecutorBase<IQueryable<T>, T>
     {
-        public override IQueryResult<T> Execute(IQuery query, IQueryable<T> source)
+        protected override IQueryable<T> ApplyFiltering(IQueryable<T> source, IQuery query)
         {
-            var filtered = ApplyFiltering(source, query);
-            var sorted = ApplySorting(filtered, query);
+            var expr = _expressionBuilder.BuildFilterExpression(query.Filters);
 
-            return ApplyPaging(sorted, query);
+            return source.Where(expr);
         }
 
-        public override Task<IQueryResult<T>> ExecuteAsync(IQuery query, IQueryable<T> source, CancellationToken cancellationToken = default)
-            => Task.FromResult(Execute(query, source));
+        protected override IQueryable<T> ApplySorting(IQueryable<T> source, IQuery query)
+        {
+            var sorts = query.Sort?.Sorts;
+            if (sorts == null || !sorts.Any())
+            {
+                return source;
+            }
+
+            IOrderedQueryable<T>? ordered = null;
+
+            foreach (var descriptor in sorts)
+            {
+                var expression = _expressionBuilder.BuildSortExpression(descriptor.Field);
+
+                ordered = ordered == null
+                    ? descriptor.Direction == SortDirection.Asc
+                        ? source.OrderBy(expression)
+                        : source.OrderByDescending(expression)
+                    : descriptor.Direction == SortDirection.Asc
+                        ? ordered.ThenBy(expression)
+                        : ordered.ThenByDescending(expression);
+            }
+
+            return ordered ?? source;
+        }
 
         protected override IQueryResult<T> ApplyCursorPaging(IQueryable<T> source, IQuery query)
         {
             var paging = query.CursorPaging!;
+            var prop = typeof(T).GetProperty(paging.CursorField)!;
+            var lambda = _expressionBuilder.BuildSortExpression(paging.CursorField);
 
-            source = ApplyCursorOrdering(source, paging);
+            // Re-use sorting logic to ensure cursor stability
+            source = paging.Direction == CursorDirection.Forward
+                ? source.OrderBy(lambda)
+                : source.OrderByDescending(lambda);
 
             if (!string.IsNullOrEmpty(paging.Cursor))
             {
-                source = ApplyCursorFiltering(source, paging);
+                var cursorValue = CursorEncryption.DecodeCursor(paging.Cursor, prop.PropertyType);
+
+                var param = ExpressionCache<T>.Param;
+                var filter = paging.Direction == CursorDirection.Forward
+                    ? Expression.GreaterThan(Expression.Property(param, prop), Expression.Constant(cursorValue))
+                    : Expression.LessThan(Expression.Property(param, prop), Expression.Constant(cursorValue));
+
+                source = source.Where(Expression.Lambda<Func<T, bool>>(filter, param));
             }
 
             var items = source.Take(paging.Limit + 1);
@@ -37,111 +70,18 @@ namespace Sumapap.Queries.Execution.Executors
             var result = items.Take(paging.Limit);
 
             var endCursor = result.Any()
-                ? CursorEncryption.EncodeCursor(
-                    ReflectionCache
-                        .GetProperty<T>(paging.CursorField)!
-                        .GetValue(result.Last())!)
+                ? CursorEncryption.EncodeCursor(prop.GetValue(result.Last())!)
                 : null;
 
             return new QueryResult<T>(
                 result,
-                -1,
+                totalDataCount: -1,
                 new PageInfo(
                     hasNextPage: hasNext,
                     hasPreviousPage: paging.Cursor != null,
-                    paging.Cursor,
+                    startCursor: paging.Cursor,
                     endCursor)
             );
-        }
-
-        protected override IQueryable<T> ApplyFiltering(IQueryable<T> source, IQuery query)
-            => source.Where(item => FilterEvaluator.EvaluateGroup(query.Filters, item));
-
-        protected override IQueryResult<T> ApplyPaging(IQueryable<T> source, IQuery query)
-        {
-            if (query.UsesCursorPaging)
-            {
-                return ApplyCursorPaging(source, query);
-            }
-
-            var total = source.Count();
-
-            if (query.UsesOffsetPaging)
-            {
-                var page = query.OffsetPaging!;
-                var items = source
-                    .Skip(page.Offset)
-                    .Take(page.PageSize);
-
-                return new QueryResult<T>(items, total, new PageInfo(
-                    hasNextPage: page.Offset + page.PageSize < total,
-                    hasPreviousPage: page.Offset > 0)
-                    );
-            }
-
-            return new QueryResult<T>([.. source], total);
-        }
-
-        protected override IQueryable<T> ApplySorting(IQueryable<T> source, IQuery query)
-        {
-            SortConfiguration sort = query.Sort;
-
-            if (sort == null || sort.Sorts.Count == 0)
-                return source;
-
-            IOrderedQueryable<T>? ordered = null;
-
-            foreach (var descriptor in sort.Sorts)
-            {
-                SortEvaluator.EvaluateDescriptor(descriptor, source, ref ordered);
-            }
-
-            return ordered ?? source;
-        }
-
-        private static IQueryable<T> ApplyCursorOrdering(
-            IQueryable<T> source,
-            CursorPaginationConfiguration paging)
-        {
-            var prop = ReflectionCache.GetProperty<T>(paging.CursorField)!;
-            var param = ExpressionCache<T>.Param;
-            var body = Expression.Property(param, prop);
-            var lambda = Expression.Lambda(body, param);
-
-            var methodName = paging.Direction == CursorDirection.Forward
-                ? nameof(Queryable.OrderBy)
-                : nameof(Queryable.OrderByDescending);
-
-            var method = typeof(Queryable)
-                .GetMethods()
-                .Single(m =>
-                    m.Name == methodName &&
-                    m.GetParameters().Length == 2);
-
-            return (IQueryable<T>)method
-                .MakeGenericMethod(typeof(T), prop.PropertyType)
-                .Invoke(null, [source, lambda])!;
-        }
-
-        private static IQueryable<T> ApplyCursorFiltering(
-            IQueryable<T> source,
-            CursorPaginationConfiguration paging)
-        {
-            var prop = ReflectionCache.GetProperty<T>(paging.CursorField)!;
-            var cursorValue = CursorEncryption.DecodeCursor(
-                paging.Cursor!,
-                prop.PropertyType);
-
-            var param = ExpressionCache<T>.Param;
-            var left = Expression.Property(param, prop);
-            var right = Expression.Constant(cursorValue, prop.PropertyType);
-
-            var comparison = paging.Direction == CursorDirection.Forward
-                ? Expression.GreaterThan(left, right)
-                : Expression.LessThan(left, right);
-
-            var lambda = Expression.Lambda<Func<T, bool>>(comparison, param);
-            return source.Where(lambda);
         }
     }
 }

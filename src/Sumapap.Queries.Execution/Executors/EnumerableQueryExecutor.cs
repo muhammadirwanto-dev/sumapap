@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using Sumapap.Queries.Abstractions;
-using Sumapap.Queries.Execution.Evaluators;
 using Sumapap.Queries.Execution.Utils;
 using Sumapap.Queries.Paging;
 using Sumapap.Queries.Sorting;
@@ -10,73 +9,65 @@ namespace Sumapap.Queries.Execution.Executors
     public sealed class EnumerableQueryExecutor<T>
         : QueryExecutorBase<IEnumerable<T>, T>
     {
-        public override IQueryResult<T> Execute(IQuery query, IEnumerable<T> source)
-        {
-            var filtered = ApplyFiltering(source, query);
-            var sorted = ApplySorting(filtered, query);
-
-            return ApplyPaging(sorted, query);
-        }
-
-        public override Task<IQueryResult<T>> ExecuteAsync(IQuery query, IEnumerable<T> source, CancellationToken cancellationToken = default)
-            => Task.FromResult(Execute(query, source));
-
         protected override IEnumerable<T> ApplyFiltering(IEnumerable<T> source, IQuery query)
-            => source.Where(item => FilterEvaluator.EvaluateGroup(query.Filters, item));
-
-        protected override IQueryResult<T> ApplyPaging(IEnumerable<T> source, IQuery query)
         {
-            if (query.UsesCursorPaging)
-            {
-                return ApplyCursorPaging(source, query);
-            }
+            var expr = _expressionBuilder.BuildFilterExpression(query.Filters);
 
-            var total = source.Count();
-
-            if (query.UsesOffsetPaging)
-            {
-                var page = query.OffsetPaging!;
-                var items = source
-                    .Skip(page.Offset)
-                    .Take(page.PageSize);
-
-                return new QueryResult<T>(items, total, new PageInfo(
-                    hasNextPage: page.Offset + page.PageSize < total,
-                    hasPreviousPage: page.Offset > 0)
-                    );
-            }
-
-            return new QueryResult<T>([.. source], total);
+            return source.AsEnumerable().Where(expr.Compile()).AsEnumerable();
         }
 
+        protected override IEnumerable<T> ApplySorting(IEnumerable<T> source, IQuery query)
+        {
+            var sorts = query.Sort?.Sorts;
+            if (sorts == null || !sorts.Any())
+            {
+                return source;
+            }
+
+            IOrderedEnumerable<T>? ordered = null;
+
+            foreach (var descriptor in sorts)
+            {
+                var expression = _expressionBuilder.BuildSortExpression(descriptor.Field);
+
+                ordered = ordered == null
+                    ? descriptor.Direction == SortDirection.Asc
+                        ? source.OrderBy(expression.Compile())
+                        : source.OrderByDescending(expression.Compile())
+                    : descriptor.Direction == SortDirection.Asc
+                        ? ordered.ThenBy(expression.Compile())
+                        : ordered.ThenByDescending(expression.Compile());
+            }
+
+            return ordered ?? source;
+        }
 
         protected override IQueryResult<T> ApplyCursorPaging(IEnumerable<T> source, IQuery query)
         {
             var paging = query.CursorPaging!;
-            var prop = ReflectionCache.GetProperty<T>(paging.CursorField)
-                ?? throw new InvalidOperationException(
-                    $"Cursor field '{paging.CursorField}' not found on '{typeof(T).Name}'.");
+            var prop = typeof(T).GetProperty(paging.CursorField)!;
+            var lambda = _expressionBuilder.BuildSortExpression(paging.CursorField);
+
+            // Re-use sorting logic to ensure cursor stability
+            source = paging.Direction == CursorDirection.Forward
+                ? source.OrderBy(lambda.Compile())
+                : source.OrderByDescending(lambda.Compile());
 
             if (!string.IsNullOrEmpty(paging.Cursor))
             {
-                var cursorValue = CursorEncryption.DecodeCursor(
-                    paging.Cursor,
-                    prop.PropertyType);
+                var cursorValue = CursorEncryption.DecodeCursor(paging.Cursor, prop.PropertyType);
 
                 source = paging.Direction == CursorDirection.Forward
-                    ? source.Where(x =>
-                        Comparer.Default.Compare(prop.GetValue(x), cursorValue) > 0)
-                    : source.Where(x =>
-                        Comparer.Default.Compare(prop.GetValue(x), cursorValue) < 0);
+                    ? source.Where(x => Comparer.Default.Compare(prop.GetValue(x), cursorValue) > 0)
+                    : source.Where(x => Comparer.Default.Compare(prop.GetValue(x), cursorValue) < 0);
             }
 
-            var items = source.Take(paging.Limit + 1).ToList();
-            var hasNext = items.Count > paging.Limit;
-            var result = items.Take(paging.Limit).ToList();
+            var items = source.Take(paging.Limit + 1);
+            var hasNext = items.Count() > paging.Limit;
+            var result = items.Take(paging.Limit);
 
-            var endCursor = result.Count > 0
-                ? CursorEncryption.EncodeCursor(
-                    prop.GetValue(result.Last())!)
+            var endCursor = result.Any()
+                ? CursorEncryption.EncodeCursor(prop.GetValue(result.Last())!)
                 : null;
 
             return new QueryResult<T>(
@@ -86,26 +77,9 @@ namespace Sumapap.Queries.Execution.Executors
                     hasNextPage: hasNext,
                     hasPreviousPage: paging.Cursor != null,
                     startCursor: paging.Cursor,
-                    endCursor: endCursor
+                    endCursor
                 )
             );
-        }
-
-        protected override IEnumerable<T> ApplySorting(IEnumerable<T> source, IQuery query)
-        {
-            SortConfiguration sort = query.Sort;
-
-            if (sort.Sorts.Count == 0)
-                return source;
-
-            IOrderedEnumerable<T>? ordered = null;
-
-            foreach (var descriptor in sort.Sorts)
-            {
-                SortEvaluator.EvaluateDescriptor(descriptor, source, ref ordered);
-            }
-
-            return ordered ?? source;
         }
     }
 }

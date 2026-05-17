@@ -49,7 +49,7 @@ services.AddDomainEventsDispatcher(typeof(Startup).Assembly, typeof(SomeHandler)
 await dispatcher.DispatchAsync(order.ConsumeEvents(), cancellationToken);
 ```
 
-## 🛠 Implementation details
+## 🛠 Features and usage
 
 - `DomainEventDispatcher`
   - For each event in the provided batch, the dispatcher constructs the concrete handler interface type `IDomainEventHandler<T>`

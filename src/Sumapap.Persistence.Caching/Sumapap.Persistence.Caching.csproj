@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0513</FileVersion>
+    <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
+  </PropertyGroup>
+
+  <!--NuGet properties-->
+  <PropertyGroup>
+    <Title>Sumapap.Persistence.Caching</Title>
+    <PackageId>Sumapap.Persistence.Caching</PackageId>
+    <PackageTags>Sumapap;Persistence;Caching</PackageTags>
+    <Description>
+      Utility for caching within the persistence layer.
+    </Description>
+    <PackageReadmeFile>docs\Sumapap.Persistence.Caching.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\Sumapap.Persistence.Caching.md" Pack="true" PackagePath="docs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sumapap.Caching\Sumapap.Caching.csproj" />
+    <ProjectReference Include="..\Sumapap.Persistence\Sumapap.Persistence.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Sumapap.Persistence.Caching.FusionCache" />
+  </ItemGroup>
+  
+</Project>

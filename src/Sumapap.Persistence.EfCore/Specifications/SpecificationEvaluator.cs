@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Sumapap.Persistence.Abstraction;
-using Sumapap.Queries.Execution.EfCore.Extensions;
+using Sumapap.Persistence.Abstractions;
+using Sumapap.Queries.Execution.Extensions;
 
 namespace Sumapap.Persistence.EfCore.Specifications
 {
@@ -29,7 +29,7 @@ namespace Sumapap.Persistence.EfCore.Specifications
             // Aggregate is used to chain the .Include() calls sequentially onto the query.
             // Example: query.Include(o => o.Customer).Include(o => o.OrderItems)
             query = specification.Includes.Aggregate(query,
-                                        (current, include) => current.Include(include));
+                (current, include) => current.Include(include));
 
             var specificationResult = specification.QueryOptions?.Execute(query);
             if (specificationResult != null)

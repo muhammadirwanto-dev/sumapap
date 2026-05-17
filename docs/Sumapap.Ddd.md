@@ -100,6 +100,16 @@ abstractions you can implement or plug into your application. Use it when you wa
   - Use `ConsumeEvents()` to atomically read and remove events (useful when flushing events after
     a successful transaction/commit).
 
+## ⚠️ Notes & best practices
+
+- **Immutability** — Domain events should be immutable. Use C# records for concise, immutable event definitions.
+- **Event timing** — Dispatch domain events only after successful persistence (after `SaveChangesAsync` completes) to avoid notifying handlers about rolled-back changes.
+- **Handler lifetime** — Register handlers with appropriate lifetimes based on their dependencies. Scoped is typically preferred for handlers that depend on DbContext or repositories.
+- **Error handling** — The default `IDomainEventDispatcher` implementations do not swallow exceptions. Wrap dispatch calls with try/catch or implement retry policies (Polly) if needed.
+- **Event granularity** — Keep events focused on a single business fact. Avoid "mega-events" that describe multiple state changes.
+- **Threading** — `DomainEntity` uses `ConcurrentQueue<T>` for thread-safe event collection, but typical domain operations are single-threaded within a request scope.
+- **Testing** — Use `GetEvents()` to inspect queued events in unit tests without consuming them, enabling assertions on event production without side effects.
+
 # ⭐ License
 
 Distributed under the [MIT License](https://github.com/muhammadirwanto-dev/sumapap/tree/main?tab=MIT-1-ov-file#readme). See the `LICENSE` file in the repository for more information.
