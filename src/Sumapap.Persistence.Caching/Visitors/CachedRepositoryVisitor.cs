@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Sumapap.Persistence.Abstractions;
 using Sumapap.Persistence.Caching.DependencyInjection;
 using Sumapap.Persistence.DependencyInjection;
+using Sumapap.Persistence.Extensions;
 
 namespace Sumapap.Persistence.Caching.Visitors;
 
@@ -24,9 +25,7 @@ public class CachedRepositoryVisitor : IRepositoryRegistrationVisitor
             RepositoryType = entry.ImplType,
             EntityType = entry.EntityType,
             Configuration = cachedEntry.Configuration,
-            ServiceTypes = entry.IsGeneric
-                ? RepositoryRegistrationBuilder.GetGenericServiceTypes(entry)
-                : RepositoryRegistrationBuilder.GetServiceTypes(entry)
+            ServiceTypes = [.. entry.GetRepositoryInterfacesTypes()]
         };
 
         cacheRegistry.Register(cacheEntry);

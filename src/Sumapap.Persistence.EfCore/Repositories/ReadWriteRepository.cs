@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Sumapap.Persistence.Abstractions;
 using Sumapap.Queries.Abstractions;
 
@@ -14,15 +13,14 @@ namespace Sumapap.Persistence.EfCore.Repositories
     /// <typeparam name="TKey">The entity's primary key type.</typeparam>
     /// <typeparam name="TContext">The DbContext type.</typeparam>
     public class ReadWriteRepository<TEntity, TContext>(
-        IServiceProvider _serviceProvider,
         TContext @context
         ) : IReadWriteRepository<TEntity, TContext>
         where TEntity : class, IEntity
         where TContext : DbContext
     {
         protected readonly TContext _context = context;
-        protected readonly IReadRepository<TEntity, TContext> _read = _serviceProvider.GetRequiredService<IReadRepository<TEntity, TContext>>();
-        protected readonly IWriteRepository<TEntity, TContext> _write = _serviceProvider.GetRequiredService<IWriteRepository<TEntity, TContext>>();
+        protected readonly IReadRepository<TEntity, TContext> _read = new ReadRepository<TEntity, TContext>(context);
+        protected readonly IWriteRepository<TEntity, TContext> _write = new WriteRepository<TEntity, TContext>(context);
 
         public void Add(TEntity entity)
             => _write.Add(entity);

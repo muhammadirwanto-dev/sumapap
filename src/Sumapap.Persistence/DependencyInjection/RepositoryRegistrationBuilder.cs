@@ -112,48 +112,6 @@ namespace Sumapap.Persistence.DependencyInjection
             return this;
         }
 
-        internal static List<Type> GetServiceTypes(RepositoryRegistrationEntry registration)
-        {
-            var serviceTypes = new List<Type>();
-            var entityType = registration.EntityType;
-            var implType = registration.ImplType;
-
-            if (entityType == null)
-            {
-                throw new InvalidOperationException("EntityType cannot be null for non-generic repository service type resolution.");
-            }
-
-            if (registration.AbstractType != implType)
-            {
-                serviceTypes.Add(registration.AbstractType);
-            }
-
-            foreach (var interf in GetRepositoryInterfaceTypes(entityType))
-            {
-                if (interf.IsAssignableFrom(implType))
-                {
-                    serviceTypes.Add(interf);
-                }
-            }
-
-            return serviceTypes;
-        }
-
-        internal static List<Type> GetGenericServiceTypes(RepositoryRegistrationEntry registration)
-        {
-            var serviceTypes = new List<Type>();
-            if (registration.AbstractType != registration.ImplType)
-            {
-                serviceTypes.Add(registration.AbstractType);
-            }
-
-            // For generic repositories, we add the open generic types
-            // The implementation type is typically the open generic
-            serviceTypes.Add(registration.ImplType);
-
-            return serviceTypes;
-        }
-
         private void RegisterRepository(RepositoryRegistrationEntry registration)
         {
             if (registration.EntityType == null)
@@ -164,10 +122,10 @@ namespace Sumapap.Persistence.DependencyInjection
             switch (registration.ServiceLifetime)
             {
                 case ServiceLifetime.Scoped:
-                    AddScopedRepository(_services, registration.AbstractType, registration.ImplType, registration.EntityType);
+                    AddScopedRepository(_services, registration.AbstractType, registration.ImplType);
                     break;
                 case ServiceLifetime.Transient:
-                    AddTransientRepository(_services, registration.AbstractType, registration.ImplType, registration.EntityType);
+                    AddTransientRepository(_services, registration.AbstractType, registration.ImplType);
                     break;
                 default:
                     throw new NotSupportedException($"Service lifetime {registration.ServiceLifetime} is not supported for repository registration.");
@@ -176,121 +134,76 @@ namespace Sumapap.Persistence.DependencyInjection
 
         private void RegisterGenericRepository(RepositoryRegistrationEntry registration)
         {
-            switch (registration.ServiceLifetime)
+            if (registration.IsReadWriteRepository())
             {
-                case ServiceLifetime.Scoped:
-                    if (registration.IsReadWriteRepository())
-                    {
-                        _services.TryAddScoped(sp => RegisterReadWriteRepository(registration, sp));
-                    }
-                    else
-                    {
+                switch (registration.ServiceLifetime)
+                {
+                    case ServiceLifetime.Scoped:
                         _services.TryAddScoped(registration.AbstractType, registration.ImplType);
-                    }
-                    break;
-                case ServiceLifetime.Transient:
-                    if (registration.IsReadWriteRepository())
-                    {
-                        _services.TryAddTransient(sp => RegisterReadWriteRepository(registration, sp));
-                    }
-                    else
-                    {
+                        break;
+                    case ServiceLifetime.Transient:
                         _services.TryAddTransient(registration.AbstractType, registration.ImplType);
-                    }
-                    break;
-                default:
-                    throw new NotSupportedException($"Service lifetime {registration.ServiceLifetime} is not supported for repository registration.");
+                        break;
+                    default:
+                        throw new NotSupportedException($"Service lifetime {registration.ServiceLifetime} is not supported for repository registration.");
+                }
             }
-        }
-
-        private static object RegisterReadWriteRepository(
-            RepositoryRegistrationEntry registration,
-            IServiceProvider provider)
-        {
-            if (!registration.IsReadWriteRepository())
+            else
             {
-                throw new InvalidOperationException("Registered instance should be read-write");
+                switch (registration.ServiceLifetime)
+                {
+                    case ServiceLifetime.Scoped:
+                        AddScopedRepository(_services, registration.ImplType);
+                        break;
+                    case ServiceLifetime.Transient:
+                        AddTransientRepository(_services, registration.ImplType);
+                        break;
+                    default:
+                        throw new NotSupportedException($"Service lifetime {registration.ServiceLifetime} is not supported for repository registration.");
+                }
             }
-
-            var typeArguments = registration.ImplType.GetGenericArguments();
-            var entityType = typeArguments.FirstOrDefault(x => typeof(IEntity).IsAssignableFrom(x)) ?? throw new InvalidOperationException("Entity type cannot be determined.");
-            var contextType = typeArguments.FirstOrDefault(x => !typeof(IEntity).IsAssignableFrom(x)) ?? throw new InvalidOperationException("Context type cannot be determined.");
-            var context = provider.GetRequiredService(contextType);
-
-            var readRepoInterfaceType = typeof(IReadRepository<,>).MakeGenericType(entityType, contextType);
-            var writeRepoInterfaceType = typeof(IWriteRepository<,>).MakeGenericType(entityType, contextType);
-
-            var readRepositoryImpl = provider.GetRequiredService(readRepoInterfaceType);
-            var writeRepositoryImpl = provider.GetRequiredService(writeRepoInterfaceType);
-            var closedReadWriteType = registration.ImplType.IsGenericTypeDefinition
-                ? registration.ImplType.MakeGenericType(entityType, contextType)
-                : registration.ImplType;
-
-            return Activator.CreateInstance(
-                closedReadWriteType,
-                context,
-                readRepositoryImpl,
-                writeRepositoryImpl
-            ) ?? throw new InvalidOperationException($"Failed to create an instance of {closedReadWriteType.Name}");
         }
 
         private static void AddScopedRepository(
             IServiceCollection services,
             Type serviceType,
-            Type implType,
-            Type entityType)
+            Type implType)
         {
-            AddScopedRepository(services, implType, entityType);
+            AddScopedRepository(services, implType);
             services.AddScoped(serviceType, sp => sp.GetRequiredService(implType));
         }
 
         private static void AddScopedRepository(
             IServiceCollection services,
-            Type implType,
-            Type entityType)
+            Type implType)
         {
             services.AddScoped(implType);
 
-            foreach (var interf in GetRepositoryInterfaceTypes(entityType))
+            foreach (var interf in implType.GetRepositoryInterfacesTypes())
             {
-                if (interf.IsAssignableFrom(implType))
-                {
-                    services.AddScoped(interf, sp => sp.GetRequiredService(implType));
-                }
+                services.AddScoped(interf, sp => sp.GetRequiredService(implType));
             }
         }
 
         private static void AddTransientRepository(
             IServiceCollection services,
             Type serviceType,
-            Type implType,
-            Type entityType)
+            Type implType)
         {
-            AddTransientRepository(services, implType, entityType);
+            AddTransientRepository(services, implType);
             services.AddTransient(serviceType, sp => sp.GetRequiredService(implType));
         }
 
         private static void AddTransientRepository(
             IServiceCollection services,
-            Type implType,
-            Type entityType)
+            Type implType)
         {
             services.AddTransient(implType);
 
-            foreach (var interf in GetRepositoryInterfaceTypes(entityType))
+            foreach (var interf in implType.GetRepositoryInterfacesTypes())
             {
-                if (interf.IsAssignableFrom(implType))
-                {
-                    services.AddTransient(interf, sp => sp.GetRequiredService(implType));
-                }
+                services.AddTransient(interf, sp => sp.GetRequiredService(implType));
             }
         }
-
-        private static IEnumerable<Type> GetRepositoryInterfaceTypes(Type entityType) => [
-            typeof(IReadRepository<>).MakeGenericType(entityType),
-            typeof(IWriteRepository<>).MakeGenericType(entityType),
-            typeof(IReadWriteRepository<>).MakeGenericType(entityType),
-            typeof(IRepository<>).MakeGenericType(entityType)
-        ];
     }
 }

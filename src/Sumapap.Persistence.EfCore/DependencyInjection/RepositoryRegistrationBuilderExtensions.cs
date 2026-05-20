@@ -12,7 +12,7 @@ namespace Sumapap.Persistence.EfCore.DependencyInjection
         {
             public IRepositoryRegistrationBuilder AddGenericRepositories(ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
             {
-                builder.AddGenericRepository(typeof(IReadWriteRepository<,>), typeof(ReadWriteRepository<,>), serviceLifetime).AllowCaching();
+                builder.AddGenericRepository(typeof(IReadWriteRepository<,>), typeof(ReadWriteRepository<,>), serviceLifetime);
                 builder.AddGenericRepository(typeof(IReadRepository<,>), typeof(ReadRepository<,>), serviceLifetime);
                 builder.AddGenericRepository(typeof(IWriteRepository<,>), typeof(WriteRepository<,>), serviceLifetime);
 

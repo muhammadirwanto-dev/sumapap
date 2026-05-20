@@ -15,7 +15,6 @@ namespace Sumapap.Persistence.EfCore.UnitOfWork
     /// </remarks>
     /// <param name="dbContext">The _context instance, typically provided by Dependency Injection.</param>
     public class UnitOfWork<TContext>(
-        IServiceProvider _serviceProvider,
         TContext _dbContext) : IUnitOfWork<TContext>
         where TContext : DbContext
     {
@@ -36,7 +35,7 @@ namespace Sumapap.Persistence.EfCore.UnitOfWork
             }
 
             // use the same context as the UoW
-            var rw = new ReadWriteRepository<TEntity, TContext>(_serviceProvider, _context);
+            var rw = new ReadWriteRepository<TEntity, TContext>(_context);
 
             _repositories[key] = rw;
 

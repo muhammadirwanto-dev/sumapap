@@ -1,5 +1,4 @@
-﻿using Sumapap.Persistence.Abstractions;
-using Sumapap.Persistence.DependencyInjection;
+﻿using Sumapap.Persistence.DependencyInjection;
 
 namespace Sumapap.Persistence.Extensions
 {
@@ -7,8 +6,9 @@ namespace Sumapap.Persistence.Extensions
     {
         extension(RepositoryRegistrationEntry registration)
         {
-            public bool IsReadWriteRepository()
-                => typeof(IReadWriteRepository<,>).IsAssignableFrom(registration.ImplType);
+            public bool IsReadWriteRepository() => registration.ImplType.IsReadWriteRepository();
+
+            public Type[] GetRepositoryInterfacesTypes() => registration.ImplType.GetRepositoryInterfacesTypes();
         }
     }
 }
