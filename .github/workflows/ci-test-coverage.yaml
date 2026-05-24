@@ -48,6 +48,8 @@ jobs:
           format: markdown
           output: both
           thresholds: "${{ env.MIN_YELLOW }} ${{ env.MIN_GREEN }}"
+          gist_id: '41038afccedef8e2268247b2d75d71e0'
+          gist_token: ${{ secrets.GIST_SECRET }}
 
       - name: Evaluate Coverage & Prepare Notice
         id: eval_coverage
@@ -75,7 +77,6 @@ jobs:
       # Only execute this step if the workflow was actually triggered by a pull request
       - name: Post Coverage Comment to PR
         if: github.event_name == 'pull_request'
-        uses: mshick/fast-commit-comment@v3
+        uses: mshick/add-pr-comment@v3
         with:
-          file: pr_comment.md
-          type: pr
+          message-path: pr_comment.md
