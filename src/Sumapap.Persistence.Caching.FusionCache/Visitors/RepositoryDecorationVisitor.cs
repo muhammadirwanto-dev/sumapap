@@ -39,21 +39,21 @@ namespace Sumapap.Persistence.Caching.FusionCache.Visitors
 
             if (rwInterface != null)
             {
-                return implType.IsGenericType 
+                return implType.IsGenericTypeDefinition 
                     ? typeof(CachedReadWriteRepository<,>)
                     : typeof(CachedReadWriteRepository<,>).MakeGenericType(rwInterface.GenericTypeArguments);
             }
 
             if (roInterface != null)
             {
-                return implType.IsGenericType 
+                return implType.IsGenericTypeDefinition
                     ? typeof(CachedReadRepository<,>)
                     : typeof(CachedReadRepository<,>).MakeGenericType(roInterface.GenericTypeArguments);
             }
 
             if (woInterface != null)
             {
-                return implType.IsGenericType 
+                return implType.IsGenericTypeDefinition 
                     ? typeof(CachedWriteRepository<,>)
                     : typeof(CachedWriteRepository<,>).MakeGenericType(woInterface.GenericTypeArguments);
             }
