@@ -1,3 +1,5 @@
+using Sumapap.Persistence.Abstractions;
+
 namespace Sumapap.Persistence.Caching.DependencyInjection
 {
     /// <summary>
@@ -26,5 +28,15 @@ namespace Sumapap.Persistence.Caching.DependencyInjection
         /// Clears all registrations (for testing purposes).
         /// </summary>
         internal void Clear() => _entries.Clear();
+
+        internal RepositoryCacheEntry? GetCacheEntry<T>(T repository)
+            where T : IRepository
+        {
+            return CachedRepositories
+                .FirstOrDefault(x =>
+                {
+                    return x.RepositoryType == repository.GetType();
+                });
+        }
     }
 }

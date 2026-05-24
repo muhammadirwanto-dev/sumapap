@@ -2,7 +2,6 @@
 using Sumapap.Caching.Abstractions;
 using Sumapap.Persistence.Abstractions;
 using Sumapap.Persistence.Caching.DependencyInjection;
-using Sumapap.Persistence.Caching.Extensions;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace Sumapap.Persistence.Caching.FusionCache.Repositories
@@ -23,7 +22,7 @@ namespace Sumapap.Persistence.Caching.FusionCache.Repositories
             Func<TResult> operation)
             where TEntity : class, IEntity
         {
-            if (_registry.GetCacheEntry(inner, typeof(TEntity)) is RepositoryCacheEntry entry
+            if (_registry.GetCacheEntry(inner) is RepositoryCacheEntry entry
                 && entry.IsCached(methodName))
             {
                 return entry.Configuration.Duration.HasValue
@@ -43,7 +42,7 @@ namespace Sumapap.Persistence.Caching.FusionCache.Repositories
             CancellationToken cancellationToken = default)
             where TEntity : class, IEntity
         {
-            if (_registry.GetCacheEntry(inner, typeof(TEntity)) is RepositoryCacheEntry entry
+            if (_registry.GetCacheEntry(inner) is RepositoryCacheEntry entry
                 && entry.IsCached(methodName))
             {
                 return entry.Configuration.Duration.HasValue

@@ -23,7 +23,7 @@ namespace Sumapap.Persistence.Caching.DependencyInjection
                 configurator.Builder.Registrations[registrationIndex] = currentReg with
                 {
                     AllowCaching = true,
-                    Decorator = new CachedRepositoryRegistrationEntry(currentReg, cacheConfig)
+                    Decorator = new CachedRepositoryRegistration(currentReg, cacheConfig)
                 };
 
                 return configurator;

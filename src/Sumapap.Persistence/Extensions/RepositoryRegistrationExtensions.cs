@@ -2,9 +2,9 @@
 
 namespace Sumapap.Persistence.Extensions
 {
-    internal static class RepositoryRegistrationEntryExtensions
+    internal static class RepositoryRegistrationExtensions
     {
-        extension(RepositoryRegistrationEntry registration)
+        extension(RepositoryRegistration registration)
         {
             public bool IsReadWriteRepository() => registration.ImplType.IsReadWriteRepository();
 

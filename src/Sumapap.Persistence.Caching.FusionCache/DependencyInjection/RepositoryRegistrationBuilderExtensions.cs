@@ -1,13 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Sumapap.Persistence.Abstractions;
 using Sumapap.Persistence.Caching.FusionCache.Visitors;
 using Sumapap.Persistence.Caching.Visitors;
+using Sumapap.Persistence.DependencyInjection.Abstractions;
 
 namespace Sumapap.Persistence.Caching.FusionCache.DependencyInjection
 {
     public static class RepositoryRegistrationBuilderExtensions
     {
-        extension(IRepositoryRegistrationBuilder builder)
+        extension(IPersistenceBuilder builder)
         {
             /// <summary>
             /// Registers generic repositories with FusionCache caching enabled for all methods.

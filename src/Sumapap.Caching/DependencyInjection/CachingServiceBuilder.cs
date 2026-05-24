@@ -3,7 +3,7 @@ using Sumapap.Caching.Abstractions;
 using Sumapap.Caching.DependencyInjection.Options;
 using Sumapap.DependencyInjection.Abstractions;
 
-namespace Sumapap.Caching.DependencyInjection.Builder
+namespace Sumapap.Caching.DependencyInjection
 {
     public class CachingServiceBuilder(ISumapapServiceBuilder _builder) : IBuilder<ISumapapServiceBuilder>
     {

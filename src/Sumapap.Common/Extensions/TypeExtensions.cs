@@ -16,11 +16,9 @@
 
             public Type GetClosedGeneric()
             {
-                var arguments = type.GetGenericArguments();
-
                 return type
                     .GetGenericTypeDefinition()
-                    .MakeGenericType(arguments);
+                    .MakeGenericType(type.GenericTypeArguments);
             }
         }
     }

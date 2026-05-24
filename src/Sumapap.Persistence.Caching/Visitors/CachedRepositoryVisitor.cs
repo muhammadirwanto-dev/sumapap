@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
-using Sumapap.Persistence.Abstractions;
 using Sumapap.Persistence.Caching.DependencyInjection;
 using Sumapap.Persistence.DependencyInjection;
+using Sumapap.Persistence.DependencyInjection.Abstractions;
 using Sumapap.Persistence.Extensions;
 
 namespace Sumapap.Persistence.Caching.Visitors;
@@ -12,9 +12,9 @@ namespace Sumapap.Persistence.Caching.Visitors;
 /// </summary>
 public class CachedRepositoryVisitor : IRepositoryRegistrationVisitor
 {
-    public void Visit(RepositoryRegistrationEntry entry, IServiceCollection services)
+    public void Visit(RepositoryRegistration entry, IServiceCollection services)
     {
-        if (!entry.AllowCaching || entry.Decorator is not CachedRepositoryRegistrationEntry cachedEntry)
+        if (!entry.AllowCaching || entry.Decorator is not CachedRepositoryRegistration cachedEntry)
         {
             return;
         }
@@ -23,7 +23,6 @@ public class CachedRepositoryVisitor : IRepositoryRegistrationVisitor
         var cacheEntry = new RepositoryCacheEntry
         {
             RepositoryType = entry.ImplType,
-            EntityType = entry.EntityType,
             Configuration = cachedEntry.Configuration,
             ServiceTypes = [.. entry.GetRepositoryInterfacesTypes()]
         };

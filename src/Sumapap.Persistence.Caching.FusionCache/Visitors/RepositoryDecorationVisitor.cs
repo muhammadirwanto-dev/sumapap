@@ -2,16 +2,25 @@
 using Sumapap.Persistence.Abstractions;
 using Sumapap.Persistence.Caching.FusionCache.Repositories;
 using Sumapap.Persistence.DependencyInjection;
+using Sumapap.Persistence.DependencyInjection.Abstractions;
+using Sumapap.Persistence.Extensions;
 
 namespace Sumapap.Persistence.Caching.FusionCache.Visitors
 {
     internal class RepositoryDecorationVisitor : IRepositoryRegistrationVisitor
     {
-        public void Visit(RepositoryRegistrationEntry entry, IServiceCollection services)
+        public void Visit(RepositoryRegistration entry, IServiceCollection services)
         {
             if (entry.AllowCaching)
             {
-                services.Decorate(entry.AbstractType, GetCachedImplType(entry.ImplType));
+                var cachedImplType = GetCachedImplType(entry.ImplType);
+                var repositoryInterfaces = entry.ImplType.GetRepositoryInterfacesTypes();
+
+                // decorate all repository interfaces with the corresponding cached implementation, except the AbstractType.
+                foreach (var interf in repositoryInterfaces)
+                {
+                    services.TryDecorate(interf, cachedImplType);
+                }
             }
         }
 
@@ -30,17 +39,23 @@ namespace Sumapap.Persistence.Caching.FusionCache.Visitors
 
             if (rwInterface != null)
             {
-                return typeof(CachedReadWriteRepository<,>);
+                return implType.IsGenericType 
+                    ? typeof(CachedReadWriteRepository<,>)
+                    : typeof(CachedReadWriteRepository<,>).MakeGenericType(rwInterface.GenericTypeArguments);
             }
 
             if (roInterface != null)
             {
-                return typeof(CachedReadRepository<,>);
+                return implType.IsGenericType 
+                    ? typeof(CachedReadRepository<,>)
+                    : typeof(CachedReadRepository<,>).MakeGenericType(roInterface.GenericTypeArguments);
             }
 
             if (woInterface != null)
             {
-                return typeof(CachedWriteRepository<,>);
+                return implType.IsGenericType 
+                    ? typeof(CachedWriteRepository<,>)
+                    : typeof(CachedWriteRepository<,>).MakeGenericType(woInterface.GenericTypeArguments);
             }
 
             throw new InvalidOperationException();
