@@ -1,4 +1,4 @@
-name: Publish Sumapap NuGet Packages
+name: CD - Publish Sumapap NuGet Packages
 
 on:
   workflow_dispatch:
@@ -6,7 +6,6 @@ on:
     branches: [ main ]
     types: [ closed ]
 
-# Required for GitHub Artifact Attestations (The "Free Sign")
 permissions:
   id-token: write
   contents: read
@@ -36,7 +35,7 @@ jobs:
         run: dotnet build src/ -c Release --no-restore
 
       - name: Process and Pack Projects
-        id: pack_step # Crucial for referencing outputs
+        id: pack_step
         run: |
           SUCCESS_PACKS=()
           FAILED_PACKS=()
@@ -106,7 +105,7 @@ jobs:
           echo "-- Final Summary"
           echo "--------------------------------------------------"
           if [ ! -z "$SUCCESS_LIST" ]; then
-            echo "✅ SUCCESSFULLY UPLOADED & ATTESTED:"
+            echo "✅ SUCCESSFULLY UPLOADED:"
             IFS='|' read -ra ADDR <<< "$SUCCESS_LIST"
             for i in "${ADDR[@]}"; do [ -z "$i" ] || echo "  - $i"; done
             echo ""
@@ -120,7 +119,7 @@ jobs:
           fi
           
           if [ ! -z "$SKIPPED_LIST" ]; then
-            echo "⏭️ SKIPPED:"
+            echo "⏭️ SKIPPED (EXISTING, NO VERSION, OR DISABLED):"
             IFS='|' read -ra ADDR <<< "$SKIPPED_LIST"
             for i in "${ADDR[@]}"; do [ -z "$i" ] || echo "  - $i"; done
           fi

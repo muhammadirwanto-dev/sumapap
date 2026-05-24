@@ -1,0 +1,74 @@
+name: CI - Verify Dev PR (Tests & Coverage)
+
+on:
+  pull_request:
+    branches: [ dev ]
+    types: [ opened, synchronize, reopened ]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  test-and-coverage:
+    runs-on: ubuntu-latest
+    
+    env:
+      MIN_GREEN: 90
+      MIN_YELLOW: 70
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore Dependencies
+        run: dotnet restore src/
+
+      - name: Build Projects
+        run: dotnet build src/ -c Release --no-restore
+
+      - name: Run Unit Tests
+        run: |
+          dotnet test src/ -c Release --no-build --collect:"XPlat Code Coverage" --results-directory ./TestResults
+
+      - name: Code Coverage Summary
+        id: coverage_summary
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: 'TestResults/**/*.xml'
+          badge: true
+          # Set as false to keep the PR mergeable even if coverage is below the minimum threshold, but still provide feedback in the comment
+          fail_below_min: false 
+          format: markdown
+          output: both
+          thresholds: "${{ env.MIN_YELLOW }} ${{ env.MIN_GREEN }}"
+
+      - name: Evaluate Coverage & Prepare Notice
+        id: eval_coverage
+        run: |
+          ACTUAL_COVERAGE=$(cat code-coverage-results.md | grep -oE "Line Coverage: [0-9]+" | grep -oE "[0-9]+")
+          
+          echo "### 📊 Pull Request Code Coverage Report" > pr_comment.md
+          cat code-coverage-results.md >> pr_comment.md
+          
+          echo -e "\n---" >> pr_comment.md
+          
+          # Use the environment variables inside the bash script execution context
+          if [ "$ACTUAL_COVERAGE" -ge "${{ env.MIN_GREEN }}" ]; then
+            echo -e "\n🟢 **Excellent!** Code coverage is at **${ACTUAL_COVERAGE}%** (Target: >${{ env.MIN_GREEN }}%). Your changes are safely covered by tests." >> pr_comment.md
+          elif [ "$ACTUAL_COVERAGE" -ge "${{ env.MIN_YELLOW }}" ]; then
+            echo -e "\n🟡 **Attention:** Code coverage is at **${ACTUAL_COVERAGE}%** (Warning Zone: ${{ env.MIN_YELLOW }}% - ${{ env.MIN_GREEN }}%). Please create a separate ticket in your backlog to fill in missing unit tests when project priorities allow." >> pr_comment.md
+          else
+            echo -e "\n🔴 **Action Required:** Code coverage has dropped to **${ACTUAL_COVERAGE}%** (Critical Zone: <${{ env.MIN_YELLOW }}%). While this PR remains mergeable, it is highly recommended to log a tracking ticket immediately to address the missing coverage before this feature scales." >> pr_comment.md
+          fi
+
+      - name: Post Coverage Comment to PR
+        uses: mshick/fast-commit-comment@v3
+        with:
+          file: pr_comment.md
+          type: pr
