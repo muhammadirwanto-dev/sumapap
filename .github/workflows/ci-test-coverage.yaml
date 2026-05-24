@@ -48,8 +48,6 @@ jobs:
           format: markdown
           output: both
           thresholds: "${{ env.MIN_YELLOW }} ${{ env.MIN_GREEN }}"
-          gist_id: '41038afccedef8e2268247b2d75d71e0'
-          gist_token: ${{ secrets.GIST_SECRET }}
 
       - name: Evaluate Coverage & Prepare Notice
         id: eval_coverage
@@ -80,3 +78,14 @@ jobs:
         uses: mshick/add-pr-comment@v3
         with:
           message-path: pr_comment.md
+
+      - name: Update Coverage Badge Gist
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: '41038afccedef8e2268247b2d75d71e0'
+          filename: sumapap-coverage.json
+          label: Code Coverage
+          message: "${{ env.ACTUAL_COVERAGE }}%"
+          color: ${{ env.BADGE_COLOR }}
+          style: flat-square
