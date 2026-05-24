@@ -1,6 +1,7 @@
 name: CI - Verify Dev PR (Tests & Coverage)
 
 on:
+  workflow_dispatch:
   pull_request:
     branches: [ dev ]
     types: [ opened, synchronize, reopened ]
@@ -67,7 +68,13 @@ jobs:
             echo -e "\n🔴 **Action Required:** Code coverage has dropped to **${ACTUAL_COVERAGE}%** (Critical Zone: <${{ env.MIN_YELLOW }}%). While this PR remains mergeable, it is highly recommended to log a tracking ticket immediately to address the missing coverage before this feature scales." >> pr_comment.md
           fi
 
+      # Fallback: Always write to the Actions Summary page so manual runs are readable
+      - name: Write to GitHub Job Summary
+        run: cat pr_comment.md >> $GITHUB_STEP_SUMMARY
+
+      # Only execute this step if the workflow was actually triggered by a pull request
       - name: Post Coverage Comment to PR
+        if: github.event_name == 'pull_request'
         uses: mshick/fast-commit-comment@v3
         with:
           file: pr_comment.md
