@@ -65,9 +65,14 @@ jobs:
       - name: Evaluate Coverage & Prepare Notice
         id: eval_coverage
         run: |
-          ACTUAL_COVERAGE=$(cat code-coverage-results.md | grep -oE "Line Coverage: [0-9]+" | grep -oE "[0-9]+")
+          # Extract the percentage numbers
+          EXTRACTED=$(cat code-coverage-results.md | grep -oE "Line Coverage: [0-9]+" | grep -oE "[0-9]+" || echo "")
+          
+          # Fallback: If EXTRACTED is empty (no tests run/no file match), default to 0
+          ACTUAL_COVERAGE=${EXTRACTED:-0}
           echo "ACTUAL_COVERAGE=$ACTUAL_COVERAGE" >> $GITHUB_ENV
           
+          # Determine Color for the Gist Badge
           COLOR="red"
           if [ "$ACTUAL_COVERAGE" -ge "${{ env.MIN_GREEN }}" ]; then COLOR="brightgreen";
           elif [ "$ACTUAL_COVERAGE" -ge "${{ env.MIN_YELLOW }}" ]; then COLOR="yellow"; fi
@@ -82,7 +87,7 @@ jobs:
           elif [ "$ACTUAL_COVERAGE" -ge "${{ env.MIN_YELLOW }}" ]; then
             echo -e "\n🟡 **Attention:** Code coverage is at **${ACTUAL_COVERAGE}%** (Warning Zone: ${{ env.MIN_YELLOW }}% - ${{ env.MIN_GREEN }}%). Please create a separate ticket in your backlog to fill in missing unit tests when project priorities allow." >> pr_comment.md
           else
-            echo -e "\n🔴 **Action Required:** Code coverage has dropped to **${ACTUAL_COVERAGE}%** (Critical Zone: <${{ env.MIN_YELLOW }}%). While this PR remains mergeable, it is highly recommended to log a tracking ticket immediately to address the missing coverage before this feature scales." >> pr_comment.md
+            echo -e "\n🔴 **Action Required:** Code coverage is at **${ACTUAL_COVERAGE}%** (Critical Zone: <${{ env.MIN_YELLOW }}%). While this PR remains mergeable, it is highly recommended to log a tracking ticket immediately to address the missing coverage before this feature scales." >> pr_comment.md
           fi
 
       - name: Write to GitHub Job Summary
