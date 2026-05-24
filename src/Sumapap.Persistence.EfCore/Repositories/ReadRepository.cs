@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using Sumapap.Persistence.Abstraction;
+using Sumapap.Persistence.Abstractions;
 using Sumapap.Persistence.EfCore.Specifications;
 using Sumapap.Queries.Abstractions;
-using Sumapap.Queries.Execution.EfCore.Extensions;
+using Sumapap.Queries.Extensions;
 
 namespace Sumapap.Persistence.EfCore.Repositories
 {

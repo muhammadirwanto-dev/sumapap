@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="../tests/Sumapap.Common.Tests/Sumapap.Common.Tests.csproj" />
+  <Project Path="../tests/Sumapap.Ddd.Tests/Sumapap.Ddd.Tests.csproj" />
+  <Project Path="../tests/Sumapap.DependencyInjection.Tests/Sumapap.DependencyInjection.Tests.csproj" />
+  <Project Path="../tests/Sumapap.Queries.Tests/Sumapap.Queries.Tests.csproj" />
+</Solution>

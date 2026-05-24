@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0524</FileVersion>
+    <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
+  </PropertyGroup>
+
+	<!--NuGet properties-->
+	<PropertyGroup>
+		<Title>Sumapap.Ddd.Abstractions</Title>
+		<PackageId>Sumapap.Ddd.Abstractions</PackageId>
+		<PackageTags>Sumapap;DDD;Domain;Abstractions</PackageTags>
+		<Description>
+		Core Domain-Driven Design (DDD) abstractions for the Sumapap ecosystem.
+		Provides essential building blocks including Entity base classes, Value Objects, Aggregate Roots, and Domain Event interfaces to enforce clean separation of concerns and rich domain modeling in .NET applications.	
+		</Description>
+		<PackageReadmeFile>docs\Sumapap.Ddd.Abstractions.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\docs\Sumapap.Ddd.Abstractions.md" Pack="true" PackagePath="docs" />
+	</ItemGroup>
+
+</Project>

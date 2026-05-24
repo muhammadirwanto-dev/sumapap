@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using Sumapap.Persistence.Abstraction;
+using Sumapap.Persistence.Abstractions;
 using Sumapap.Persistence.EfCore.Repositories;
 
 namespace Sumapap.Persistence.EfCore.UnitOfWork
@@ -14,10 +14,11 @@ namespace Sumapap.Persistence.EfCore.UnitOfWork
     /// Initializes a new instance of the <see cref="UnitOfWork{TContext}"/> class.
     /// </remarks>
     /// <param name="dbContext">The _context instance, typically provided by Dependency Injection.</param>
-    public class UnitOfWork<TContext>(TContext dbContext) : IUnitOfWork<TContext>
+    public class UnitOfWork<TContext>(
+        TContext _dbContext) : IUnitOfWork<TContext>
         where TContext : DbContext
     {
-        protected readonly TContext _context = dbContext;
+        protected readonly TContext _context = _dbContext;
         private readonly Dictionary<Type, object> _repositories = [];
 
         private IDbContextTransaction? _currentTransaction;

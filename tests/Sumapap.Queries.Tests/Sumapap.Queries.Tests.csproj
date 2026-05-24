@@ -5,8 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
-    <AssemblyVersion>1.0.0.0404</AssemblyVersion>
-    <FileVersion>1.0.0.0404</FileVersion>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,11 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Sumapap.Queries.Execution\Sumapap.Queries.Execution.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Using Include="Xunit" />
+    <ProjectReference Include="..\..\src\Sumapap.Queries\Sumapap.Queries.csproj" />
   </ItemGroup>
 
 </Project>

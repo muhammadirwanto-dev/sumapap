@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0404</FileVersion>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0524</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
   </PropertyGroup>
 
@@ -12,16 +12,23 @@
   <PropertyGroup>
     <Title>Sumapap.Ddd</Title>
     <PackageId>Sumapap.Ddd</PackageId>
-    <PackageTags>Sumapap;DDD;Domain</PackageTags>
+    <PackageTags>Sumapap;DDD;Dispatcher</PackageTags>
     <Description>
-		Core Domain-Driven Design (DDD) abstractions for the Sumapap ecosystem.
-		Provides essential building blocks including Entity base classes, Value Objects, Aggregate Roots, and Domain Event interfaces to enforce clean separation of concerns and rich domain modeling in .NET applications.	
+      This package provides a simple, convention-based Domain Event Dispatcher that automatically discovers and invokes all registered `IDomainEventHandlerT` implementations for any given `IDomainEvent`. By leveraging .NET's built-in dependency injection, it ensures seamless integration with your application's service container, allowing for clean separation of concerns and adherence to DDD principles without coupling your domain layer to specific frameworks.
     </Description>
     <PackageReadmeFile>docs\Sumapap.Ddd.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\docs\Sumapap.Ddd.md" Pack="true" PackagePath="docs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sumapap.Ddd.Abstractions\Sumapap.Ddd.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>
