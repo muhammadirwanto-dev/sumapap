@@ -17,6 +17,7 @@ jobs:
     env:
       MIN_GREEN: 90
       MIN_YELLOW: 70
+      COVERAGE_JSON_FILE: "sumapap-coverage.json"
 
     steps:
       - name: Checkout Code
@@ -65,8 +66,12 @@ jobs:
       - name: Evaluate Coverage & Prepare Notice
         id: eval_coverage
         run: |
-          # Extract the percentage numbers
-          EXTRACTED=$(cat code-coverage-results.md | grep -oE "Line Coverage: [0-9]+" | grep -oE "[0-9]+" || echo "")
+          # Flexible parsing lookup: Extract case-insensitive coverage percentages cleanly
+          EXTRACTED=$(grep -i "Coverage" code-coverage-results.md | grep -oE "[0-9]+" | head -n 1 || echo "")
+          
+          if [ -z "$EXTRACTED" ]; then
+            EXTRACTED=$(grep -oE "[0-9]+%" code-coverage-results.md | grep -oE "[0-9]+" | head -n 1 || echo "")
+          fi
           
           # Fallback: If EXTRACTED is empty (no tests run/no file match), default to 0
           ACTUAL_COVERAGE=${EXTRACTED:-0}
@@ -99,12 +104,13 @@ jobs:
         with:
           message-path: pr_comment.md
 
+      # Uses the variable definition directly from the global env context
       - name: Update Coverage Badge Gist
         uses: schneegans/dynamic-badges-action@v1.7.0
         with:
           auth: ${{ secrets.GIST_SECRET }}
           gistID: '41038afccedef8e2268247b2d75d71e0'
-          filename: sumapap-coverage.json
+          filename: ${{ env.COVERAGE_JSON_FILE }}
           label: Code Coverage
           message: "${{ env.ACTUAL_COVERAGE }}%"
           color: ${{ env.BADGE_COLOR }}
