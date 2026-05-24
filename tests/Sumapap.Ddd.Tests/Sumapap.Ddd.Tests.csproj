@@ -17,7 +17,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Sumapap.Queries\Sumapap.Queries.csproj" />
+    <ProjectReference Include="..\..\src\Sumapap.Ddd\Sumapap.Ddd.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
   </ItemGroup>
 
 </Project>
