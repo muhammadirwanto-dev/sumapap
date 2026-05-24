@@ -23,13 +23,13 @@
 
 1. Add the package (once published on NuGet):
 
-    ``bash
+    ```bash
     dotnet add package Sumapap.Queries.Abstractions
-    ``
+    ```
 
 2. Build a declarative query from incoming DTOs:
 
-    ``csharp
+    ```csharp
     using Sumapap.Queries.Abstractions;
     using Sumapap.Queries.Filtering;
     using Sumapap.Queries.Paging;
@@ -47,18 +47,18 @@
         .ThenBy("Id");
 
     var query = new Query(filters, sort, new OffsetPaginationOptions(page: 1, pageSize: 25));
-    ``
+    ```
 
 3. Pass the query to your repository/service and wrap the response:
 
-    ``csharp
+    ```csharp
     var data = await orderRepository.ExecuteAsync(query, cancellationToken);
 
     return new QueryResult<OrderDto>(
         data.Items,
         data.TotalDataCount,
         data.PageInfo);
-    ``
+    ```
 
 ## 🛠 Features and usage
 

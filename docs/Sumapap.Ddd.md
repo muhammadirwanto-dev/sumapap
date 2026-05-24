@@ -29,25 +29,25 @@ The package includes:
 
 1. Add the package to your project (when published on NuGet):
 
-``bash
+```bash
  dotnet add package Sumapap.Ddd
-``
+```
 
 2. Register the dispatcher and handlers in your DI container. The extension method scans assemblies for handler implementations:
 
-``csharp
+```csharp
 // Register handlers from the current calling assembly
 services.AddDomainEventsDispatcher();
 
 // Or specify assemblies explicitly
 services.AddDomainEventsDispatcher(typeof(Startup).Assembly, typeof(SomeHandler).Assembly);
-``
+```
 
 3. Use the dispatcher to publish events (e.g. after saving changes in a transaction):
 
-``csharp
+```csharp
 await dispatcher.DispatchAsync(order.ConsumeEvents(), cancellationToken);
-``
+```
 
 ## 🛠 Features and usage
 
@@ -77,7 +77,7 @@ await dispatcher.DispatchAsync(order.ConsumeEvents(), cancellationToken);
 
 ### Example
 
-``csharp
+```csharp
 // Event
 public record OrderPlacedEvent(Guid OrderId, DateTime OccurredAt) : IDomainEvent;
 
@@ -103,7 +103,7 @@ services.AddDomainEventsDispatcher(typeof(NotifyWarehouseHandler).Assembly);
 
 // Usage (e.g. in application service)
 await dispatcher.DispatchAsync(order.ConsumeEvents());
-``
+```
 
 # ⭐ License
 

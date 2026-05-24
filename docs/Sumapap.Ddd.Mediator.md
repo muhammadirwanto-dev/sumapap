@@ -30,7 +30,7 @@ This package supports the `Mediator.Abstractions` (source-generated mediator) fa
 
 1. Add the package(s) to your project:
 
-``bash
+```bash
  dotnet add package Sumapap.Ddd.Mediator
 
  # and the Mediator implementation (https://github.com/martinothamar/Mediator)
@@ -44,17 +44,17 @@ or
   <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 </PackageReference>
 <PackageReference Include="Mediator.Abstractions" Version="3.0.*" />
-``
+```
 
 2. Make your domain events compatible with the mediator by implementing `IDomainEventAdapter` which inherits both `IDomainEvent` and the mediator's notification interface (`INotification`). Example:
 
-``csharp
+```csharp
 public record OrderPlacedEvent(Guid OrderId, DateTime OccurredAt) : IDomainEventAdapter;
-``
+```
 
 3. Register mediator and the dispatcher in DI (example using the `Mediator` source generator):
 
-``csharp
+```csharp
 // register mediator (example)
 services.AddMediator(options =>
 {
@@ -63,15 +63,15 @@ services.AddMediator(options =>
 
 // register the domain event dispatcher
 services.AddDomainEventsDispatcher();
-``
+```
 
 4. Emit domain events from your entities and dispatch after your unit of work completes:
 
-``csharp
+```csharp
 order.AddDomainEvent(new OrderPlacedEvent(order.Id, DateTime.UtcNow));
 // after saving changes
 await dispatcher.DispatchAsync(order.ConsumeEvents());
-``
+```
 
 > [!WARNING]
 > Events must implement `IDomainEventAdapter` (or be adapted to it) — the dispatcher casts each `IDomainEvent` to `IDomainEventAdapter` before publishing.
@@ -86,7 +86,7 @@ await dispatcher.DispatchAsync(order.ConsumeEvents());
 
 ### Example handler
 
-``csharp
+```csharp
 public class NotifyWarehouseHandler : INotificationHandler<OrderPlacedEvent>
 {
     public Task Handle(OrderPlacedEvent notification, CancellationToken cancellationToken)
@@ -95,7 +95,7 @@ public class NotifyWarehouseHandler : INotificationHandler<OrderPlacedEvent>
         return Task.CompletedTask;
     }
 }
-``
+```
 
 Depending on your mediator implementation the handler interface may be `INotificationHandler<T>` or `INotificationHandler<TEvent>` provided by the mediator package you're using.
 
@@ -109,7 +109,7 @@ Depending on your mediator implementation the handler interface may be `INotific
 
 ## ✅ Example
 
-``csharp
+```csharp
 // Domain event (adapter)
 public record OrderPlacedEvent(Guid OrderId, DateTime OccurredAt) : IDomainEventAdapter;
 
@@ -130,7 +130,7 @@ services.AddDomainEventsDispatcher();
 // Usage
 var events = order.ConsumeEvents();
 await dispatcher.DispatchAsync(events, cancellationToken);
-``
+```
 
 # ⭐ License
 

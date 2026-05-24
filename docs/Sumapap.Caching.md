@@ -33,13 +33,13 @@ The goal is to standardize cache key generation across your application while ke
 
 1. Add the package to your project:
 
-``bash
+```bash
 dotnet add package Sumapap.Caching
-``
+```
 
 2. Register caching services in DI:
 
-``csharp
+```csharp
 builder.Services.AddSumapap()
     .WithCaching(caching => caching
         .UseDefaultKeyProvider(options =>
@@ -48,11 +48,11 @@ builder.Services.AddSumapap()
             options.IncludeTypeName = true;
         })
     );
-``
+```
 
 3. Inject `ICacheKeyProvider` into your services:
 
-``csharp
+```csharp
 public class UserService
 {
     private readonly ICacheKeyProvider _keyProvider;
@@ -64,17 +64,17 @@ public class UserService
         _cache = cache;
     }
 }
-``
+```
 
 4. Generate cache keys using the provider:
 
-``csharp
+```csharp
 // Generate cache key: "User:123"
 var cacheKey = _keyProvider.CreateKey<User>(123);
 
 // Try to get from cache
 var cached = await _cache.GetStringAsync(cacheKey);
-``
+```
 
 5. Use cache keys consistently across your application for all cache operations.
 
@@ -84,7 +84,7 @@ var cached = await _cache.GetStringAsync(cacheKey);
 
 **ICacheKeyProvider** - Core abstraction for cache key generation:
 
-``csharp
+```csharp
 public interface ICacheKeyProvider
 {
     // Create cache key from object name and parameters
@@ -93,10 +93,10 @@ public interface ICacheKeyProvider
     // Create cache key from generic type and parameters
     string CreateKey<TObject>(params object[] parameters);
 }
-``
+```
 
 **Usage:**
-``csharp
+```csharp
 // Type-safe key generation
 var userKey = _keyProvider.CreateKey<User>(userId);
 // Result: "User:123"
@@ -108,13 +108,13 @@ var sessionKey = _keyProvider.CreateKey("UserSession", sessionId);
 // Multiple parameters
 var queryKey = _keyProvider.CreateKey<Product>("Search", category, minPrice, maxPrice);
 // Result: "Product:Search:electronics:100:500"
-``
+```
 
 ### Default Cache Key Provider
 
 **DefaultCacheKeyProvider** - Default implementation with configurable options:
 
-``csharp
+```csharp
 public class DefaultCacheKeyProvider : ICacheKeyProvider
 {
     public DefaultCacheKeyProvider(CacheKeyProviderOptions options);
@@ -122,15 +122,15 @@ public class DefaultCacheKeyProvider : ICacheKeyProvider
     public string CreateKey(string @object, params object[] parameters);
     public string CreateKey<TObject>(params object[] parameters);
 }
-``
+```
 
 **Key Generation Format:**
-``
+```
 [Prefix:]TypeName:Param1:Param2:...
-``
+```
 
 **Examples:**
-``csharp
+```csharp
 // Default configuration (no prefix, short type name, ":" separator)
 var key = _keyProvider.CreateKey<User>(123);
 // Result: "User:123"
@@ -144,13 +144,13 @@ var key = _keyProvider.CreateKey<User>(123);
 options.IncludeTypeName = true;
 var key = _keyProvider.CreateKey<User>(123);
 // Result: "MyApp.Domain.User:123"
-``
+```
 
 ### Configuration Options
 
 **CacheKeyProviderOptions** - Configuration for default provider:
 
-``csharp
+```csharp
 public class CacheKeyProviderOptions
 {
     // Separator between cache key components (default: ":")
@@ -162,12 +162,12 @@ public class CacheKeyProviderOptions
     // Cache key prefix for namespacing (default: null)
     public string? Prefix { get; set; }
 }
-``
+```
 
 **Configuration Examples:**
 
 **With Prefix:**
-``csharp
+```csharp
 .WithCaching(caching => caching
     .UseDefaultKeyProvider(options =>
     {
@@ -176,10 +176,10 @@ public class CacheKeyProviderOptions
 )
 
 // Keys: "myapp:User:123", "myapp:Product:456"
-``
+```
 
 **With Custom Separator:**
-``csharp
+```csharp
 .WithCaching(caching => caching
     .UseDefaultKeyProvider(options =>
     {
@@ -188,10 +188,10 @@ public class CacheKeyProviderOptions
 )
 
 // Keys: "User-123", "Product-Search-electronics-100-500"
-``
+```
 
 **With Full Type Name:**
-``csharp
+```csharp
 .WithCaching(caching => caching
     .UseDefaultKeyProvider(options =>
     {
@@ -200,13 +200,13 @@ public class CacheKeyProviderOptions
 )
 
 // Keys: "MyApp.Domain.Entities.User:123"
-``
+```
 
 ### Fluent DI Configuration
 
 **WithCaching()** - Fluent builder for caching configuration:
 
-``csharp
+```csharp
 builder.Services.AddSumapap()
     .WithCaching(caching => caching
         .UseDefaultKeyProvider(options =>
@@ -216,13 +216,13 @@ builder.Services.AddSumapap()
             options.IncludeTypeName = false;
         })
     );
-``
+```
 
 ### Complete Usage Example
 
 Full application setup with caching:
 
-``csharp
+```csharp
 var builder = WebApplication.CreateBuilder(args);
 
 // Register Sumapap with caching
@@ -318,13 +318,13 @@ public class UserService
         return users;
     }
 }
-``
+```
 
 ### Custom Cache Key Provider
 
 Implement `ICacheKeyProvider` for custom key generation strategies:
 
-``csharp
+```csharp
 public class CustomCacheKeyProvider : ICacheKeyProvider
 {
     public string CreateKey(string @object, params object[] parameters)
@@ -351,7 +351,7 @@ builder.Services.AddSumapap()
     .WithCaching(caching => caching
         .UseKeyProvider<CustomCacheKeyProvider>()
     );
-``
+```
 
 ## ⚠️ Notes & best practices
 
@@ -387,7 +387,7 @@ Keep cache keys concise by:
 
 Use prefix for tenant isolation:
 
-``csharp
+```csharp
 .WithCaching(caching => caching
     .UseDefaultKeyProvider(options =>
     {
@@ -396,13 +396,13 @@ Use prefix for tenant isolation:
 )
 
 // Keys: "tenant-123:User:456", "tenant-123:Product:789"
-``
+```
 
 ### Testing Recommendations
 
 Mock `ICacheKeyProvider` in unit tests:
 
-``csharp
+```csharp
 [Fact]
 public async Task GetUser_GeneratesCorrectCacheKey()
 {
@@ -420,7 +420,7 @@ public async Task GetUser_GeneratesCorrectCacheKey()
     // Assert
     keyProviderMock.Verify(k => k.CreateKey<User>(123), Times.Once);
 }
-``
+```
 
 # ⭐ License
 

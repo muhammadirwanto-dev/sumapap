@@ -29,13 +29,13 @@ Core abstractions included:
 
 1. Add the package to your project (when published on NuGet):
 
-   ``bash
+   ```bash
    dotnet add package Sumapap.DependencyInjection
-   ``
+   ```
 
 2. Use the fluent builder in your application startup:
 
-   ``csharp
+   ```csharp
    using Sumapap.DependencyInjection;
 
    var builder = WebApplication.CreateBuilder(args);
@@ -50,18 +50,18 @@ Core abstractions included:
    // sumapapBuilder.AddQueries(...)
 
    var app = builder.Build();
-   ``
+   ```
 
 3. Access the underlying IServiceCollection if needed:
 
-   ``csharp
+   ```csharp
    var services = sumapapBuilder.Build();
    // Continue with manual service registrations if needed
-   ``
+   ```
 
 4. Extension pattern individual libraries extend SumapapServiceBuilder:
 
-   ``csharp
+   ```csharp
    public static class PersistenceExtensions
    {
        public static SumapapServiceBuilder AddPersistence(
@@ -75,7 +75,7 @@ Core abstractions included:
            return builder;
        }
    }
-   ``
+   ```
 # ⭐ License
 
 Distributed under the [MIT License](https://github.com/muhammadirwanto-dev/sumapap/tree/main?tab=MIT-1-ov-file#readme). See the `LICENSE` file in the repository for more information.
@@ -133,7 +133,7 @@ Each Sumapap library extends SumapapServiceBuilder with its own methods:
 
 ## ✅ Example
 
-``csharp
+```csharp
 // Program.cs
 using Sumapap.DependencyInjection;
 
@@ -149,9 +149,9 @@ builder.Services
 
 var app = builder.Build();
 app.Run();
-``
+```
 
-``csharp
+```csharp
 // Custom extension (in your library)
 public static class MyLibraryExtensions
 {
@@ -178,7 +178,7 @@ public static class MyLibraryExtensions
         return builder;
     }
 }
-``
+```
 
 # ⭐ License
 

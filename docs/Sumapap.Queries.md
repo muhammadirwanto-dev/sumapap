@@ -23,13 +23,13 @@
 
 1. Add the package to your project (when published on NuGet):
 
-``bash
+```bash
 dotnet add package Sumapap.Queries
-``
+```
 
 2. Create a query using the builder:
 
-``csharp
+```csharp
 using Sumapap.Queries.Abstractions;
 using Sumapap.Queries.Filtering;
 using Sumapap.Queries.Sorting;
@@ -40,11 +40,11 @@ var query = QueryBuilder.Create()
         .Add("Age", FilterOperator.GreaterThan, 18))
     .OrderBy("Name", SortDirection.Ascending)
     .Page(1, 20);
-``
+```
 
 3. Execute the query against your data source:
 
-``csharp
+```csharp
 using Sumapap.Queries;
 using Sumapap.Queries.Factories;
 
@@ -55,25 +55,25 @@ var result = await executor.ExecuteAsync(query, dbContext.Users);
 // For in-memory collections (IEnumerable)
 var executor = ExecutorFactory.CreateEnumerableExecutor<User, UserDto>();
 var result = executor.Execute(query, usersList);
-``
+```
 
 4. Use extension methods for cleaner syntax:
 
-``csharp
+```csharp
 using Sumapap.Queries.Extensions;
 
 var result = await dbContext.Users.ExecuteQueryAsync<User, UserDto>(query);
-``
+```
 
 5. Access the paginated results:
 
-``csharp
+```csharp
 Console.WriteLine($"Total: {result.Total}, Page: {result.Page} of {result.TotalPages}");
 foreach (var user in result.Items)
 {
     Console.WriteLine($"{user.Name} - {user.Email}");
 }
-``
+```
 
 ## 🛠 Features and usage
 
@@ -88,7 +88,7 @@ The library follows a factory pattern with specialized executors:
 
 Example usage:
 
-``csharp
+```csharp
 // Database execution
 var queryableExecutor = ExecutorFactory.CreateQueryableExecutor<Order, OrderDto>();
 var dbResult = await queryableExecutor.ExecuteAsync(query, dbContext.Orders);
@@ -96,13 +96,13 @@ var dbResult = await queryableExecutor.ExecuteAsync(query, dbContext.Orders);
 // In-memory execution
 var enumerableExecutor = ExecutorFactory.CreateEnumerableExecutor<Order, OrderDto>();
 var memResult = enumerableExecutor.Execute(query, ordersList);
-``
+```
 
 ### Dynamic filtering
 
 Build complex filter expressions dynamically:
 
-``csharp
+```csharp
 var query = QueryBuilder.Create()
     .Where(filter => filter
         // AND conditions
@@ -120,26 +120,26 @@ var query = QueryBuilder.Create()
         .Add("Name", FilterOperator.StartsWith, "John"));
 
 var result = await dbContext.Users.ExecuteQueryAsync<User, UserDto>(query);
-``
+```
 
 ### Multi-column sorting
 
 Specify multiple sort columns with independent directions:
 
-``csharp
+```csharp
 var query = QueryBuilder.Create()
     .OrderBy("Department", SortDirection.Ascending)
     .ThenBy("LastName", SortDirection.Ascending)
     .ThenBy("FirstName", SortDirection.Ascending);
 
 var result = await executor.ExecuteAsync(query, source);
-``
+```
 
 ### Offset pagination
 
 Traditional page-based pagination:
 
-``csharp
+```csharp
 var query = QueryBuilder.Create()
     .Page(pageNumber: 1, pageSize: 20);
 
@@ -147,13 +147,13 @@ var result = await executor.ExecuteAsync(query, source);
 
 Console.WriteLine($"Page {result.Page} of {result.TotalPages}");
 Console.WriteLine($"Showing items {result.From} - {result.To} of {result.Total}");
-``
+```
 
 ### Cursor pagination
 
 Efficient cursor-based pagination for large datasets:
 
-``csharp
+```csharp
 var query = QueryBuilder.Create()
     .WithCursor(
         cursorField: "Id",
@@ -168,13 +168,13 @@ if (result.PageInfo.HasNextPage)
     var nextCursor = result.PageInfo.EndCursor;
     // Use nextCursor for next page request
 }
-``
+```
 
 ### Extension methods
 
 Convenient extension methods for common scenarios:
 
-``csharp
+```csharp
 // Direct execution on IQueryable
 var result = await dbContext.Orders
     .Where(o => o.CustomerId == customerId)
@@ -184,7 +184,7 @@ var result = await dbContext.Orders
 var result = ordersList
     .Where(o => o.Status == "Pending")
     .ExecuteQuery<Order, OrderDto>(query);
-``
+```
 
 ## ⚠️ Notes & best practices
 
@@ -198,7 +198,7 @@ var result = ordersList
 
 ### Example integration with repository
 
-``csharp
+```csharp
 public class OrderRepository : IOrderRepository
 {
     private readonly DbContext _context;
@@ -217,7 +217,7 @@ public class OrderRepository : IOrderRepository
         return await _executor.ExecuteAsync(query, _context.Orders, cancellationToken);
     }
 }
-``
+```
 
 # ⭐ License
 
