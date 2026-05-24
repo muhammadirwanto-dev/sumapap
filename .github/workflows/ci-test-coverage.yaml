@@ -8,7 +8,7 @@ on:
 
 permissions:
   pull-requests: write
-  contents: read
+  contents: write
 
 jobs:
   test-and-coverage:
@@ -27,23 +27,36 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      # 1. Restore everything
       - name: Restore Dependencies
-        run: dotnet restore src/
+        run: |
+          dotnet restore src/Sumapap.slnx
+          dotnet restore tests/Sumapap.Tests.slnx
 
+      # 2. Build everything (Forces new/unreferenced modules to compile)
       - name: Build Projects
-        run: dotnet build src/ -c Release --no-restore
+        run: |
+          dotnet build src/Sumapap.slnx -c Release --no-restore
+          dotnet build tests/Sumapap.Tests.slnx -c Release --no-restore
 
+      # 3. Run tests via the Test Solution, but isolate coverage filters to Sumapap.* core assemblies
+      # (Excludes files ending in .Tests from dragging down or masking the real business logic metrics)
       - name: Run Unit Tests
         run: |
-          dotnet test src/ -c Release --no-build --collect:"XPlat Code Coverage" --results-directory ./TestResults
+          dotnet test tests/Sumapap.Tests.slnx -c Release --no-build \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./TestResults \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Include="[Sumapap.*]*" \
+            DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude="[* *.Tests]*" \
+            DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.IncludeDirectory="src/**/bin/Release/"
 
+      # 4. Parse the generated Cobertura XML files safely
       - name: Code Coverage Summary
         id: coverage_summary
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
           filename: 'TestResults/**/*.xml'
           badge: true
-          # Set as false to keep the PR mergeable even if coverage is below the minimum threshold, but still provide feedback in the comment
           fail_below_min: false 
           format: markdown
           output: both
@@ -53,13 +66,17 @@ jobs:
         id: eval_coverage
         run: |
           ACTUAL_COVERAGE=$(cat code-coverage-results.md | grep -oE "Line Coverage: [0-9]+" | grep -oE "[0-9]+")
+          echo "ACTUAL_COVERAGE=$ACTUAL_COVERAGE" >> $GITHUB_ENV
+          
+          COLOR="red"
+          if [ "$ACTUAL_COVERAGE" -ge "${{ env.MIN_GREEN }}" ]; then COLOR="brightgreen";
+          elif [ "$ACTUAL_COVERAGE" -ge "${{ env.MIN_YELLOW }}" ]; then COLOR="yellow"; fi
+          echo "BADGE_COLOR=$COLOR" >> $GITHUB_ENV
           
           echo "### 📊 Pull Request Code Coverage Report" > pr_comment.md
           cat code-coverage-results.md >> pr_comment.md
-          
           echo -e "\n---" >> pr_comment.md
           
-          # Use the environment variables inside the bash script execution context
           if [ "$ACTUAL_COVERAGE" -ge "${{ env.MIN_GREEN }}" ]; then
             echo -e "\n🟢 **Excellent!** Code coverage is at **${ACTUAL_COVERAGE}%** (Target: >${{ env.MIN_GREEN }}%). Your changes are safely covered by tests." >> pr_comment.md
           elif [ "$ACTUAL_COVERAGE" -ge "${{ env.MIN_YELLOW }}" ]; then
@@ -68,11 +85,9 @@ jobs:
             echo -e "\n🔴 **Action Required:** Code coverage has dropped to **${ACTUAL_COVERAGE}%** (Critical Zone: <${{ env.MIN_YELLOW }}%). While this PR remains mergeable, it is highly recommended to log a tracking ticket immediately to address the missing coverage before this feature scales." >> pr_comment.md
           fi
 
-      # Fallback: Always write to the Actions Summary page so manual runs are readable
       - name: Write to GitHub Job Summary
         run: cat pr_comment.md >> $GITHUB_STEP_SUMMARY
 
-      # Only execute this step if the workflow was actually triggered by a pull request
       - name: Post Coverage Comment to PR
         if: github.event_name == 'pull_request'
         uses: mshick/add-pr-comment@v3
