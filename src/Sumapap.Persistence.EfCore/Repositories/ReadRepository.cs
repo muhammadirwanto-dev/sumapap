@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Sumapap.Persistence.Abstractions;
 using Sumapap.Persistence.EfCore.Specifications;
 using Sumapap.Queries.Abstractions;
-using Sumapap.Queries.Execution.Extensions;
+using Sumapap.Queries.Extensions;
 
 namespace Sumapap.Persistence.EfCore.Repositories
 {

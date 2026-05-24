@@ -30,7 +30,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Sumapap.Persistence.Caching\Sumapap.Persistence.Caching.csproj" />
     <ProjectReference Include="..\Sumapap.Persistence\Sumapap.Persistence.csproj" />
-    <ProjectReference Include="..\Sumapap.Queries.Execution\Sumapap.Queries.Execution.csproj" />
   </ItemGroup>
 
 </Project>

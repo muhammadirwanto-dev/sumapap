@@ -10,21 +10,17 @@
 
   <!--NuGet properties-->
   <PropertyGroup>
-    <Title>Sumapap.Queries</Title>
-    <PackageId>Sumapap.Queries</PackageId>
-    <PackageTags>Sumapap;Queries</PackageTags>
+    <Title>Sumapap.Queries.Abstractions</Title>
+    <PackageId>Sumapap.Queries.Abstractions</PackageId>
+    <PackageTags>Sumapap;Queries;Abstractions</PackageTags>
     <Description>
       Utility for building dynamic queries, filtering, and sorting logic within the persistence layer.
     </Description>
-    <PackageReadmeFile>docs\Sumapap.Queries.md</PackageReadmeFile>
+    <PackageReadmeFile>docs\Sumapap.Queries.Abstractions.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\docs\Sumapap.Queries.md" Pack="true" PackagePath="docs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Sumapap.Queries.Abstractions\Sumapap.Queries.Abstractions.csproj" />
+    <None Include="..\..\docs\Sumapap.Queries.Abstractions.md" Pack="true" PackagePath="docs" />
   </ItemGroup>
 
 </Project>
