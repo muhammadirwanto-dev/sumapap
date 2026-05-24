@@ -33,13 +33,13 @@ Included implementations:
 
 1. Add the package to your project (when published on NuGet):
 
-``bash
+```bash
 dotnet add package Sumapap.Persistence.EFCore
-``
+```
 
 2. Create your EF Core DbContext and entities (entities implement `IEntity` or `IEntity<TKey>`):
 
-``csharp
+```csharp
 public class AppDbContext : DbContext
 {
     public DbSet<Order> Orders { get; set; }
@@ -52,20 +52,20 @@ public class Order : IEntity<Guid>
     public Guid Id { get; set; }
     public Guid CustomerId { get; set; }
 }
-``
+```
 
 3. Register EF Core persistence in DI (recommended):
 
-``csharp
+```csharp
 services.AddEfCorePersistence<AppDbContext>(options =>
     options.UseSqlServer(configuration.GetConnectionString("Default")));
-``
+```
 
 This registers the generic repository types and the `IUnitOfWork<TContext>` implementation and also registers your `DbContext`.
 
 4. Use the repositories / unit of work in application services:
 
-``csharp
+```csharp
 public class OrderService
 {
     private readonly IUnitOfWork<AppDbContext> _uow;
@@ -79,7 +79,7 @@ public class OrderService
         await _uow.SaveChangesAsync();
     }
 }
-``
+```
 
 ## 🛠 Features & Usage Details
 
@@ -130,7 +130,7 @@ public class OrderService
 
 ## ✅ Example
 
-``csharp
+```csharp
 // Register in Program.cs
 services.AddEfCorePersistence<AppDbContext>(opts => opts.UseSqlServer(connString));
 
@@ -161,7 +161,7 @@ public class OrdersAppService
         }
     }
 }
-``
+```
 
 # ⭐ License
 

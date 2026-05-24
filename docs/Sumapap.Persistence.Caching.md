@@ -33,13 +33,13 @@ The goal is to enable flexible, testable repository caching while maintaining cl
 
 1. Add the package to your Infrastructure layer project:
 
-``bash
+```bash
 dotnet add package Sumapap.Persistence.Caching
-``
+```
 
 2. Configure repositories with opt-in caching in your DI setup:
 
-``csharp
+```csharp
 services.AddSumapap()
     .WithRepositories(builder =>
     {
@@ -53,11 +53,11 @@ services.AddSumapap()
             
         builder.UseRepositoryCaching(); // Register visitor
     });
-``
+```
 
 3. Add a cache provider (e.g., FusionCache) to consume the registry:
 
-``csharp
+```csharp
 services.AddSumapap()
     .WithRepositories(builder =>
     {
@@ -65,7 +65,7 @@ services.AddSumapap()
         builder.UseRepositoryCaching();
     })
     .UseFusionCache(); // Provider consumes RepositoryCacheRegistry
-``
+```
 
 4. The cache provider decorates registered repositories automatically based on metadata.
 
@@ -75,7 +75,7 @@ services.AddSumapap()
 
 The caching infrastructure uses the Visitor pattern to separate cache decoration from core repository registration:
 
-``
+```
 Repository Registration → AllowCaching() → Metadata Stored
                                                  ↓
                                      CachingRepositoryVisitor
@@ -83,7 +83,7 @@ Repository Registration → AllowCaching() → Metadata Stored
                                        RepositoryCacheRegistry
                                                  ↓
                                      Cache Provider (FusionCache, etc.)
-``
+```
 
 **Key Components:**
 
@@ -96,7 +96,7 @@ Repository Registration → AllowCaching() → Metadata Stored
 
 **AllowCaching()** - Enable caching for a repository with configuration:
 
-``csharp
+```csharp
 builder
     .AddScopedRepository<IProductRepository, ProductRepository, Product>()
     .AllowCaching(config =>
@@ -105,50 +105,50 @@ builder
         config.Methods.EnableAllReads(); // Cache all read operations
         config.Metadata["Priority"] = "High"; // Custom metadata
     });
-``
+```
 
 **Default Configuration** (minimal):
-``csharp
+```csharp
 builder
     .AddScopedRepository<IOrderRepository, OrderRepository, Order>()
     .AllowCaching(); // Uses default: 5 minutes, all read methods
-``
+```
 
 ### Method-Level Cache Control
 
 **EnableAllReads()** - Cache all read repository methods (default):
-``csharp
+```csharp
 config.Methods.EnableAllReads();
 // Caches: Find, GetAll, FirstOrDefault, SingleOrDefault, Count, Any, Stream*
-``
+```
 
 **EnableSpecific()** - Cache only specific methods:
-``csharp
+```csharp
 config.Methods.Clear();
 config.Methods.EnableMethod("FindAsync");
 config.Methods.EnableMethod("GetAllAsync");
 // Only FindAsync and GetAllAsync are cached
-``
+```
 
 **DisableMethod()** - Exclude specific methods from caching:
-``csharp
+```csharp
 config.Methods.EnableAllReads();
 config.Methods.DisableMethod("StreamAllAsync"); // Disable streaming method cache
-``
+```
 
 ### Cache Registry Inspection
 
 **RepositoryCacheRegistry** - Central registry of cached repository configurations:
 
-``csharp
+```csharp
 public sealed class RepositoryCacheRegistry
 {
     public IReadOnlyList<RepositoryCacheEntry> CachedRepositories { get; }
 }
-``
+```
 
 **Access the registry** (useful for testing or runtime inspection):
-``csharp
+```csharp
 var registry = serviceProvider.GetRequiredService<RepositoryCacheRegistry>();
 
 foreach (var entry in registry.CachedRepositories)
@@ -157,13 +157,13 @@ foreach (var entry in registry.CachedRepositories)
     Console.WriteLine($"Duration: {entry.Configuration.Duration}");
     Console.WriteLine($"Cached Methods: {string.Join(", ", entry.Configuration.Methods)}");
 }
-``
+```
 
 ### Repository Cache Entry
 
 **RepositoryCacheEntry** - Represents a cached repository registration:
 
-``csharp
+```csharp
 public sealed class RepositoryCacheEntry
 {
     public required Type RepositoryType { get; init; }
@@ -171,13 +171,13 @@ public sealed class RepositoryCacheEntry
     public required ServiceLifetime Lifetime { get; init; }
     public required RepositoryCacheConfiguration Configuration { get; init; }
 }
-``
+```
 
 ### Caching Repository Visitor
 
 **CachingRepositoryVisitor** - Processes registrations with caching metadata:
 
-``csharp
+```csharp
 public class CachingRepositoryVisitor : IRepositoryRegistrationVisitor
 {
     public void Visit(RepositoryRegistrationEntry entry, IServiceCollection services)
@@ -195,7 +195,7 @@ public class CachingRepositoryVisitor : IRepositoryRegistrationVisitor
         });
     }
 }
-``
+```
 
 ### Default Cached Methods
 
@@ -225,7 +225,7 @@ By default, the following read-only repository methods are cached:
 
 Cache providers consume the `RepositoryCacheRegistry` to apply decorators:
 
-``csharp
+```csharp
 // Inside a cache provider (e.g., Sumapap.Persistence.FusionCache)
 public static ISumapapBuilder UseFusionCache(this ISumapapBuilder builder)
 {
@@ -247,7 +247,7 @@ public static ISumapapBuilder UseFusionCache(this ISumapapBuilder builder)
     
     return builder;
 }
-``
+```
 
 ## ⚠️ Notes & best practices
 

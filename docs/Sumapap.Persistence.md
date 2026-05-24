@@ -30,45 +30,45 @@ The goal is to let your domain and application layers depend on a consistent per
 
 1. Add the package to your project (when published on NuGet):
 
-``bash
+```bash
  dotnet add package Sumapap.Persistence
-``
+```
 
 2. Implement your entity (must implement `IEntity` or `IEntity<TKey>`):
 
-``csharp
+```csharp
 public class Order : IEntity<Guid>
 {
     public Guid Id { get; set; }
 }
-``
+```
 
 3. Implement a repository for your persistence technology (read/write):
 
-``csharp
+```csharp
 public class EfOrderRepository : IReadWriteRepository<Order>
 {
     // implement methods using your DbContext
 }
-``
+```
 
 4. Register repository in DI using provided helpers:
 
-``csharp
+```csharp
 // when implementing EfOrderRepository as concrete implementation
 services.AddScopedRepository<EfOrderRepository, Order>();
 
 // or if you have an interface abstraction IOrderRepository
 services.AddScopedRepository<IOrderRepository, EfOrderRepository, Order>();
-``
+```
 
 5. Use repository and unit of work in your services:
 
-``csharp
+```csharp
 var repo = unitOfWork.GetRepository<Order>();
 var orders = await repo.GetAllAsync();
 await unitOfWork.SaveChangesAsync();
-``
+```
 
 ## 🛠 Features and usage
 
@@ -90,7 +90,7 @@ Common patterns:
 
 Example:
 
-``csharp
+```csharp
 await using var uow = serviceScope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
 uow.ExecuteAsync(c =>
@@ -98,7 +98,7 @@ uow.ExecuteAsync(c =>
   var repo = uow.GetRepository<Order>();
   repo.Add(newOrder);
 }, cancellationToken);
-``
+```
 
 ### Specification pattern
 - `ISpecification<T>` encapsulates query criteria (`Expression<Func<T,bool>>? Criteria`), includes (list of navigation paths) and optional `IQuery` (paging and sorting options).
@@ -108,10 +108,10 @@ uow.ExecuteAsync(c =>
 
 Usage example:
 
-``csharp
+```csharp
 var spec = new PagingSpecification<Order>(o => o.CustomerId == customerId, new OffsetPaginationOptions(0, 20));
 var page = await repo.GetAllAsync(spec);
-``
+```
 
 ### Dependency injection helpers
 - `DependencyInjection` exposes extension methods to register repository implementations with correct service mappings and lifetimes:
@@ -131,7 +131,7 @@ This helps avoid repetitive registration code and ensures repositories are avail
 
 #### Example
 
-``csharp
+```csharp
 // Specification
 public class OrdersByCustomerSpec : BaseSpecification<Order>
 {
@@ -149,7 +149,7 @@ services.AddScopedRepository<IOrderRepository, EfOrderRepository, Order>();
 var repo = unitOfWork.GetRepository<Order>();
 var orders = await repo.GetAllAsync(new OrdersByCustomerSpec(customerId));
 await unitOfWork.SaveChangesAsync();
-``
+```
 
 # ⭐ License
 

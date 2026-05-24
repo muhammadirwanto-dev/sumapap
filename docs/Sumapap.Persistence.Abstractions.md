@@ -33,24 +33,24 @@ The goal is to enable Clean Architecture by allowing your domain to depend on ab
 
 1. Add the package to your Domain layer project:
 
-``bash
+```bash
 dotnet add package Sumapap.Persistence.Abstractions
-``
+```
 
 2. Mark your domain entities with `IEntity` or `IEntity<TKey>`:
 
-``csharp
+```csharp
 public class Product : IEntity<Guid>
 {
 	public Guid Id { get; set; }
 	public string Name { get; set; } = string.Empty;
 	public decimal Price { get; set; }
 }
-``
+```
 
 3. Mark aggregate roots with `IAggregateRoot`:
 
-``csharp
+```csharp
 public class Order : IAggregateRoot, IEntity<int>
 {
 	public int Id { get; set; }
@@ -61,16 +61,16 @@ public class Order : IAggregateRoot, IEntity<int>
 		Lines.Add(new OrderLine(product, quantity));
 	}
 }
-``
+```
 
 4. Define domain repository interfaces extending the base contracts:
 
-``csharp
+```csharp
 public interface IProductRepository : IReadRepository<Product>
 {
 	Task<IEnumerable<Product>> GetExpensiveProductsAsync(decimal minPrice);
 }
-``
+```
 
 5. Implement repositories in your Infrastructure layer using `Sumapap.Persistence` or `Sumapap.Persistence.EfCore`.
 
@@ -80,34 +80,34 @@ public interface IProductRepository : IReadRepository<Product>
 
 **IEntity** - Marker interface for all entities:
 
-``csharp
+```csharp
 public interface IEntity;
-``
+```
 
 Use this as a base marker for types that represent entities:
 
-``csharp
+```csharp
 public class AuditLog : IEntity
 {
 	public Guid Id { get; private set; }
 	public string Action { get; set; } = string.Empty;
 	public DateTime Timestamp { get; set; }
 }
-``
+```
 
 **IEntity<TKey>** - Entity with strongly-typed identifier:
 
-``csharp
+```csharp
 public interface IEntity<TKey> : IEntity
 	where TKey : IEquatable<TKey>
 {
 	TKey Id { get; set; }
 }
-``
+```
 
 Most common entity pattern with type-safe ID:
 
-``csharp
+```csharp
 public class User : IEntity<Guid>
 {
 	public Guid Id { get; set; }
@@ -120,19 +120,19 @@ public class Category : IEntity<int>
 	public int Id { get; set; }
 	public string Name { get; set; } = string.Empty;
 }
-``
+```
 
 ### Aggregate Root
 
 **IAggregateRoot** - Marker interface for DDD aggregate roots:
 
-``csharp
+```csharp
 public interface IAggregateRoot : IEntity;
-``
+```
 
 Aggregates enforce consistency boundaries and encapsulate domain logic:
 
-``csharp
+```csharp
 public class ShoppingCart : IAggregateRoot, IEntity<Guid>
 {
 	public Guid Id { get; set; }
@@ -158,19 +158,19 @@ public class ShoppingCart : IAggregateRoot, IEntity<Guid>
 
 	public decimal GetTotal() => _items.Sum(i => i.Subtotal);
 }
-``
+```
 
 ### Repository Interfaces
 
 **IRepository<TEntity>** - Base marker for all repositories:
 
-``csharp
+```csharp
 public interface IRepository<TEntity> where TEntity : class, IEntity;
-``
+```
 
 **IReadRepository<TEntity>** - Read-only repository operations:
 
-``csharp
+```csharp
 public interface IReadRepository<TEntity> : IRepository<TEntity>
 	where TEntity : class, IEntity
 {
@@ -194,11 +194,11 @@ public interface IReadRepository<TEntity> : IRepository<TEntity>
 	IAsyncEnumerable<TEntity> StreamAllAsync(CancellationToken cancellationToken = default);
 	IAsyncEnumerable<TEntity> StreamWhereAsync(ISpecification<TEntity> specification, CancellationToken cancellationToken = default);
 }
-``
+```
 
 **IWriteRepository<TEntity>** - Write operations:
 
-``csharp
+```csharp
 public interface IWriteRepository<TEntity> : IRepository<TEntity>
 	where TEntity : class, IEntity
 {
@@ -214,20 +214,20 @@ public interface IWriteRepository<TEntity> : IRepository<TEntity>
 	Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default);
 	Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
-``
+```
 
 **IReadWriteRepository<TEntity>** - Combined read-write repository:
 
-``csharp
+```csharp
 public interface IReadWriteRepository<TEntity> : IReadRepository<TEntity>, IWriteRepository<TEntity>
 	where TEntity : class, IEntity
 {
 }
-``
+```
 
 **Usage in Domain:**
 
-``csharp
+```csharp
 // Define domain-specific repository interface
 public interface IOrderRepository : IReadWriteRepository<Order>
 {
@@ -261,29 +261,29 @@ public class OrderService
 		return order;
 	}
 }
-``
+```
 
 ### Specification Pattern
 
 **ISpecification<T>** - Contract for reusable query specifications:
 
-``csharp
+```csharp
 public interface ISpecification<T>;
-``
+```
 
 **ISpecificationEvaluator** - Evaluates specifications against queryable data:
 
-``csharp
+```csharp
 public interface ISpecificationEvaluator
 {
 	IQueryable<T> GetQuery<T>(IQueryable<T> inputQuery, ISpecification<T> specification) 
 		where T : class;
 }
-``
+```
 
 **Define specifications in your domain:**
 
-``csharp
+```csharp
 public class ActiveProductsSpecification : ISpecification<Product>
 {
 	// Specification implementation provided by infrastructure layer
@@ -298,23 +298,23 @@ public class ExpensiveProductsSpecification : ISpecification<Product>
 		MinimumPrice = minimumPrice;
 	}
 }
-``
+```
 
 **Use specifications with repositories:**
 
-``csharp
+```csharp
 var activeProducts = await _productRepository
 	.GetAllAsync(new ActiveProductsSpecification());
 
 var expensiveProducts = await _productRepository
 	.GetAllAsync(new ExpensiveProductsSpecification(minPrice: 1000m));
-``
+```
 
 ### Unit of Work
 
 **IUnitOfWork** - Transactional boundary and repository access:
 
-``csharp
+```csharp
 public interface IUnitOfWork : IDisposable
 {
 	IReadWriteRepository<TEntity> GetRepository<TEntity>() where TEntity : class, IEntity;
@@ -331,11 +331,11 @@ public interface IUnitOfWork : IDisposable
 	void RollbackTransaction();
 	Task RollbackTransactionAsync(CancellationToken cancellationToken = default);
 }
-``
+```
 
 **Usage:**
 
-``csharp
+```csharp
 public class TransferService
 {
 	private readonly IUnitOfWork _unitOfWork;
@@ -375,7 +375,7 @@ public class TransferService
 		}
 	}
 }
-``
+```
 
 ## ⚠️ Notes & best practices
 
@@ -401,7 +401,7 @@ public class TransferService
 
 **Correct approach:**
 
-``csharp
+```csharp
 // One repository per aggregate root
 public interface IOrderRepository : IReadWriteRepository<Order> { }
 
@@ -411,14 +411,14 @@ public class Order : IAggregateRoot, IEntity<int>
 	private readonly List<OrderLine> _lines = new();
 	public IReadOnlyList<OrderLine> Lines => _lines.AsReadOnly();
 }
-``
+```
 
 **Incorrect approach:**
 
-``csharp
+```csharp
 // ❌ Don't create separate repositories for child entities
 public interface IOrderLineRepository : IRepository<OrderLine> { }
-``
+```
 
 ### Specification Pattern Best Practices
 
