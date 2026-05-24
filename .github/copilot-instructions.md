@@ -200,6 +200,9 @@ Each library **must** have a corresponding documentation file in `/docs/` folder
 - Avoid obvious comments (`// Set name` is useless)
 - Use `TODO:`, `FIXME:`, `NOTE:` markers for future work
 
+### Don'ts
+- Don't add any documentations in /src, put documentations in /docs instead
+
 ## 🧪 Testing Standards
 
 ### Test Project Naming

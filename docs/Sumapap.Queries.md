@@ -1,4 +1,4 @@
-# Sumapap.Queries
+﻿# Sumapap.Queries
 
 [![NuGet Version](https://img.shields.io/nuget/v/Sumapap.Queries.svg?style=flat-square)](https://www.nuget.org/packages/Sumapap.Queries/)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Queries.svg?style=flat-square)](https://www.nuget.org/packages/Sumapap.Queries/)
@@ -10,88 +10,214 @@
 
 ## 💡 Overview
 
-`Sumapap.Queries` delivers a composable query metadata model that unifies filtering, sorting, and pagination concerns for repositories, APIs, and UI layers. By centralizing query intent into transport-friendly objects, it keeps persistence logic focused on translating declarative inputs instead of parsing ad-hoc request contracts.
+`Sumapap.Queries` provides powerful query execution infrastructure for the Sumapap query abstraction layer. This library implements the execution engine that transforms `IQuery` objects into actual data operations, supporting both in-memory (`IEnumerable<T>`) and database (`IQueryable<T>`) data sources with optimized filtering, sorting, paging, and cursor-based pagination.
 
 ## ✨ Why use `Sumapap.Queries`?
 
-- Normalize query requests across REST, gRPC, or messaging endpoints using the same abstraction.
-- Avoid leaking ORM-specific semantics by mapping generic descriptors to provider-specific implementations.
-- Support both offset and cursor pagination strategies without duplicating state handling.
-- Compose, reuse, and test filter logic independently from persistence execution code.
+- Seamlessly execute queries against both database (`IQueryable<T>`) and in-memory (`IEnumerable<T>`) sources with the same API.
+- Benefit from expression caching and reflection optimization for high-performance query execution.
+- Leverage dynamic query building that generates efficient SQL for databases and compiled delegates for in-memory collections.
+- Eliminate boilerplate code with factory patterns and extension methods that integrate cleanly with repositories and services.
 
 ## 🚀 Quick start
 
-1. Add the package (once published on NuGet):
+1. Add the package to your project (when published on NuGet):
 
-    ```bash
-    dotnet add package Sumapap.Queries
-    ```
+``bash
+dotnet add package Sumapap.Queries
+``
 
-2. Build a declarative query from incoming DTOs:
+2. Create a query using the builder:
 
-    ```csharp
-    using Sumapap.Queries;
-    using Sumapap.Queries.Filtering;
-    using Sumapap.Queries.Paging;
-    using Sumapap.Queries.Sorting;
+``csharp
+using Sumapap.Queries.Abstractions;
+using Sumapap.Queries.Filtering;
+using Sumapap.Queries.Sorting;
 
-    var filters = new FilterOptions(
-        new FilterGroup()
-            .WithFilters([
-                new FilterDescriptor("Status", FilterOperator.Equals, "Pending"),
-                new FilterDescriptor("Total", FilterOperator.GreaterThanOrEqual, 1000M)
-            ]));
+var query = QueryBuilder.Create()
+    .Where(filter => filter
+        .Add("Status", FilterOperator.Equals, "Active")
+        .Add("Age", FilterOperator.GreaterThan, 18))
+    .OrderBy("Name", SortDirection.Ascending)
+    .Page(1, 20);
+``
 
-    var sort = new SortOptions()
-        .By("CreatedAt", SortDirection.Desc)
-        .ThenBy("Id");
+3. Execute the query against your data source:
 
-    var query = new Query(filters, sort, new OffsetPaginationOptions(page: 1, pageSize: 25));
-    ```
+``csharp
+using Sumapap.Queries;
+using Sumapap.Queries.Factories;
 
-3. Pass the query to your repository/service and wrap the response:
+// For database queries (IQueryable)
+var executor = ExecutorFactory.CreateQueryableExecutor<User, UserDto>();
+var result = await executor.ExecuteAsync(query, dbContext.Users);
 
-    ```csharp
-    var data = await orderRepository.ExecuteAsync(query, cancellationToken);
+// For in-memory collections (IEnumerable)
+var executor = ExecutorFactory.CreateEnumerableExecutor<User, UserDto>();
+var result = executor.Execute(query, usersList);
+``
 
-    return new QueryResult<OrderDto>(
-        data.Items,
-        data.TotalDataCount,
-        data.PageInfo);
-    ```
+4. Use extension methods for cleaner syntax:
+
+``csharp
+using Sumapap.Queries.Extensions;
+
+var result = await dbContext.Users.ExecuteQueryAsync<User, UserDto>(query);
+``
+
+5. Access the paginated results:
+
+``csharp
+Console.WriteLine($"Total: {result.Total}, Page: {result.Page} of {result.TotalPages}");
+foreach (var user in result.Items)
+{
+    Console.WriteLine($"{user.Name} - {user.Email}");
+}
+``
 
 ## 🛠 Features and usage
 
-### Query abstractions
-- `IQuery` exposes normalized access to filters, sort descriptors, and pagination payloads with helper flags (`UsesOffsetPaging`, `UsesCursorPaging`) so repositories can branch logic safely.
-- `Query` provides multiple constructor overloads to support common scenarios (filters-only, sort-only, pagination-only) while defaulting to `FilterOptions.Empty` and `SortOptions.Empty` when not provided.
-- `IQueryResult<T>` and `QueryResult<T>` hold the actual data items, total counts, and optional cursor metadata so callers can return rich responses without bespoke DTOs.
+### Query executors
 
-### Filtering
-- `FilterDescriptor` pairs a field name, operator, and optional value; use enums in your domain to avoid magic strings.
-- `FilterGroup` composes descriptors with `CompositeOperator` (`And`/`Or`) and supports nested groups via `HasSubGroups`, enabling complex boolean expressions.
-- `FilterOptions` wraps the root group and offers the `Empty` singleton for cases with no filters.
+The library follows a factory pattern with specialized executors:
 
-### Sorting
-- `SortDescriptor` keeps a field + direction (`Asc`/`Desc`); use multiple descriptors for deterministic ordering.
-- `SortOptions` exposes fluent helpers `By` and `ThenBy` to build sorting chains, and its default constructor starts with an empty list to avoid accidental null checks.
+- **`IQueryExecutor<TSource, TResult>`** — Core abstraction for query execution with both sync and async methods.
+- **`QueryableQueryExecutor<TSource, TResult>`** — Optimized for `IQueryable<T>` sources (EF Core, LINQ to SQL) with efficient SQL generation.
+- **`EnumerableQueryExecutor<TSource, TResult>`** — Optimized for `IEnumerable<T>` sources (in-memory collections) with compiled expression caching.
+- **`ExecutorFactory`** — Factory for creating appropriate executors based on source type.
 
-### Pagination
-- `OffsetPaginationOptions` covers traditional page/pageSize workflows and exposes a computed `Offset` for SQL `OFFSET` queries.
-- `CursorPaginationOptions` supports cursor-based pagination with explicit cursor field, opaque token, limit, and direction (`Forward`/`Backward`).
-- Repositories can branch on `UsesCursorPaging` vs `UsesOffsetPaging` to decide which strategy to execute while sharing the same query pipeline.
+Example usage:
 
-### Result packaging
-- `PageInfo` stores `HasNextPage`, `HasPreviousPage`, and cursor boundaries (`StartCursor`, `EndCursor`) so UI layers can continue pagination confidently.
-- Overloaded `QueryResult<T>` constructors make it easy to return empty results or total-count-only payloads without allocating collections.
+``csharp
+// Database execution
+var queryableExecutor = ExecutorFactory.CreateQueryableExecutor<Order, OrderDto>();
+var dbResult = await queryableExecutor.ExecuteAsync(query, dbContext.Orders);
+
+// In-memory execution
+var enumerableExecutor = ExecutorFactory.CreateEnumerableExecutor<Order, OrderDto>();
+var memResult = enumerableExecutor.Execute(query, ordersList);
+``
+
+### Dynamic filtering
+
+Build complex filter expressions dynamically:
+
+``csharp
+var query = QueryBuilder.Create()
+    .Where(filter => filter
+        // AND conditions
+        .Add("Status", FilterOperator.Equals, "Active")
+        .Add("CreatedDate", FilterOperator.GreaterThanOrEqual, DateTime.Now.AddMonths(-6))
+        
+        // OR group
+        .BeginGroup(LogicalOperator.Or)
+            .Add("Role", FilterOperator.Equals, "Admin")
+            .Add("Role", FilterOperator.Equals, "Manager")
+        .EndGroup()
+        
+        // String operations
+        .Add("Email", FilterOperator.Contains, "@company.com")
+        .Add("Name", FilterOperator.StartsWith, "John"));
+
+var result = await dbContext.Users.ExecuteQueryAsync<User, UserDto>(query);
+``
+
+### Multi-column sorting
+
+Specify multiple sort columns with independent directions:
+
+``csharp
+var query = QueryBuilder.Create()
+    .OrderBy("Department", SortDirection.Ascending)
+    .ThenBy("LastName", SortDirection.Ascending)
+    .ThenBy("FirstName", SortDirection.Ascending);
+
+var result = await executor.ExecuteAsync(query, source);
+``
+
+### Offset pagination
+
+Traditional page-based pagination:
+
+``csharp
+var query = QueryBuilder.Create()
+    .Page(pageNumber: 1, pageSize: 20);
+
+var result = await executor.ExecuteAsync(query, source);
+
+Console.WriteLine($"Page {result.Page} of {result.TotalPages}");
+Console.WriteLine($"Showing items {result.From} - {result.To} of {result.Total}");
+``
+
+### Cursor pagination
+
+Efficient cursor-based pagination for large datasets:
+
+``csharp
+var query = QueryBuilder.Create()
+    .WithCursor(
+        cursorField: "Id",
+        cursor: lastSeenId,
+        limit: 20,
+        direction: CursorDirection.Forward);
+
+var result = await executor.ExecuteAsync(query, source);
+
+if (result.PageInfo.HasNextPage)
+{
+    var nextCursor = result.PageInfo.EndCursor;
+    // Use nextCursor for next page request
+}
+``
+
+### Extension methods
+
+Convenient extension methods for common scenarios:
+
+``csharp
+// Direct execution on IQueryable
+var result = await dbContext.Orders
+    .Where(o => o.CustomerId == customerId)
+    .ExecuteQueryAsync<Order, OrderDto>(query);
+
+// Direct execution on IEnumerable
+var result = ordersList
+    .Where(o => o.Status == "Pending")
+    .ExecuteQuery<Order, OrderDto>(query);
+``
 
 ## ⚠️ Notes & best practices
 
-- Align `FilterDescriptor.Field` values with the names your persistence translator understands (columns, properties, or aliases).
-- Validate and sanitize external inputs before turning them into descriptors to prevent injection or unexpected operator usage.
-- Prefer cursor pagination for continuously mutating datasets (activity feeds, infinite scroll) to reduce duplicate or missing records.
-- Reuse `FilterOptions.Empty`, `SortOptions.Empty`, and lightweight constructors to avoid unnecessary allocations in hot paths.
-- Keep mapping between application-specific query DTOs and `Sumapap.Queries` types in a dedicated mapper to ensure consistency across endpoints.
+- Use `QueryableQueryExecutor` for database queries to generate efficient SQL rather than loading all data into memory.
+- Prefer async APIs (`ExecuteAsync`) in server applications to avoid thread pool starvation.
+- Cache executor instances when executing multiple queries with the same source/result types to benefit from internal expression caching.
+- Validate and sanitize filter field names and values from external input to prevent injection attacks or runtime errors.
+- Use cursor pagination for continuously updated datasets (activity feeds, logs) to avoid page drift caused by inserts/deletes.
+- When using `EnumerableQueryExecutor`, be aware that filtering and sorting happen in-memory; pre-filter large collections before execution.
+- Keep `QueryBuilder` fluent chains readable by grouping related operations (filter → sort → page) and avoid excessive nesting in filter groups.
+
+### Example integration with repository
+
+``csharp
+public class OrderRepository : IOrderRepository
+{
+    private readonly DbContext _context;
+    private readonly IQueryExecutor<IQueryable<Order>, OrderDto> _executor;
+
+    public OrderRepository(DbContext context)
+    {
+        _context = context;
+        _executor = ExecutorFactory.CreateQueryableExecutor<Order, OrderDto>();
+    }
+
+    public async Task<IQueryResult<OrderDto>> GetOrdersAsync(
+        IQuery query,
+        CancellationToken cancellationToken = default)
+    {
+        return await _executor.ExecuteAsync(query, _context.Orders, cancellationToken);
+    }
+}
+``
 
 # ⭐ License
 
@@ -100,11 +226,11 @@ Distributed under the [MIT License](https://github.com/muhammadirwanto-dev/sumap
 # 🚩 Contact
 
 `GitHub` [@muhammadirwanto-dev](https://github.com/muhammadirwanto-dev)  
-`Project Url` https://github.com/muhammadirwanto-dev/sumapap/tree/main/source/Sumapap.Persistence
+`Project Url` https://github.com/muhammadirwanto-dev/sumapap/tree/main/src/Sumapap.Queries
 
 # ☕ Support
 
-If you like this project and want to support it, you can [buy me a coffee︎](https://buymeacoffee.com/muhirwanto.dev). Your coffee will keep me awake while developing this project ☕.
+If you like this project and want to support it, you can [buy me a coffee︎](https://buymeacoffee.com/muhirwanto.dev). Your coffee will keep me awake while developing this project ☕.
 
 <p align="center">
   <a href="https://buymeacoffee.com/muhirwanto.dev">

@@ -33,19 +33,19 @@ The goal is to reduce boilerplate code and provide consistent, well-tested utili
 
 1. Add the package to your project:
 
-```bash
+``bash
 dotnet add package Sumapap.Common
-```
+``
 
 2. Import the extensions namespace:
 
-```csharp
+``csharp
 using Sumapap.Common.Extensions;
-```
+``
 
 3. Use string case conversions:
 
-```csharp
+``csharp
 var kebab = "MyVariableName".ToKebabCase();
 // Result: "my-variable-name"
 
@@ -54,19 +54,19 @@ var snake = "MyVariableName".ToSnakeCase();
 
 var upperSnake = "MyVariableName".ToUpperSnakeCase();
 // Result: "MY_VARIABLE_NAME"
-```
+``
 
 4. Hash objects for content comparison:
 
-```csharp
+``csharp
 var user = new User { Id = 1, Name = "John" };
 var hash = user.GetContentHash();
 // Result: "A1B2C3D4..." (SHA256 hex string)
-```
+``
 
 5. Extract deep exception messages:
 
-```csharp
+``csharp
 try
 {
 	// code that throws nested exceptions
@@ -76,7 +76,7 @@ catch (Exception ex)
 	var message = ex.GetDeepMessage();
 	// Result: Multi-line formatted message with all inner exceptions
 }
-```
+``
 
 ## 🛠 Features and usage
 
@@ -84,15 +84,15 @@ catch (Exception ex)
 
 **ToKebabCase()** - Convert to kebab-case (lowercase with hyphens):
 
-```csharp
+``csharp
 extension(string? origin)
 {
 	public string? ToKebabCase();
 }
-```
+``
 
 **Examples:**
-```csharp
+``csharp
 "MyVariableName".ToKebabCase();          // "my-variable-name"
 "HTTPResponse".ToKebabCase();            // "httpresponse"
 "UserId".ToKebabCase();                  // "user-id"
@@ -102,41 +102,41 @@ extension(string? origin)
 string? nullValue = null;
 nullValue.ToKebabCase();                 // null
 "".ToKebabCase();                        // ""
-```
+``
 
 **ToSnakeCase()** - Convert to snake_case (lowercase with underscores):
 
-```csharp
+``csharp
 extension(string? origin)
 {
 	public string? ToSnakeCase();
 }
-```
+``
 
 **Examples:**
-```csharp
+``csharp
 "MyVariableName".ToSnakeCase();          // "my_variable_name"
 "HTTPResponse".ToSnakeCase();            // "httpresponse"
 "UserId".ToSnakeCase();                  // "user_id"
 "ProductCatalogService".ToSnakeCase();   // "product_catalog_service"
-```
+``
 
 **ToUpperSnakeCase()** - Convert to UPPER_SNAKE_CASE (uppercase with underscores):
 
-```csharp
+``csharp
 extension(string? origin)
 {
 	public string? ToUpperSnakeCase();
 }
-```
+``
 
 **Examples:**
-```csharp
+``csharp
 "MyVariableName".ToUpperSnakeCase();          // "MY_VARIABLE_NAME"
 "HTTPResponse".ToUpperSnakeCase();            // "HTTPRESPONSE"
 "UserId".ToUpperSnakeCase();                  // "USER_ID"
 "ProductCatalogService".ToUpperSnakeCase();   // "PRODUCT_CATALOG_SERVICE"
-```
+``
 
 **Use Cases:**
 - **API Endpoints**: Convert C# PascalCase to kebab-case URLs (`/api/user-profile`)
@@ -148,15 +148,15 @@ extension(string? origin)
 
 **Sanitize()** - Sanitize strings for safe logging:
 
-```csharp
+``csharp
 extension(string? origin)
 {
 	public string? Sanitize();
 }
-```
+``
 
 **Examples:**
-```csharp
+``csharp
 "User input\nwith newlines".Sanitize();
 // Result: "User input\\nwith newlines" (escaped)
 
@@ -165,7 +165,7 @@ extension(string? origin)
 
 "Name: John\r\nPassword: secret".Sanitize();
 // Result: "Name: John\\nPassword: secret" (safe for logs)
-```
+``
 
 **Use Cases:**
 - **Log Injection Prevention**: Escape newlines to prevent log forging
@@ -174,15 +174,15 @@ extension(string? origin)
 
 **ToSecureString()** - Convert string to SecureString for sensitive data:
 
-```csharp
+``csharp
 extension(string? origin)
 {
 	public SecureString? ToSecureString();
 }
-```
+``
 
 **Examples:**
-```csharp
+``csharp
 var password = "MySecretPassword123";
 var secured = password.ToSecureString();
 // Result: SecureString instance (encrypted in memory)
@@ -192,7 +192,7 @@ emptyPassword.ToSecureString();          // null
 
 string? nullPassword = null;
 nullPassword.ToSecureString();           // null
-```
+``
 
 **Use Cases:**
 - **Password Handling**: Store passwords in memory securely
@@ -203,15 +203,15 @@ nullPassword.ToSecureString();           // null
 
 **GetContentHash()** - Generate SHA256 hash of object content:
 
-```csharp
+``csharp
 extension(object @object)
 {
 	public string GetContentHash();
 }
-```
+``
 
 **Examples:**
-```csharp
+``csharp
 var user = new User { Id = 1, Name = "John", Email = "john@example.com" };
 var hash1 = user.GetContentHash();
 // Result: "A1B2C3D4E5F6..." (64-character hex string)
@@ -222,7 +222,7 @@ var hash2 = user.GetContentHash();
 
 object? nullObject = null;
 nullObject.GetContentHash();             // "" (empty string)
-```
+``
 
 **How It Works:**
 1. Serializes object to JSON using `System.Text.Json`
@@ -236,7 +236,7 @@ nullObject.GetContentHash();             // "" (empty string)
 - **Idempotency Keys**: Generate unique keys for idempotent operations
 
 **Example - Cache Key Generation:**
-```csharp
+``csharp
 public class ProductService
 {
 	private readonly ICacheKeyProvider _cacheKeyProvider;
@@ -257,21 +257,21 @@ public class ProductService
 		// Fetch and cache...
 	}
 }
-```
+``
 
 ### Exception Message Formatting
 
 **GetDeepMessage()** - Extract full exception message including all inner exceptions:
 
-```csharp
+``csharp
 extension(Exception exception)
 {
 	public string GetDeepMessage(bool writeNewLine = true);
 }
-```
+``
 
 **Examples:**
-```csharp
+``csharp
 try
 {
 	// Throws nested exceptions
@@ -296,7 +296,7 @@ catch (Exception ex)
 	var singleLine = ex.GetDeepMessage(writeNewLine: false);
 	// Result: Operation failed > Invalid argument > Object is null
 }
-```
+``
 
 **Special Handling:**
 - **TaskCanceledException**: Returns only the cancellation message (stops traversing inner exceptions)
@@ -308,7 +308,7 @@ catch (Exception ex)
 - **Exception Monitoring**: Send detailed error info to monitoring systems (Sentry, Application Insights)
 
 **Example - Logging:**
-```csharp
+``csharp
 public class ErrorHandler
 {
 	private readonly ILogger<ErrorHandler> _logger;
@@ -322,13 +322,13 @@ public class ErrorHandler
 		// Logs: Request failed: Operation failed > Invalid argument > Object is null
 	}
 }
-```
+``
 
 ### Compiled Regex Patterns
 
 **ComputedRegex** - Pre-compiled regex patterns for performance:
 
-```csharp
+``csharp
 public partial class ComputedRegex
 {
 	[GeneratedRegex(@"[a-zA-Z]+(?=(?:[^{}]*{[^{}]*})*[^{}]*$)")]
@@ -337,21 +337,21 @@ public partial class ComputedRegex
 	[GeneratedRegex("([a-z])([A-Z])")]
 	public static partial Regex CaseBoundaryRegex();
 }
-```
+``
 
 **OutsideBracesRegex()** - Matches text outside curly braces:
-```csharp
+``csharp
 var input = "Hello {world} foo {bar}";
 var matches = ComputedRegex.OutsideBracesRegex().Matches(input);
 // Matches: "Hello ", " foo "
-```
+``
 
 **CaseBoundaryRegex()** - Matches case boundaries (lowercase to uppercase):
-```csharp
+``csharp
 var input = "myVariableName";
 var result = ComputedRegex.CaseBoundaryRegex().Replace(input, "$1-$2");
 // Result: "my-Variable-Name"
-```
+``
 
 **Performance Benefits:**
 - **Zero Allocation**: `[GeneratedRegex]` generates optimized code at compile-time
@@ -380,17 +380,17 @@ var result = ComputedRegex.CaseBoundaryRegex().Replace(input, "$1-$2");
 ### Case Conversion Edge Cases
 
 **Acronyms and Consecutive Capitals:**
-```csharp
+``csharp
 "HTTPRequest".ToKebabCase();     // "httprequest" (no separator)
 "XMLParser".ToSnakeCase();       // "xmlparser"
 "IOError".ToUpperSnakeCase();    // "IOERROR"
-```
+``
 
 **Preserve Text in Braces:**
-```csharp
+``csharp
 "My{Template}Name".ToKebabCase(); // "my-{Template}-name"
 // Text inside braces is not converted
-```
+``
 
 ### Content Hashing Considerations
 

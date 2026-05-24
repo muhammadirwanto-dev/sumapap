@@ -10,17 +10,17 @@
 
 ## 💡 Overview
 
-``Sumapap.Persistence.Caching`` provides provider-agnostic caching infrastructure for Sumapap persistence repositories using the Visitor pattern. The package focuses on:
+`Sumapap.Persistence.Caching` provides provider-agnostic caching infrastructure for Sumapap persistence repositories using the Visitor pattern. The package focuses on:
 
 - Visitor-based cache decorator registration for extensibility
-- Opt-in repository caching via ``AllowCaching()`` configuration
+- Opt-in repository caching via `AllowCaching()` configuration
 - Metadata-driven caching without tight coupling to specific cache implementations
 - Centralized cache registry for inspection and provider consumption
 - Granular control over which repository methods should be cached
 
 The goal is to enable flexible, testable repository caching while maintaining clean separation between persistence and caching concerns.
 
-## ✨ Why use ``Sumapap.Persistence.Caching``?
+## ✨ Why use `Sumapap.Persistence.Caching`?
 
 - **Visitor Pattern Architecture**: Cache decoration logic is isolated in visitors, enabling extensibility without modifying core registration code
 - **Opt-in by Design**: Repositories explicitly declare caching intent; caching is never forced globally
@@ -33,13 +33,13 @@ The goal is to enable flexible, testable repository caching while maintaining cl
 
 1. Add the package to your Infrastructure layer project:
 
-```bash
+``bash
 dotnet add package Sumapap.Persistence.Caching
-```
+``
 
 2. Configure repositories with opt-in caching in your DI setup:
 
-```csharp
+``csharp
 services.AddSumapap()
     .WithRepositories(builder =>
     {
@@ -53,11 +53,11 @@ services.AddSumapap()
             
         builder.UseRepositoryCaching(); // Register visitor
     });
-```
+``
 
 3. Add a cache provider (e.g., FusionCache) to consume the registry:
 
-```csharp
+``csharp
 services.AddSumapap()
     .WithRepositories(builder =>
     {
@@ -65,7 +65,7 @@ services.AddSumapap()
         builder.UseRepositoryCaching();
     })
     .UseFusionCache(); // Provider consumes RepositoryCacheRegistry
-```
+``
 
 4. The cache provider decorates registered repositories automatically based on metadata.
 
@@ -75,7 +75,7 @@ services.AddSumapap()
 
 The caching infrastructure uses the Visitor pattern to separate cache decoration from core repository registration:
 
-```
+``
 Repository Registration → AllowCaching() → Metadata Stored
                                                  ↓
                                      CachingRepositoryVisitor
@@ -83,7 +83,7 @@ Repository Registration → AllowCaching() → Metadata Stored
                                        RepositoryCacheRegistry
                                                  ↓
                                      Cache Provider (FusionCache, etc.)
-```
+``
 
 **Key Components:**
 
@@ -96,7 +96,7 @@ Repository Registration → AllowCaching() → Metadata Stored
 
 **AllowCaching()** - Enable caching for a repository with configuration:
 
-```csharp
+``csharp
 builder
     .AddScopedRepository<IProductRepository, ProductRepository, Product>()
     .AllowCaching(config =>
@@ -105,50 +105,50 @@ builder
         config.Methods.EnableAllReads(); // Cache all read operations
         config.Metadata["Priority"] = "High"; // Custom metadata
     });
-```
+``
 
 **Default Configuration** (minimal):
-```csharp
+``csharp
 builder
     .AddScopedRepository<IOrderRepository, OrderRepository, Order>()
     .AllowCaching(); // Uses default: 5 minutes, all read methods
-```
+``
 
 ### Method-Level Cache Control
 
 **EnableAllReads()** - Cache all read repository methods (default):
-```csharp
+``csharp
 config.Methods.EnableAllReads();
 // Caches: Find, GetAll, FirstOrDefault, SingleOrDefault, Count, Any, Stream*
-```
+``
 
 **EnableSpecific()** - Cache only specific methods:
-```csharp
+``csharp
 config.Methods.Clear();
 config.Methods.EnableMethod("FindAsync");
 config.Methods.EnableMethod("GetAllAsync");
 // Only FindAsync and GetAllAsync are cached
-```
+``
 
 **DisableMethod()** - Exclude specific methods from caching:
-```csharp
+``csharp
 config.Methods.EnableAllReads();
 config.Methods.DisableMethod("StreamAllAsync"); // Disable streaming method cache
-```
+``
 
 ### Cache Registry Inspection
 
 **RepositoryCacheRegistry** - Central registry of cached repository configurations:
 
-```csharp
+``csharp
 public sealed class RepositoryCacheRegistry
 {
     public IReadOnlyList<RepositoryCacheEntry> CachedRepositories { get; }
 }
-```
+``
 
 **Access the registry** (useful for testing or runtime inspection):
-```csharp
+``csharp
 var registry = serviceProvider.GetRequiredService<RepositoryCacheRegistry>();
 
 foreach (var entry in registry.CachedRepositories)
@@ -157,13 +157,13 @@ foreach (var entry in registry.CachedRepositories)
     Console.WriteLine($"Duration: {entry.Configuration.Duration}");
     Console.WriteLine($"Cached Methods: {string.Join(", ", entry.Configuration.Methods)}");
 }
-```
+``
 
 ### Repository Cache Entry
 
 **RepositoryCacheEntry** - Represents a cached repository registration:
 
-```csharp
+``csharp
 public sealed class RepositoryCacheEntry
 {
     public required Type RepositoryType { get; init; }
@@ -171,13 +171,13 @@ public sealed class RepositoryCacheEntry
     public required ServiceLifetime Lifetime { get; init; }
     public required RepositoryCacheConfiguration Configuration { get; init; }
 }
-```
+``
 
 ### Caching Repository Visitor
 
 **CachingRepositoryVisitor** - Processes registrations with caching metadata:
 
-```csharp
+``csharp
 public class CachingRepositoryVisitor : IRepositoryRegistrationVisitor
 {
     public void Visit(RepositoryRegistrationEntry entry, IServiceCollection services)
@@ -195,37 +195,37 @@ public class CachingRepositoryVisitor : IRepositoryRegistrationVisitor
         });
     }
 }
-```
+``
 
 ### Default Cached Methods
 
 By default, the following read-only repository methods are cached:
 
 **Synchronous:**
-- ``Find(id)``
-- ``GetAll()``
-- ``FirstOrDefault()``
-- ``SingleOrDefault()``
-- ``Count()``
-- ``Any()``
+- `Find(id)`
+- `GetAll()`
+- `FirstOrDefault()`
+- `SingleOrDefault()`
+- `Count()`
+- `Any()`
 
 **Asynchronous:**
-- ``FindAsync(id)``
-- ``GetAllAsync()``
-- ``FirstOrDefaultAsync()``
-- ``SingleOrDefaultAsync()``
-- ``CountAsync()``
-- ``AnyAsync()``
-- ``StreamAllAsync()``
-- ``StreamWhereAsync()``
+- `FindAsync(id)`
+- `GetAllAsync()`
+- `FirstOrDefaultAsync()`
+- `SingleOrDefaultAsync()`
+- `CountAsync()`
+- `AnyAsync()`
+- `StreamAllAsync()`
+- `StreamWhereAsync()`
 
-**Write operations are never cached** (``Add``, ``Update``, ``Delete``, ``SaveChanges``).
+**Write operations are never cached** (`Add`, `Update`, `Delete`, `SaveChanges`).
 
 ### Cache Provider Integration
 
-Cache providers consume the ``RepositoryCacheRegistry`` to apply decorators:
+Cache providers consume the `RepositoryCacheRegistry` to apply decorators:
 
-```csharp
+``csharp
 // Inside a cache provider (e.g., Sumapap.Persistence.FusionCache)
 public static ISumapapBuilder UseFusionCache(this ISumapapBuilder builder)
 {
@@ -247,46 +247,46 @@ public static ISumapapBuilder UseFusionCache(this ISumapapBuilder builder)
     
     return builder;
 }
-```
+``
 
 ## ⚠️ Notes & best practices
 
 ### ✅ Do
 
-- **Always call ``UseRepositoryCaching()``** after adding repositories with ``AllowCaching()`` to register the visitor
+- **Always call `UseRepositoryCaching()`** after adding repositories with `AllowCaching()` to register the visitor
 - **Use default configuration** for typical CRUD repositories (covers common scenarios)
 - **Customize cache duration** based on data volatility (short for frequently changing data, longer for reference data)
 - **Inspect the registry in tests** to verify caching is configured correctly
-- **Use ``DisableMethod()``** for expensive queries that should not be cached (e.g., large streaming operations)
+- **Use `DisableMethod()`** for expensive queries that should not be cached (e.g., large streaming operations)
 
 ### ❌ Don''t
 
-- **Never cache write operations** - the default configuration only caches reads; do not enable caching for ``Add``, ``Update``, ``Delete``
+- **Never cache write operations** - the default configuration only caches reads; do not enable caching for `Add`, `Update`, `Delete`
 - **Avoid very long cache durations** for frequently changing data (leads to stale reads)
-- **Don''t forget to register the visitor** - calling ``AllowCaching()`` without ``UseRepositoryCaching()`` has no effect
+- **Don''t forget to register the visitor** - calling `AllowCaching()` without `UseRepositoryCaching()` has no effect
 - **Avoid caching streaming methods** for very large datasets (can cause memory pressure)
 - **Don''t use caching for real-time data** where staleness is unacceptable
 
 ### Cache Invalidation
 
-This package only handles cache decoration and configuration. **Cache invalidation is the responsibility of the cache provider** (e.g., ``Sumapap.Persistence.FusionCache``). Refer to your cache provider documentation for invalidation strategies.
+This package only handles cache decoration and configuration. **Cache invalidation is the responsibility of the cache provider** (e.g., `Sumapap.Persistence.FusionCache`). Refer to your cache provider documentation for invalidation strategies.
 
 ### Testing Recommendations
 
 When testing repositories with caching:
 1. **Test without cache first** to verify repository logic
-2. **Verify cache configuration** by inspecting ``RepositoryCacheRegistry``
+2. **Verify cache configuration** by inspecting `RepositoryCacheRegistry`
 3. **Test cache behavior** by verifying cache provider decorators are applied
 4. **Mock the cache provider** when testing repository consumers to avoid cache side effects
 
 # ⭐ License
 
-Distributed under the [MIT License](https://github.com/muhammadirwanto-dev/sumapap/tree/main?tab=MIT-1-ov-file#readme). See the ``LICENSE`` file in the repository for more information.
+Distributed under the [MIT License](https://github.com/muhammadirwanto-dev/sumapap/tree/main?tab=MIT-1-ov-file#readme). See the `LICENSE` file in the repository for more information.
 
 # 🚩 Contact
 
-``GitHub`` [@muhammadirwanto-dev](https://github.com/muhammadirwanto-dev)  
-``Project Url`` https://github.com/muhammadirwanto-dev/sumapap
+`GitHub` [@muhammadirwanto-dev](https://github.com/muhammadirwanto-dev)  
+`Project Url` https://github.com/muhammadirwanto-dev/sumapap
 
 # ☕ Support
 

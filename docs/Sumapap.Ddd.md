@@ -1,4 +1,4 @@
-# Sumapap.Ddd
+﻿# Sumapap.Ddd
 
 [![NuGet Version](https://img.shields.io/nuget/v/Sumapap.Ddd.svg?style=flat-square)](https://www.nuget.org/packages/Sumapap.Ddd/)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/Sumapap.Ddd.svg?style=flat-square)](https://www.nuget.org/packages/Sumapap.Ddd/)
@@ -10,105 +10,100 @@
 
 ## 💡 Overview
 
-`Sumapap.Ddd` provides a small set of domain-driven design (DDD) abstractions intended to be lightweight,
-framework-agnostic and easy to adopt in .NET applications. The project focuses on core building blocks used
-to model rich domains: domain events, domain entities and a minimal event dispatching contract.
+`Sumapap.Ddd` contains a lightweight, DI-friendly implementation for dispatching domain events
+produced by domain entities or aggregate roots. It wires event handlers discovered in assemblies and provides a
+simple, robust mechanism to publish batches of `IDomainEvent` instances to their corresponding `IDomainEventHandler<TEvent>` implementations.
 
-Core concepts included in this package:
-- `IDomainEvent` — marker interface for domain events.
-- `IDomainEventHandler<TEvent>` — consumer contract for a specific domain event.
-- `IDomainEventDispatcher` — a dispatcher that publishes/dispatches domain events to handlers.
-- `DomainEntity` — a base entity helper that collects domain events emitted by an aggregate or entity.
+The package includes:
+- `DomainEventDispatcher` — resolves handlers from `IServiceProvider` and invokes them for each event.
+- `DependencyInjection` — an extension to scan assemblies and register event handlers and the dispatcher into Microsoft DI.
 
-## ✨ Why Sumapap.Ddd?
+## ✨ Why use Sumapap.Ddd?
 
-The library keeps the domain model clean and decoupled from infrastructure by providing small, focused
-abstractions you can implement or plug into your application. Use it when you want:
-- A consistent pattern for publishing domain events from entities or aggregate roots.
-- A simple, testable contract for handling domain events.
-- Minimal dependencies so the core domain remains portable across projects and runtimes.
+- Minimal, dependency-free approach for in-process domain event dispatching.
+- Automatic discovery and registration of `IDomainEventHandler<TEvent>` implementations.
+- Handlers are registered as Scoped so they can depend on per-request services (e.g. DbContext, repositories).
+- Works well with `DomainEntity` from Sumapap.Ddd: consume events and dispatch after a successful unit-of-work.
 
 ## 🚀 Quick start
 
 1. Add the package to your project (when published on NuGet):
 
-   ```dotnetcli
-   dotnet add package Sumapap.Ddd
-   ```
+``bash
+ dotnet add package Sumapap.Ddd
+``
 
-2. Model a domain event:
+2. Register the dispatcher and handlers in your DI container. The extension method scans assemblies for handler implementations:
 
-   ```csharp
-   public record OrderPlacedEvent(Guid OrderId, DateTime OccurredAt) : IDomainEvent;
-   ```
+``csharp
+// Register handlers from the current calling assembly
+services.AddDomainEventsDispatcher();
 
-3. Implement an event handler:
+// Or specify assemblies explicitly
+services.AddDomainEventsDispatcher(typeof(Startup).Assembly, typeof(SomeHandler).Assembly);
+``
 
-   ```csharp
-   public class NotifyWarehouseHandler : IDomainEventHandler<OrderPlacedEvent>
-   {
-       public Task HandleAsync(OrderPlacedEvent domainEvent, CancellationToken cancellationToken = default)
-       {
-           // send message to warehouse
-           return Task.CompletedTask;
-       }
-   }
-   ```
+3. Use the dispatcher to publish events (e.g. after saving changes in a transaction):
 
-4. Emit events from your domain entity:
+``csharp
+await dispatcher.DispatchAsync(order.ConsumeEvents(), cancellationToken);
+``
 
-   ```csharp
-   public class Order : DomainEntity
-   {
-       public void Place()
-       {
-           // domain logic
-           AddDomainEvent(new OrderPlacedEvent(Id, DateTime.UtcNow));
-       }
-   }
-   ```
+## 🛠 Features and usage
 
-5. Dispatch events using `IDomainEventDispatcher` (register your dispatcher and handlers in DI):
+- `DomainEventDispatcher`
+  - For each event in the provided batch, the dispatcher constructs the concrete handler interface type `IDomainEventHandler<T>`
+    using reflection and resolves all registered handlers for that type from `IServiceProvider`.
+  - It invokes `HandleAsync` on each handler using dynamic dispatch: `await ((dynamic)handler).HandleAsync((dynamic)@event, cancellationToken);`.
+  - This approach keeps the dispatcher implementation compact and generic, but relies on runtime dispatch (dynamic) and reflection.
 
-   ```csharp
-   await dispatcher.DispatchAsync(order.ConsumeEvents());
-   ```
-
-   > [!NOTE]
-   > `DomainEntity` provides basic collection and consumption methods for events. In larger systems
-   you may prefer a richer AggregateRoot base class with explicit child-management, versioning and
-   domain event semantics.
-
-## 🛎️ Features and usage
-
-- `IDomainEvent`
-  - A marker interface to identify domain events. Keep events immutable (records are a good fit).
-
-- `IDomainEventHandler<TEvent>`
-  - Implement this generic interface for each event you want to handle. Handlers receive a single
-    domain event and a CancellationToken. Prefer async handlers.
-
-- `IDomainEventDispatcher`
-  - A small contract that accepts a batch of domain events and publishes them to registered handlers.
-  - Typical implementations either resolve handlers from an IServiceProvider (DI) and invoke them
-    or map events to an in-process message bus. Implementations should be robust to handler
-    exceptions and support cancellation.
-
-- `DomainEntity`
-  - A convenience base class for entities that can raise domain events. It exposes methods to add,
-    access, consume and clear events produced by the entity.
-  - Use `ConsumeEvents()` to atomically read and remove events (useful when flushing events after
-    a successful transaction/commit).
+- `DependencyInjection`
+  - `AddDomainEventsDispatcher` scans provided assemblies (or the calling assembly by default) to find concrete types
+    that implement `IDomainEventHandler<TEvent>` and registers each handler as Scoped under its interface type.
+  - Finally registers the `DomainEventDispatcher` as a Singleton implementation of `IDomainEventDispatcher`.
 
 ## ⚠️ Notes & best practices
 
-- **Immutability** — Domain events should be immutable. Use C# records for concise, immutable event definitions.
-- **Event timing** — Dispatch domain events only after successful persistence (after `SaveChangesAsync` completes) to avoid notifying handlers about rolled-back changes.
-- **Handler lifetime** — Register handlers with appropriate lifetimes based on their dependencies. Scoped is typically preferred for handlers that depend on DbContext or repositories.
-- **Error handling** — The default `IDomainEventDispatcher` implementations do not swallow exceptions. Wrap dispatch calls with try/catch or implement retry policies (Polly) if needed.
-- **Event granularity** — Keep events focused on a single business fact. Avoid "mega-events" that describe multiple state changes.
-- **Threading** — `DomainEntity` uses `ConcurrentQueue<T>` for thread-safe event collection, but typical domain operations are single-threaded within a request scope.
-- **Testing** — Use `GetEvents()` to inspect queued events in unit tests without consuming them, enabling assertions on event production without side effects.
+- Transactional boundaries — dispatch events only after the unit-of-work completes (e.g. after `DbContext.SaveChangesAsync()`)
+  to avoid publishing events for rolled-back changes.
+- Handler lifetime — handlers are registered as Scoped to allow dependency injection of scoped services (`DbContext`, `UnitOfWork`).
+  The dispatcher itself is registered as Singleton but resolves handlers from `IServiceProvider` per dispatch call, so using Scoped handlers is safe when Dispatch is called within a scope.
+- Ordering & retries — the default dispatcher calls handlers sequentially in the order of discovery. If you need parallelism,
+  guaranteed ordering, or retry policies, implement a custom dispatcher or wrap handlers with resiliency policies (e.g. `Polly`).
+- Exception handling — the dispatcher does not swallow exceptions; let exceptions bubble or wrap dispatch calls with try/catch where you call the dispatcher. Consider logging or compensating actions in case of handler failure.
+- Performance — reflection and dynamic invocation have runtime costs. For high-throughput scenarios consider caching handler resolution,
+  using compiled delegates or a source-generated dispatcher.
+- Alternatives — for advanced scenarios you may prefer using `MediatR` or an outbox pattern for reliable delivery across process boundaries.
+
+### Example
+
+``csharp
+// Event
+public record OrderPlacedEvent(Guid OrderId, DateTime OccurredAt) : IDomainEvent;
+
+// Handler
+public class NotifyWarehouseHandler : IDomainEventHandler<OrderPlacedEvent>
+{
+    private readonly ILogger<NotifyWarehouseHandler> _logger;
+
+    public NotifyWarehouseHandler(ILogger<NotifyWarehouseHandler> logger)
+    {
+        _logger = logger;
+    }
+
+    public Task HandleAsync(OrderPlacedEvent domainEvent, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Notify warehouse for order {OrderId}", domainEvent.OrderId);
+        return Task.CompletedTask;
+    }
+}
+
+// Registration in Startup / Program
+services.AddDomainEventsDispatcher(typeof(NotifyWarehouseHandler).Assembly);
+
+// Usage (e.g. in application service)
+await dispatcher.DispatchAsync(order.ConsumeEvents());
+``
 
 # ⭐ License
 
@@ -117,11 +112,11 @@ Distributed under the [MIT License](https://github.com/muhammadirwanto-dev/sumap
 # 🚩 Contact
 
 `GitHub` [@muhammadirwanto-dev](https://github.com/muhammadirwanto-dev)  
-`Project Url` https://github.com/muhammadirwanto-dev/sumapap/tree/main/source/Sumapap.Ddd
+`Project Url` https://github.com/muhammadirwanto-dev/sumapap/tree/main/src/Sumapap.Ddd
 
 # ☕ Support
 
-If you like this project and want to support it, you can [buy me a coffee︎](https://buymeacoffee.com/muhirwanto.dev). Your coffee will keep me awake while developing this project ☕.
+If you like this project and want to support it, you can [buy me a coffee](https://buymeacoffee.com/muhirwanto.dev). Your coffee will keep me awake while developing this project ☕.
 
 <p align="center">
   <a href="https://buymeacoffee.com/muhirwanto.dev">

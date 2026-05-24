@@ -8,7 +8,7 @@
 
 The original `RepositoryRegistrationBuilder` had tight coupling between repository registration logic and caching concerns:
 
-```csharp
+``csharp
 public SumapapServiceBuilder Build()
 {
     var cacheRegistry = GetOrCreateCacheRegistry(_services);
@@ -25,7 +25,7 @@ public SumapapServiceBuilder Build()
         }
     }
 }
-```
+``
 
 **Issues**:
 1. **Single Responsibility Violation**: Builder responsible for both registration AND caching
@@ -37,7 +37,7 @@ public SumapapServiceBuilder Build()
 
 Applied the Visitor pattern to separate cross-cutting concerns from core registration logic:
 
-```csharp
+``csharp
 // Core builder (open for extension, closed for modification)
 public SumapapServiceBuilder Build()
 {
@@ -58,20 +58,20 @@ public SumapapServiceBuilder Build()
     
     return _builder;
 }
-```
+``
 
 ### Visitor Interface
 
-```csharp
+``csharp
 public interface IRepositoryRegistrationVisitor
 {
     void Visit(RepositoryRegistrationEntry entry, IServiceCollection services);
 }
-```
+``
 
 ### Caching Visitor Implementation
 
-```csharp
+``csharp
 public class CachingRepositoryVisitor : IRepositoryRegistrationVisitor
 {
     public void Visit(RepositoryRegistrationEntry entry, IServiceCollection services)
@@ -84,13 +84,13 @@ public class CachingRepositoryVisitor : IRepositoryRegistrationVisitor
         cacheRegistry.Register(cacheEntry);
     }
 }
-```
+``
 
 ## Architecture Benefits
 
 ### Before (Tight Coupling)
 
-```
+``
 ┌─────────────────────────────────────┐
 │  RepositoryRegistrationBuilder      │
 │  ┌────────────────────────────────┐ │
@@ -100,11 +100,11 @@ public class CachingRepositoryVisitor : IRepositoryRegistrationVisitor
 │  │  + (Future: Validation?)       │ │
 │  └────────────────────────────────┘ │
 └─────────────────────────────────────┘
-```
+``
 
 ### After (Visitor Pattern)
 
-```
+``
 ┌─────────────────────────────────────┐
 │  RepositoryRegistrationBuilder      │
 │  ┌────────────────────────────────┐ │
@@ -127,13 +127,13 @@ public class CachingRepositoryVisitor : IRepositoryRegistrationVisitor
 │  │ ValidationRepositoryVisitor     │ │ ← Future extension
 │  └─────────────────────────────────┘ │
 └──────────────────────────────────────┘
-```
+``
 
 ## API Changes
 
 ### Before
 
-```csharp
+``csharp
 // Caching was automatically applied if AllowCaching() was called
 builder.Services.AddSumapap()
     .WithRepositories(repos =>
@@ -141,11 +141,11 @@ builder.Services.AddSumapap()
         repos.AddScopedRepository<UserRepository, User>()
             .AllowCaching(); // Cache registry populated implicitly
     });
-```
+``
 
 ### After (Breaking Change)
 
-```csharp
+``csharp
 // Must explicitly register the caching visitor
 builder.Services.AddSumapap()
     .WithRepositories(repos =>
@@ -155,7 +155,7 @@ builder.Services.AddSumapap()
             .Builder
             .UseRepositoryCaching(); // Registers visitor to process caching
     });
-```
+``
 
 **Migration Path**:
 - Add `.UseRepositoryCaching()` call after repository registrations
@@ -165,17 +165,17 @@ builder.Services.AddSumapap()
 
 ### Phase 1: Create Visitor Abstraction
 
-```csharp
+``csharp
 // Sumapap.Persistence\DependencyInjection\Abstractions\IRepositoryRegistrationVisitor.cs
 public interface IRepositoryRegistrationVisitor
 {
     void Visit(RepositoryRegistrationEntry entry, IServiceCollection services);
 }
-```
+``
 
 ### Phase 2: Add Visitor Collection to Builder
 
-```csharp
+``csharp
 public class RepositoryRegistrationBuilder
 {
     private readonly List<IRepositoryRegistrationVisitor> _visitors = [];
@@ -186,11 +186,11 @@ public class RepositoryRegistrationBuilder
         return this;
     }
 }
-```
+``
 
 ### Phase 3: Refactor Build() Method
 
-```csharp
+``csharp
 public SumapapServiceBuilder Build()
 {
     // Register all repository services first
@@ -213,11 +213,11 @@ public SumapapServiceBuilder Build()
     
     return _builder;
 }
-```
+``
 
 ### Phase 4: Move Caching Logic to Visitor
 
-```csharp
+``csharp
 // Sumapap.Persistence\Caching\Visitors\CachingRepositoryVisitor.cs
 public class CachingRepositoryVisitor : IRepositoryRegistrationVisitor
 {
@@ -230,11 +230,11 @@ public class CachingRepositoryVisitor : IRepositoryRegistrationVisitor
         // ... populate cache registry
     }
 }
-```
+``
 
 ### Phase 5: Create Extension Method
 
-```csharp
+``csharp
 // Sumapap.Persistence\DependencyInjection\Extensions\RepositoryCachingExtensions.cs
 public static RepositoryRegistrationBuilder UseRepositoryCaching(
     this RepositoryRegistrationBuilder builder)
@@ -242,7 +242,7 @@ public static RepositoryRegistrationBuilder UseRepositoryCaching(
     builder.AddVisitor(new CachingRepositoryVisitor());
     return builder;
 }
-```
+``
 
 ## Design Principles Applied
 
@@ -262,7 +262,7 @@ The visitor pattern enables easy addition of:
 
 Example future logging visitor:
 
-```csharp
+``csharp
 public class LoggingRepositoryVisitor : IRepositoryRegistrationVisitor
 {
     private readonly ILogger _logger;
@@ -274,7 +274,7 @@ public class LoggingRepositoryVisitor : IRepositoryRegistrationVisitor
             entry.ImplType, entry.EntityType, entry.ServiceLifetime);
     }
 }
-```
+``
 
 ## Testing Impact
 
@@ -282,7 +282,7 @@ public class LoggingRepositoryVisitor : IRepositoryRegistrationVisitor
 
 Testing caching required testing the entire builder:
 
-```csharp
+``csharp
 [Fact]
 public void Build_WithCaching_PopulatesRegistry()
 {
@@ -294,13 +294,13 @@ public void Build_WithCaching_PopulatesRegistry()
     var registry = services.GetCacheRegistry();
     Assert.Single(registry.CachedRepositories);
 }
-```
+``
 
 ### After (Decoupled)
 
 Caching and registration can be tested independently:
 
-```csharp
+``csharp
 [Fact]
 public void CachingVisitor_ProcessesAllowCachingEntries()
 {
@@ -313,7 +313,7 @@ public void CachingVisitor_ProcessesAllowCachingEntries()
     var registry = services.GetCacheRegistry();
     Assert.Single(registry.CachedRepositories);
 }
-```
+``
 
 ## Related Documentation
 
