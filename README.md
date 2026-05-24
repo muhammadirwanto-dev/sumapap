@@ -5,8 +5,8 @@
 [![GitHub Stars](https://img.shields.io/github/stars/muhammadirwanto-dev/sumapap?style=flat-square)](https://github.com/muhammadirwanto-dev/sumapap/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/muhammadirwanto-dev/sumapap?style=flat-square)](https://github.com/muhammadirwanto-dev/sumapap/network/members)
 [![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg?style=flat-square)](https://github.com/muhammadirwanto-dev/sumapap/pulls)
-[![Build & Publish](https://github.com/muhammadirwanto-dev/sumapap/actions/workflows/cd-publish-nuget.yml/badge.svg?style=flat-square)](https://github.com/muhammadirwanto-dev/sumapap/actions/workflows/cd-publish-nuget.yml)
-[![Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/muhammadirwanto-dev/41038afccedef8e2268247b2d75d71e0/raw/code-coverage-results.json&style=flat-square)](https://github.com/muhammadirwanto-dev/sumapap/actions/workflows/ci-test-coverage.yml)
+[![Build & Publish](https://github.com/muhammadirwanto-dev/sumapap/actions/workflows/cd-publish-nuget.yaml/badge.svg?style=flat-square)](https://github.com/muhammadirwanto-dev/sumapap/actions/workflows/cd-publish-nuget.yaml)
+[![Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/muhammadirwanto-dev/41038afccedef8e2268247b2d75d71e0/raw/code-coverage-results.json&style=flat-square)](https://github.com/muhammadirwanto-dev/sumapap/actions/workflows/ci-test-coverage.yaml)
 
 `Sumapap` is an evolving ecosystem of .NET libraries born from real-world development challenges. It reflects my continuous journey as a software engineer — moving away from "perfect" abstractions toward practical, production-ready systems.
 
