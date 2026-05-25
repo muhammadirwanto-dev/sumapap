@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Sumapap.Ddd.Abstractions;
+using Sumapap.Ddd.Abstractions.Events;
+using Sumapap.Ddd.Mediator.Events;
 
 namespace Sumapap.Ddd.Mediator.DependencyInjection
 {
@@ -24,12 +25,10 @@ namespace Sumapap.Ddd.Mediator.DependencyInjection
         ///  </PackageReference>
         /// </summary>
         /// <param name="services">The service collection to which the domain event dispatcher will be added. Cannot be null.</param>
-        /// <param name="assemblies">An array of assemblies to scan for domain event handlers. Can be empty.</param>
         /// <returns>The service collection with the domain event dispatcher registered. This enables domain event dispatching
         /// capabilities in the application's dependency injection container.</returns>
-        public static IServiceCollection AddMediatorDispatcher(
-            this IServiceCollection services,
-            params Assembly[] assemblies)
+        public static IServiceCollection AddMediatorEventsDispatcher(
+            this IServiceCollection services)
         {
             return services
                 .AddSingleton<IDomainEventDispatcher, DomainEventDispatcher>();

@@ -1,5 +1,7 @@
 ﻿using System.Linq.Expressions;
-using Sumapap.Persistence.Abstractions;
+using Sumapap.Persistence.Abstractions.Entities;
+using Sumapap.Persistence.Abstractions.Repositories;
+using Sumapap.Persistence.Abstractions.Specifications;
 using Sumapap.Queries.Abstractions;
 
 namespace Sumapap.Persistence.Caching.FusionCache.Repositories

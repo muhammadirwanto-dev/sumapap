@@ -3,7 +3,7 @@ using Sumapap.Queries.Abstractions.Filtering;
 using Sumapap.Queries.Abstractions.Paging;
 using Sumapap.Queries.Abstractions.Sorting;
 
-namespace Sumapap.Queries.Internal
+namespace Sumapap.Queries
 {
     public sealed class Query(
         FilterConfiguration filters,

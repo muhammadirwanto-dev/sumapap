@@ -1,4 +1,4 @@
-﻿namespace Sumapap.Persistence.Abstractions
+﻿namespace Sumapap.Persistence.Abstractions.Specifications
 {
     /// <summary>
     /// Utility class to apply ISpecification logic to an IQueryable.

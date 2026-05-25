@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using Sumapap.Persistence.Abstractions;
+using Sumapap.Persistence.Abstractions.Specifications;
 using Sumapap.Queries.Abstractions;
 
 namespace Sumapap.Persistence.Specifications

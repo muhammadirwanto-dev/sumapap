@@ -1,7 +1,7 @@
 ﻿using Sumapap.Queries.Abstractions;
 using Sumapap.Queries.Abstractions.Paging;
 
-namespace Sumapap.Queries.Internal
+namespace Sumapap.Queries
 {
     public sealed class QueryResult<T>(
         IEnumerable<T> items,

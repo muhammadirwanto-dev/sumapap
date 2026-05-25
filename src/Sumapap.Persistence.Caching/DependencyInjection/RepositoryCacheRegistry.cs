@@ -1,4 +1,4 @@
-using Sumapap.Persistence.Abstractions;
+using Sumapap.Persistence.Abstractions.Repositories;
 
 namespace Sumapap.Persistence.Caching.DependencyInjection
 {

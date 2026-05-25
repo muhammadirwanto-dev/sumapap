@@ -1,6 +1,5 @@
 ﻿using Sumapap.Queries.Abstractions;
 using Sumapap.Queries.Abstractions.Paging;
-using Sumapap.Queries.Internal;
 using Sumapap.Queries.Utils;
 
 namespace Sumapap.Queries.Executors

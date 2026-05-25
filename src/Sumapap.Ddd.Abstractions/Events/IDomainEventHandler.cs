@@ -1,4 +1,4 @@
-﻿namespace Sumapap.Ddd.Abstractions
+﻿namespace Sumapap.Ddd.Abstractions.Events
 {
     public interface IDomainEventHandler<in TEvent>
         where TEvent : IDomainEvent

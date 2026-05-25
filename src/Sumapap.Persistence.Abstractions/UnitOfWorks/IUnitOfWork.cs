@@ -1,4 +1,7 @@
-﻿namespace Sumapap.Persistence.Abstractions
+﻿using Sumapap.Persistence.Abstractions.Entities;
+using Sumapap.Persistence.Abstractions.Repositories;
+
+namespace Sumapap.Persistence.Abstractions.UnitOfWorks
 {
     /// <summary>
     /// Defines the contract for a Unit of Work.

@@ -2,7 +2,6 @@
 using Sumapap.Queries.Abstractions;
 using Sumapap.Queries.Abstractions.Paging;
 using Sumapap.Queries.Abstractions.Sorting;
-using Sumapap.Queries.Internal;
 using Sumapap.Queries.Utils;
 
 namespace Sumapap.Queries.Executors

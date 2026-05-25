@@ -2,7 +2,6 @@
 using Sumapap.Queries.Abstractions.Filtering;
 using Sumapap.Queries.Abstractions.Paging;
 using Sumapap.Queries.Abstractions.Sorting;
-using Sumapap.Queries.Internal;
 
 namespace Sumapap.Queries
 {
@@ -25,6 +24,9 @@ namespace Sumapap.Queries
             return this;
         }
 
+        public QueryBuilder UseOffsetPaging(int limit, int offset)
+            => UseOffsetPaging(new OffsettPaginationConfiguration(limit, offset));
+
         public QueryBuilder UseCursorPaging(CursorPaginationConfiguration paging)
         {
             _offset = null;
@@ -33,17 +35,14 @@ namespace Sumapap.Queries
             return this;
         }
 
+        public QueryBuilder UseCursorPaging(string cursorField, string? cursor = null, int limit = 20, CursorDirection direction = CursorDirection.Forward)
+            => UseCursorPaging(new CursorPaginationConfiguration(cursorField, cursor, limit, direction));
+
         public QueryBuilder WithOptionalFilter(FilterConfiguration? filters)
             => filters == null ? this : WithFilters(filters);
 
         public QueryBuilder WithOptionalSort(SortConfiguration? sort)
             => sort == null ? this : WithSort(sort);
-
-        public QueryBuilder UseOffsetPaging(int limit, int offset)
-            => UseOffsetPaging(new OffsettPaginationConfiguration(limit, offset));
-
-        public QueryBuilder UseCursorPaging(string cursorField, string? cursor = null, int limit = 20, CursorDirection direction = CursorDirection.Forward)
-            => UseCursorPaging(new CursorPaginationConfiguration(cursorField, cursor, limit, direction));
 
         public IQuery Build() => new Query(_filters, _sort, _offset, _cursor);
     }

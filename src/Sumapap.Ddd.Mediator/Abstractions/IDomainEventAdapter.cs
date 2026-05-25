@@ -1,5 +1,5 @@
 ﻿using Mediator;
-using Sumapap.Ddd.Abstractions;
+using Sumapap.Ddd.Abstractions.Events;
 
 namespace Sumapap.Ddd.Mediator.Abstractions
 {

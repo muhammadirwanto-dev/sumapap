@@ -1,4 +1,4 @@
-﻿namespace Sumapap.Persistence.Abstractions
+﻿namespace Sumapap.Persistence.Abstractions.Repositories
 {
     public interface IRepository;
 

@@ -1,4 +1,6 @@
-﻿namespace Sumapap.Persistence.Abstractions
+﻿using Sumapap.Persistence.Abstractions.Entities;
+
+namespace Sumapap.Persistence.Abstractions.Repositories
 {
     public interface IReadWriteRepository<TEntity> : IReadRepository<TEntity>, IWriteRepository<TEntity>
         where TEntity : class, IEntity;

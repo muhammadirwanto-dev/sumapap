@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Sumapap.Caching.Abstractions;
-using Sumapap.Persistence.Abstractions;
+using Sumapap.Persistence.Abstractions.Entities;
+using Sumapap.Persistence.Abstractions.Repositories;
 using Sumapap.Persistence.Caching.DependencyInjection;
 using ZiggyCreatures.Caching.Fusion;
 

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
-using Sumapap.Ddd.Abstractions;
+using Sumapap.Ddd.Abstractions.Events;
 
-namespace Sumapap.Ddd
+namespace Sumapap.Ddd.Abstractions.Entities
 {
     public abstract class DomainEntity
     {

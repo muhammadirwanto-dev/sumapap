@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Sumapap.Queries.Abstractions;
 
-namespace Sumapap.Persistence.Abstractions
+namespace Sumapap.Persistence.Abstractions.Specifications
 {
     /// <summary>
     /// Defines a contract for the Specification pattern.

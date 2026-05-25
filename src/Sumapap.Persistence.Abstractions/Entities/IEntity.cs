@@ -1,4 +1,4 @@
-﻿namespace Sumapap.Persistence.Abstractions
+﻿namespace Sumapap.Persistence.Abstractions.Entities
 {
     /// <summary>
     /// Defines a contract for an entity type that can be used as a base for domain or data model objects.

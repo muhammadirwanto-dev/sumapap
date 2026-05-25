@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Sumapap.Ddd.Abstractions;
-using Sumapap.Ddd.Dispatcher;
+using Sumapap.Ddd.Abstractions.Events;
+using Sumapap.Ddd.Events;
 
 namespace Sumapap.Ddd.DependencyInjection
 {

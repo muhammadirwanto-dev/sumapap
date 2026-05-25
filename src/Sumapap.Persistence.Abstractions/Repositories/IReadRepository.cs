@@ -1,7 +1,9 @@
 ﻿using System.Linq.Expressions;
+using Sumapap.Persistence.Abstractions.Entities;
+using Sumapap.Persistence.Abstractions.Specifications;
 using Sumapap.Queries.Abstractions;
 
-namespace Sumapap.Persistence.Abstractions
+namespace Sumapap.Persistence.Abstractions.Repositories
 {
     /// <summary>
     /// Defines a read-only repository for querying entities of a specified type from a data source.

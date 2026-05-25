@@ -1,10 +1,10 @@
 ﻿using Mediator;
-using Sumapap.Ddd.Abstractions;
+using Sumapap.Ddd.Abstractions.Events;
 using Sumapap.Ddd.Mediator.Abstractions;
 
-namespace Sumapap.Ddd.Mediator
+namespace Sumapap.Ddd.Mediator.Events
 {
-    public sealed class DomainEventDispatcher(IPublisher _publisher)
+    internal sealed class DomainEventDispatcher(IPublisher _publisher)
         : IDomainEventDispatcher
     {
         public Task DispatchAsync(IEnumerable<IDomainEvent> domainEvents, CancellationToken cancellationToken = default)

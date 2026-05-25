@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Sumapap.Ddd.Abstractions;
+using Sumapap.Ddd.Abstractions.Events;
 
-namespace Sumapap.Ddd.Dispatcher
+namespace Sumapap.Ddd.Events
 {
-    public sealed class DomainEventDispatcher(IServiceProvider _provider)
+    internal sealed class DomainEventDispatcher(IServiceProvider _provider)
         : IDomainEventDispatcher
     {
         public async Task DispatchAsync(IEnumerable<IDomainEvent> domainEvents, CancellationToken cancellationToken = default)

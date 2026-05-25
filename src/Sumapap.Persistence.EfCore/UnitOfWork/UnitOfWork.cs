@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using Sumapap.Persistence.Abstractions;
+using Sumapap.Persistence.Abstractions.Entities;
+using Sumapap.Persistence.Abstractions.Repositories;
+using Sumapap.Persistence.Abstractions.UnitOfWorks;
 using Sumapap.Persistence.EfCore.Repositories;
 
 namespace Sumapap.Persistence.EfCore.UnitOfWork
