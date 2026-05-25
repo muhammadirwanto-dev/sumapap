@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0524</FileVersion>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0.0524</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
   </PropertyGroup>
 
@@ -28,6 +28,9 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Sumapap.Caching" />
+    <InternalsVisibleTo Include="Sumapap.Ddd" />
+    <InternalsVisibleTo Include="Sumapap.Ddd.Abstractions" />
+    <InternalsVisibleTo Include="Sumapap.Ddd.Mediator" />
     <InternalsVisibleTo Include="Sumapap.Persistence" />
     <InternalsVisibleTo Include="Sumapap.Persistence.Caching" />
     <InternalsVisibleTo Include="Sumapap.Persistence.Caching.FusionCache" />

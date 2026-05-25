@@ -31,7 +31,7 @@ namespace Sumapap.Persistence.DependencyInjection
         /// </example>
         extension(ISumapapServiceBuilder builder)
         {
-            public ISumapapServiceBuilder WithRepositories(Action<IPersistenceBuilder> configuration)
+            public ISumapapServiceBuilder WithPersistence(Action<IPersistenceBuilder> configuration)
             {
                 ArgumentNullException.ThrowIfNull(configuration);
 
