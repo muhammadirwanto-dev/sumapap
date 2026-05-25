@@ -3,7 +3,6 @@ using Sumapap.Ddd.Abstractions.Events;
 using Sumapap.Ddd.DependencyInjection;
 using Sumapap.Ddd.DependencyInjection.Abstractions;
 using Sumapap.Ddd.Mediator.Events;
-using Sumapap.DependencyInjection;
 
 namespace Sumapap.Ddd.Mediator.DependencyInjection.Strategies
 {
@@ -11,13 +10,6 @@ namespace Sumapap.Ddd.Mediator.DependencyInjection.Strategies
     {
         public void Register(EventDispatcherRegistration registration, IServiceCollection services)
         {
-            services.AddSumapap()
-                .WithDdd(builder =>
-                {
-                    builder.AddDomainEventsDispatcher([]);
-                    builder.AddDomainEventsDispatcher([])
-                        .UseMediatorForDomainEventHandler();
-                });
             services.AddSingleton<IDomainEventDispatcher, DomainEventDispatcher>();
         }
     }
