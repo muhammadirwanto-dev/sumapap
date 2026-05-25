@@ -1,16 +1,16 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Sumapap.Ddd.Abstractions.Events;
+using Sumapap.Ddd.DependencyInjection.Abstractions;
 using Sumapap.Ddd.Events;
 
-namespace Sumapap.Ddd.DependencyInjection
+namespace Sumapap.Ddd.DependencyInjection.Strategies
 {
-    public static class ServiceCollectionExtensions
+    internal class DefaultEventDispatcherRegistrationStrategy : IEventDispatcherRegistrationStrategy
     {
-        public static IServiceCollection AddDomainEventsDispatcher(
-            this IServiceCollection services,
-            params Assembly[] assemblies)
+        public void Register(EventDispatcherRegistration registration, IServiceCollection services)
         {
+            var assemblies = registration.Assemblies;
             if (assemblies.Length == 0)
             {
                 assemblies = [Assembly.GetCallingAssembly()];
@@ -26,14 +26,11 @@ namespace Sumapap.Ddd.DependencyInjection
 
                 foreach (var handler in handlers)
                 {
-                    // Register as Scoped so handlers can inject your Repository/DbContext
                     services.AddScoped(handler.Interface, handler.Implementation);
                 }
             }
 
             services.AddSingleton<IDomainEventDispatcher, DomainEventDispatcher>();
-
-            return services;
         }
     }
 }

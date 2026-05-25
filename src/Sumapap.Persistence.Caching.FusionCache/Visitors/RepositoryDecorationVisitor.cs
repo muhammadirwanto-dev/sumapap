@@ -9,12 +9,12 @@ namespace Sumapap.Persistence.Caching.FusionCache.Visitors
 {
     internal class RepositoryDecorationVisitor : IRepositoryRegistrationVisitor
     {
-        public void Visit(RepositoryRegistration entry, IServiceCollection services)
+        public void Visit(RepositoryRegistration registration, IServiceCollection services)
         {
-            if (entry.AllowCaching)
+            if (registration.AllowCaching)
             {
-                var cachedImplType = GetCachedImplType(entry.ImplType);
-                var repositoryInterfaces = entry.ImplType.GetRepositoryInterfacesTypes();
+                var cachedImplType = GetCachedImplType(registration.ImplType);
+                var repositoryInterfaces = registration.ImplType.GetRepositoryInterfacesTypes();
 
                 // decorate all repository interfaces with the corresponding cached implementation, except the AbstractType.
                 foreach (var interf in repositoryInterfaces)

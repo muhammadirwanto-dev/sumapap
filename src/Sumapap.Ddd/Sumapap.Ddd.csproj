@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>2.1.0</AssemblyVersion>
-    <FileVersion>2.1.0.0524</FileVersion>
+    <AssemblyVersion>3.0.0</AssemblyVersion>
+    <FileVersion>3.0.0.0524</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
   </PropertyGroup>
 
@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sumapap.Ddd.Abstractions\Sumapap.Ddd.Abstractions.csproj" />
+    <ProjectReference Include="..\Sumapap.DependencyInjection\Sumapap.DependencyInjection.csproj" />
   </ItemGroup>
 
 </Project>
