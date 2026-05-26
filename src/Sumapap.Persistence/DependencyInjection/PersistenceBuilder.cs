@@ -28,7 +28,7 @@ namespace Sumapap.Persistence.DependencyInjection
             {
                 foreach (var registration in _registrations)
                 {
-                    visitor.Visit(registration, _services);
+                    registration.Accept(visitor, _services);
                 }
             }
 
