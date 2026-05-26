@@ -17,8 +17,9 @@ This skill helps you create or update XML documentation for interfaces and their
 - Focus on clarity and conciseness: Use clear language and avoid unnecessary jargon or technical terms. Keep sentences short and to the point.
 - Use consistent formatting: Follow the project's guidelines for XML documentation, including the use of `<summary>`, `<param>`, `<returns>`, and other relevant tags. Use consistent formatting throughout the documentation.
 - Add the documentation directly above the interface and method declaration in the code.
-- Don't add the documentation above the class and its members, unless it doesn't have any interfaces.
-- Don't add the documentation for private members, unless it is necessary for understanding the public API.
+- Don't add the documentation above the class and its members and methods, unless it doesn't have any interfaces.
+- If you need to add the documentation for classes which are not implementing interface, don't add the documentation for constructors, unless it is necessary for understanding the public API.
+- If you need to add the documentation for classes which are not implementing interface, don't add the documentation for private members, unless it is necessary for understanding the public API.
 
 # References
 
