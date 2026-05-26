@@ -28,6 +28,12 @@ This skill helps you create or update Markdown documentation for the project. It
 - Filename same as the module `/src/Sumapap.{Capability}.{Technology}` → `/docs/Sumapap.{Capability}.{Technology}.md`
 - All modules should have documentation, even if it's just a brief overview. If a module is deprecated or not intended for public use, this should be clearly stated in the documentation.
 
+### Don'ts
+
+- Don't include sensitive information: Avoid including any secrets, tokens, internal URLs, or other sensitive information in the documentation.
+- Don't rewrite class or record definitions in the documentation. Instead, provide a high-level overview and link to the relevant code files for details.
+- Don't rewrite method signatures in the documentation. Instead, provide a high-level overview of the method's purpose and link to the relevant code files for details.
+
 ## Workflow
 
 ### Step 1: Read and understand the module and its context
