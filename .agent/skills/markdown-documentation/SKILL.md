@@ -85,6 +85,7 @@ After creating a documentation, verify:
 - [ ] Documentation follows the project's formatting guidelines and is consistent with other documentation files
 - [ ] Documentation includes relevant examples and usage scenarios that illustrate key concepts
 - [ ] Documentation is organized logically with appropriate headings and subheadings for easy navigation
+- [ ] Add new tests project to `tests/Sumapap.Tests.slnx`
 
 ## References
 
