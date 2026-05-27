@@ -1,4 +1,3 @@
-using Sumapap.Ddd;
 using Sumapap.Ddd.Abstractions;
 
 namespace Sumapap.Ddd.Tests

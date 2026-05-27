@@ -1,5 +1,5 @@
-using Xunit;
 using Sumapap.Queries.Abstractions.Sorting;
+using Xunit;
 
 namespace Sumapap.Queries.Tests.Sorting
 {

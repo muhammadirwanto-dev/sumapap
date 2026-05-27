@@ -1,8 +1,8 @@
-using System.Linq.Expressions;
-using Xunit;
 using Sumapap.Persistence.Abstractions.Specifications;
 using Sumapap.Queries;
 using Sumapap.Queries.Abstractions.Filtering;
+using System.Linq.Expressions;
+using Xunit;
 
 namespace Sumapap.Persistence.Abstractions.Tests.Specifications
 {

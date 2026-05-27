@@ -1,9 +1,7 @@
-using Xunit;
-using Sumapap.Queries;
-using Sumapap.Queries.Abstractions;
 using Sumapap.Queries.Abstractions.Filtering;
-using Sumapap.Queries.Abstractions.Sorting;
 using Sumapap.Queries.Abstractions.Paging;
+using Sumapap.Queries.Abstractions.Sorting;
+using Xunit;
 
 namespace Sumapap.Queries.Tests
 {

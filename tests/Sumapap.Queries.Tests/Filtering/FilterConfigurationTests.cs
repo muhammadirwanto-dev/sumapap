@@ -1,5 +1,5 @@
-using Xunit;
 using Sumapap.Queries.Abstractions.Filtering;
+using Xunit;
 
 namespace Sumapap.Queries.Tests.Filtering
 {

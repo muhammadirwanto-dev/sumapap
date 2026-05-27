@@ -1,5 +1,5 @@
-using Xunit;
 using Sumapap.Queries.Abstractions.Paging;
+using Xunit;
 
 namespace Sumapap.Queries.Tests.Paging
 {
