@@ -69,19 +69,9 @@ jobs:
       - name: Evaluate Coverage & Prepare Notice
         id: eval_coverage
         run: |
-          # Use the output from the CodeCoverageSummary action directly
-          ACTUAL_COVERAGE="${{ steps.coverage_summary.outputs.line-rate }}"
-
-          # Convert from decimal (0.49) to percentage (49), handle empty case
-          if [ -z "$ACTUAL_COVERAGE" ] || [ "$ACTUAL_COVERAGE" == "0" ]; then
-            ACTUAL_COVERAGE=0
-          else
-            # Round to nearest integer: multiply by 100
-            ACTUAL_COVERAGE=$(printf "%.0f" $(echo "$ACTUAL_COVERAGE * 100" | bc))
-          fi
-
+          ACTUAL_COVERAGE=$(grep "Summary" code-coverage-results.md | sed -n 's/^[^|]*|[^*]*\*\*\([0-9]\+\)%.*/\1/p' | head -n 1)
+          ACTUAL_COVERAGE=${ACTUAL_COVERAGE:-0}
           echo "ACTUAL_COVERAGE=$ACTUAL_COVERAGE" >> $GITHUB_ENV
-          echo "Extracted coverage: $ACTUAL_COVERAGE%"
           
           # Determine Color for the Gist Badge
           COLOR="red"
