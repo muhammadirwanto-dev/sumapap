@@ -6,9 +6,20 @@ using Sumapap.Queries.Utils;
 
 namespace Sumapap.Queries.Executors
 {
+    /// <summary>
+    /// Query executor for database queries (IQueryable sources).
+    /// Builds expression trees that are translated to SQL by the query provider.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the queryable.</typeparam>
     public sealed class QueryableQueryExecutor<T>
         : QueryExecutorBase<IQueryable<T>, T>
     {
+        /// <summary>
+        /// Applies filtering to the queryable using expression trees.
+        /// </summary>
+        /// <param name="source">The queryable data source.</param>
+        /// <param name="query">The query containing filter criteria.</param>
+        /// <returns>The filtered queryable.</returns>
         protected override IQueryable<T> ApplyFiltering(IQueryable<T> source, IQuery query)
         {
             var expr = _expressionBuilder.BuildFilterExpression(query.Filters);
@@ -16,6 +27,12 @@ namespace Sumapap.Queries.Executors
             return source.Where(expr);
         }
 
+        /// <summary>
+        /// Applies sorting to the queryable using expression trees.
+        /// </summary>
+        /// <param name="source">The queryable data source.</param>
+        /// <param name="query">The query containing sort criteria.</param>
+        /// <returns>The sorted queryable.</returns>
         protected override IQueryable<T> ApplySorting(IQueryable<T> source, IQuery query)
         {
             var sorts = query.Sort?.Sorts;
@@ -42,6 +59,12 @@ namespace Sumapap.Queries.Executors
             return ordered ?? source;
         }
 
+        /// <summary>
+        /// Applies cursor-based pagination to the queryable.
+        /// </summary>
+        /// <param name="source">The queryable data source.</param>
+        /// <param name="query">The query containing cursor pagination configuration.</param>
+        /// <returns>The cursor-paginated query result.</returns>
         protected override IQueryResult<T> ApplyCursorPaging(IQueryable<T> source, IQuery query)
         {
             var paging = query.CursorPaging!;

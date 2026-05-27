@@ -6,9 +6,20 @@ using Sumapap.Queries.Utils;
 
 namespace Sumapap.Queries.Executors
 {
+    /// <summary>
+    /// Query executor for in-memory collections (IEnumerable sources).
+    /// Compiles LINQ expressions and executes them against in-memory data.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the collection.</typeparam>
     public sealed class EnumerableQueryExecutor<T>
         : QueryExecutorBase<IEnumerable<T>, T>
     {
+        /// <summary>
+        /// Applies filtering to the in-memory collection using compiled expressions.
+        /// </summary>
+        /// <param name="source">The in-memory collection.</param>
+        /// <param name="query">The query containing filter criteria.</param>
+        /// <returns>The filtered collection.</returns>
         protected override IEnumerable<T> ApplyFiltering(IEnumerable<T> source, IQuery query)
         {
             var expr = _expressionBuilder.BuildFilterExpression(query.Filters);
@@ -16,6 +27,12 @@ namespace Sumapap.Queries.Executors
             return source.AsEnumerable().Where(expr.Compile()).AsEnumerable();
         }
 
+        /// <summary>
+        /// Applies sorting to the in-memory collection using compiled expressions.
+        /// </summary>
+        /// <param name="source">The in-memory collection.</param>
+        /// <param name="query">The query containing sort criteria.</param>
+        /// <returns>The sorted collection.</returns>
         protected override IEnumerable<T> ApplySorting(IEnumerable<T> source, IQuery query)
         {
             var sorts = query.Sort?.Sorts;
@@ -42,6 +59,12 @@ namespace Sumapap.Queries.Executors
             return ordered ?? source;
         }
 
+        /// <summary>
+        /// Applies cursor-based pagination to the in-memory collection.
+        /// </summary>
+        /// <param name="source">The in-memory collection.</param>
+        /// <param name="query">The query containing cursor pagination configuration.</param>
+        /// <returns>The cursor-paginated query result.</returns>
         protected override IQueryResult<T> ApplyCursorPaging(IEnumerable<T> source, IQuery query)
         {
             var paging = query.CursorPaging!;

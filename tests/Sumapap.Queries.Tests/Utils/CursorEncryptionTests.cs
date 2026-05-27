@@ -1,5 +1,5 @@
-using Xunit;
 using Sumapap.Queries.Utils;
+using Xunit;
 
 namespace Sumapap.Queries.Tests.Utils
 {

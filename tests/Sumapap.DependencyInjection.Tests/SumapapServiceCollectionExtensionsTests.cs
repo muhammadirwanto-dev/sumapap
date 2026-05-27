@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Sumapap.DependencyInjection;
 using Sumapap.DependencyInjection.Abstractions;
 
 namespace Sumapap.DependencyInjection.Tests

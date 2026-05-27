@@ -13,5 +13,11 @@ namespace Sumapap.Persistence.DependencyInjection
         Type ImplType,
         bool IsGeneric,
         bool AllowCaching,
-        IRepositoryRegistrationDecorator? Decorator);
+        IRepositoryRegistrationDecorator? Decorator)
+    {
+        public void Accept(IRepositoryRegistrationVisitor visitor, IServiceCollection services)
+        {
+            visitor.Visit(this, services);
+        }
+    }
 }

@@ -8,6 +8,10 @@
     /// and encapsulate business logic.</remarks>
     public interface IAggregateRoot : IEntity;
 
+    /// <summary>
+    /// Represents the root entity of an aggregate with a strongly typed identifier.
+    /// </summary>
+    /// <typeparam name="TKey">The type of the aggregate root's identifier.</typeparam>
     public interface IAggregateRoot<TKey> : IAggregateRoot, IEntity<TKey>
         where TKey : IEquatable<TKey>;
 }

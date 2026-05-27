@@ -18,10 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Sumapap.Ddd\Sumapap.Ddd.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Using Include="Xunit" />
+    <ProjectReference Include="..\..\src\Sumapap.Ddd.Abstractions\Sumapap.Ddd.Abstractions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

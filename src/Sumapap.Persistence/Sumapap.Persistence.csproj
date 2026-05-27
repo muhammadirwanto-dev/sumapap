@@ -10,17 +10,17 @@
 
   <!--NuGet properties-->
   <PropertyGroup>
-    <Title>Sumapap.Persistence.DependencyInjection</Title>
-    <PackageId>Sumapap.Persistence.DependencyInjection</PackageId>
-    <PackageTags>Sumapap;Persistence;DependencyInjection;DI</PackageTags>
+    <Title>Sumapap.Persistence</Title>
+    <PackageId>Sumapap.Persistence</PackageId>
+    <PackageTags>Sumapap;Persistence;DI</PackageTags>
     <Description>
-      `Sumapap.Persistence.DependencyInjection` provides fluent dependency injection builders and extensions for configuring Sumapap.Persistence repositories and caching.
+      The `Sumapap.Persistence` package provides a set of tools and abstractions for implementing persistence in your applications. It includes features such as caching, database access, and integration with dependency injection frameworks. With Sumapap.Persistence, you can easily manage your application's data storage and retrieval while maintaining a clean and modular architecture.
     </Description>
-    <PackageReadmeFile>docs\Sumapap.Persistence.DependencyInjection.md</PackageReadmeFile>
+    <PackageReadmeFile>docs\Sumapap.Persistence.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\docs\Sumapap.Persistence.DependencyInjection.md" Pack="true" PackagePath="docs" />
+    <None Include="..\..\docs\Sumapap.Persistence.md" Pack="true" PackagePath="docs" />
   </ItemGroup>
 
   <ItemGroup>
