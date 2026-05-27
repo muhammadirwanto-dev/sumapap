@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Sumapap.Ddd\Sumapap.Ddd.csproj" />
-    <ProjectReference Include="..\..\src\Sumapap.Ddd.Abstractions\Sumapap.Ddd.Abstractions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
