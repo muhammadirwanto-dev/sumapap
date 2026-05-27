@@ -37,8 +37,8 @@ jobs:
       # 2. Build everything (Forces new/unreferenced modules to compile)
       - name: Build Source and Tests
         run: |
-          dotnet build src/Sumapap.slnx -c Release
-          dotnet build tests/Sumapap.Tests.slnx -c Release
+          dotnet build src/Sumapap.slnx -c Release --no-restore
+          dotnet build tests/Sumapap.Tests.slnx -c Release --no-restore --no-dependencies
 
       # 3. Run tests via the Test Solution, but isolate coverage filters to Sumapap.* core assemblies
       # (Excludes files ending in .Tests from dragging down or masking the real business logic metrics)
