@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net10.0</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<AssemblyVersion>1.0.0</AssemblyVersion>
+		<FileVersion>1.0.0.0524</FileVersion>
+		<VersionPrefix>$(AssemblyVersion)</VersionPrefix>
+	</PropertyGroup>
+
+	<!--NuGet properties-->
+	<PropertyGroup>
+		<Title>Sumapap.Navigations</Title>
+		<PackageId>Sumapap.Navigations</PackageId>
+		<PackageTags>Sumapap;Navigations</PackageTags>
+		<Description>
+			The `Sumapap.Navigations` package provides a set of tools and abstractions for implementing navigation functionality in your applications. It includes features such as navigation between views, passing parameters, and managing navigation stacks. With Sumapap.Navigations, you can easily create and manage navigation flows while maintaining a clean and modular architecture.
+		</Description>
+		<PackageReadmeFile>docs\Sumapap.Navigations.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\docs\Sumapap.Navigations.md" Pack="true" PackagePath="docs" />
+	</ItemGroup>
+
+</Project>
