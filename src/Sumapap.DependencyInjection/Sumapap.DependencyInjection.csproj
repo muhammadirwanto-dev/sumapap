@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>1.1.0</AssemblyVersion>
-    <FileVersion>1.1.0.0524</FileVersion>
+    <AssemblyVersion>1.1.1</AssemblyVersion>
+    <FileVersion>1.1.1.0524</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
   </PropertyGroup>
 
@@ -36,6 +36,8 @@
     <InternalsVisibleTo Include="Sumapap.Persistence.Caching.FusionCache" />
     <InternalsVisibleTo Include="Sumapap.Persistence.DependencyInjection" />
     <InternalsVisibleTo Include="Sumapap.Persistence.EfCore" />
+    <InternalsVisibleTo Include="Sumapap.Reporting" />
+    <InternalsVisibleTo Include="Sumapap.Reporting.Logging" />
     <InternalsVisibleTo Include="Sumapap.Tests" />
   </ItemGroup>
   
