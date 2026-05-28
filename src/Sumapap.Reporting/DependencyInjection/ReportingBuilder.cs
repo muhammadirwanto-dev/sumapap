@@ -19,7 +19,7 @@ namespace Sumapap.Reporting.DependencyInjection
         public IReportingBuilder AddReporting(Action<ReportingOptions> configuration)
         {
             _services.Configure(configuration);
-            _services.AddSingleton<IReporter, Reporter>();
+            _services.AddSingleton<IReportingService, ReportingService>();
 
             return this;
         }

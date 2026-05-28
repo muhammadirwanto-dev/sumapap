@@ -4,7 +4,7 @@
     /// Provides a centralized service for reporting errors and exceptions.
     /// The service orchestrates report creation and dispatches it to configured sinks.
     /// </summary>
-    public interface IReporter
+    public interface IReportingService
     {
         void Report(Exception exception);
 

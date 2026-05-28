@@ -4,10 +4,10 @@ using Sumapap.Reporting.Options;
 
 namespace Sumapap.Reporting
 {
-    internal sealed class Reporter(
+    internal sealed class ReportingService(
         IEnumerable<IReportSink> sinks,
         IOptions<ReportingOptions> options
-        ) : IReporter
+        ) : IReportingService
     {
         private readonly IEnumerable<IReportSink> _sinks = sinks;
         private readonly ReportingOptions _options = options.Value;
