@@ -37,7 +37,6 @@
     <InternalsVisibleTo Include="Sumapap.Persistence.DependencyInjection" />
     <InternalsVisibleTo Include="Sumapap.Persistence.EfCore" />
     <InternalsVisibleTo Include="Sumapap.Reporting" />
-    <InternalsVisibleTo Include="Sumapap.Reporting.Logging" />
     <InternalsVisibleTo Include="Sumapap.Reporting.Maui" />
     <InternalsVisibleTo Include="Sumapap.Tests" />
   </ItemGroup>
