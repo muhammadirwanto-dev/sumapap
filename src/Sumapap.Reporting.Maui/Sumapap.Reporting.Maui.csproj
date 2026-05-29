@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<!-- Target all MAUI platforms for complete NuGet package -->
+		<!-- Note: Full build requires macOS for iOS/Catalyst, Windows for Windows -->
+		<TargetFrameworks>net10.0-android;net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
+		<!-- Add Windows target when building on Windows -->
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
+
+		<UseMaui>true</UseMaui>
+		<SingleProject>true</SingleProject>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<!-- Enable XAML source generation for faster build times and improved performance.
+		     This generates C# code from XAML at compile time instead of runtime inflation.
+		     To disable, remove this line.
+		     For individual files, you can override by setting Inflator metadata:
+		       <MauiXaml Update="MyPage.xaml" Inflator="Default" /> (reverts to defaults: Runtime for Debug, XamlC for Release)
+		       <MauiXaml Update="MyPage.xaml" Inflator="Runtime" /> (force runtime inflation) -->
+		<MauiXamlInflator>SourceGen</MauiXamlInflator>
+
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
+		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+
+		<AssemblyVersion>1.0.0</AssemblyVersion>
+		<FileVersion>1.0.0.0524</FileVersion>
+		<VersionPrefix>$(AssemblyVersion)</VersionPrefix>
+	</PropertyGroup>
+
+	<!--NuGet properties-->
+	<PropertyGroup>
+		<Title>Sumapap.Reporting.Maui</Title>
+		<PackageId>Sumapap.Reporting.Maui</PackageId>
+		<PackageTags>Sumapap;Reporting;MAUI</PackageTags>
+		<Description>
+			The `Sumapap.Reporting.Maui` package provides a set of tools and abstractions for implementing reporting functionality in your MAUI applications. It includes features such as report generation, data visualization, and integration with various data sources. With Sumapap.Reporting.Maui, you can easily create and manage reports while maintaining a clean and modular architecture.
+		</Description>
+		<PackageReadmeFile>docs\Sumapap.Reporting.Maui.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\docs\Sumapap.Reporting.Maui.md" Pack="true" PackagePath="docs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Sumapap.Reporting\Sumapap.Reporting.csproj" />
+	</ItemGroup>
+
+</Project>

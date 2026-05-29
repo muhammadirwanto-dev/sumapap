@@ -13,7 +13,9 @@
 `Sumapap.Caching` provides core abstractions and utilities for building consistent caching strategies across Sumapap applications. The package focuses on:
 
 - Cache key provider abstraction for consistent key generation
-- Default implementation with configurable options (separator, prefix, type name formatting)
+- Default implementation with configurable options (separator, tenant prefix)
+- Content-based hashing for complex objects (SHA256)
+- Automatic kebab-case transformation for cache keys
 - Fluent configuration API for DI setup
 - Provider-agnostic design (works with Redis, FusionCache, MemoryCache, etc.)
 - Extensible architecture for custom cache key strategies
@@ -22,8 +24,10 @@ The goal is to standardize cache key generation across your application while ke
 
 ## ✨ Why use `Sumapap.Caching`?
 
-- **Consistent Key Generation**: Standardized cache key format across your entire application
+- **Consistent Key Generation**: Standardized cache key format across your entire application with automatic kebab-case transformation
+- **Content-Based Hashing**: Complex objects are automatically hashed (SHA256) for stable cache keys
 - **Type-Safe API**: Generic methods provide compile-time safety for cache keys
+- **Multi-Tenancy Support**: Built-in tenant prefix for isolated cache namespaces
 - **Provider-Agnostic**: Works with any caching implementation (Redis, FusionCache, MemoryCache, IDistributedCache)
 - **Fluent Configuration**: Easy DI setup via `AddSumapap().WithCaching()`
 - **Extensible**: Implement `ICacheKeyProvider` for custom key generation strategies
@@ -44,8 +48,8 @@ builder.Services.AddSumapap()
     .WithCaching(caching => caching
         .UseDefaultKeyProvider(options =>
         {
-            options.KeySeparator = ":";
-            options.IncludeTypeName = true;
+            options.Separator = ":";
+            options.Tenant = "myapp";
         })
     );
 ```
@@ -69,7 +73,7 @@ public class UserService
 4. Generate cache keys using the provider:
 
 ```csharp
-// Generate cache key: "User:123"
+// Generate cache key: "myapp:user:123"
 var cacheKey = _keyProvider.CreateKey<User>(123);
 
 // Try to get from cache
@@ -87,27 +91,34 @@ var cached = await _cache.GetStringAsync(cacheKey);
 ```csharp
 public interface ICacheKeyProvider
 {
-    // Create cache key from object name and parameters
-    string CreateKey(string @object, params object[] parameters);
+    // Create cache key from object instance and parameters
+    string CreateKey<TObject>(TObject @object, params object[] parameters)
+        where TObject : class;
 
     // Create cache key from generic type and parameters
-    string CreateKey<TObject>(params object[] parameters);
+    string CreateKey<TObject>(params object[] parameters)
+        where TObject : class;
 }
 ```
 
 **Usage:**
 ```csharp
-// Type-safe key generation
+// Type-safe key generation (simple parameters)
 var userKey = _keyProvider.CreateKey<User>(userId);
-// Result: "User:123"
+// Result: "user:123" (kebab-case)
 
-// String-based key generation
+// Object-based key generation
 var sessionKey = _keyProvider.CreateKey("UserSession", sessionId);
-// Result: "UserSession:abc123"
+// Result: "user-session:abc123" (kebab-case)
 
 // Multiple parameters
 var queryKey = _keyProvider.CreateKey<Product>("Search", category, minPrice, maxPrice);
-// Result: "Product:Search:electronics:100:500"
+// Result: "search:electronics:100:500"
+
+// Complex object (uses content hash)
+var complexFilter = new ProductFilter { Category = "electronics", MinPrice = 100, MaxPrice = 500 };
+var filterKey = _keyProvider.CreateKey(complexFilter);
+// Result: "A3B5C7D9E1F2..." (SHA256 hash of JSON, kebab-case)
 ```
 
 ### Default Cache Key Provider
@@ -117,33 +128,37 @@ var queryKey = _keyProvider.CreateKey<Product>("Search", category, minPrice, max
 ```csharp
 public class DefaultCacheKeyProvider : ICacheKeyProvider
 {
-    public DefaultCacheKeyProvider(CacheKeyProviderOptions options);
-    
-    public string CreateKey(string @object, params object[] parameters);
-    public string CreateKey<TObject>(params object[] parameters);
+    public DefaultCacheKeyProvider(IOptions<CacheKeyProviderOptions> options);
+
+    public string CreateKey<TObject>(TObject @object, params object[] parameters)
+        where TObject : class;
+    public string CreateKey<TObject>(params object[] parameters)
+        where TObject : class;
 }
 ```
 
 **Key Generation Format:**
 ```
-[Prefix:]TypeName:Param1:Param2:...
+[Tenant:]object-or-type:param1:param2:...
 ```
+
+All keys are automatically converted to kebab-case. Complex objects (non-string, non-primitive) are hashed using SHA256 of their JSON representation.
 
 **Examples:**
 ```csharp
-// Default configuration (no prefix, short type name, ":" separator)
+// Default configuration (no tenant, ":" separator, kebab-case)
 var key = _keyProvider.CreateKey<User>(123);
-// Result: "User:123"
+// Result: "user:123"
 
-// With prefix configured
-options.Prefix = "myapp";
+// With tenant configured
+options.Tenant = "myapp";
 var key = _keyProvider.CreateKey<User>(123);
-// Result: "myapp:User:123"
+// Result: "myapp:user:123"
 
-// With full type name
-options.IncludeTypeName = true;
-var key = _keyProvider.CreateKey<User>(123);
-// Result: "MyApp.Domain.User:123"
+// Complex object (content hash)
+var filter = new UserFilter { Status = "Active", Role = "Admin" };
+var key = _keyProvider.CreateKey(filter, "list");
+// Result: "A3B5C7D9E1F2...:list" (SHA256 hash, kebab-case)
 ```
 
 ### Configuration Options
@@ -154,28 +169,25 @@ var key = _keyProvider.CreateKey<User>(123);
 public class CacheKeyProviderOptions
 {
     // Separator between cache key components (default: ":")
-    public string KeySeparator { get; set; } = ":";
+    public string Separator { get; set; } = ":";
 
-    // Include full type name in cache key (default: false)
-    public bool IncludeTypeName { get; set; } = false;
-
-    // Cache key prefix for namespacing (default: null)
-    public string? Prefix { get; set; }
+    // Tenant identifier for multi-tenant cache isolation (default: null)
+    public string? Tenant { get; set; }
 }
 ```
 
 **Configuration Examples:**
 
-**With Prefix:**
+**With Tenant:**
 ```csharp
 .WithCaching(caching => caching
     .UseDefaultKeyProvider(options =>
     {
-        options.Prefix = "myapp";
+        options.Tenant = "myapp";
     })
 )
 
-// Keys: "myapp:User:123", "myapp:Product:456"
+// Keys: "myapp:user:123", "myapp:product:456"
 ```
 
 **With Custom Separator:**
@@ -183,23 +195,24 @@ public class CacheKeyProviderOptions
 .WithCaching(caching => caching
     .UseDefaultKeyProvider(options =>
     {
-        options.KeySeparator = "-";
+        options.Separator = "-";
     })
 )
 
-// Keys: "User-123", "Product-Search-electronics-100-500"
+// Keys: "user-123", "product-search-electronics-100-500"
 ```
 
-**With Full Type Name:**
+**With Both Tenant and Custom Separator:**
 ```csharp
 .WithCaching(caching => caching
     .UseDefaultKeyProvider(options =>
     {
-        options.IncludeTypeName = true;
+        options.Tenant = "tenant-a";
+        options.Separator = "_";
     })
 )
 
-// Keys: "MyApp.Domain.Entities.User:123"
+// Keys: "tenant-a_user_123", "tenant-a_product_456"
 ```
 
 ### Fluent DI Configuration
@@ -211,9 +224,8 @@ builder.Services.AddSumapap()
     .WithCaching(caching => caching
         .UseDefaultKeyProvider(options =>
         {
-            options.KeySeparator = ":";
-            options.Prefix = "myapp";
-            options.IncludeTypeName = false;
+            options.Separator = ":";
+            options.Tenant = "myapp";
         })
     );
 ```
@@ -230,8 +242,8 @@ builder.Services.AddSumapap()
     .WithCaching(caching => caching
         .UseDefaultKeyProvider(options =>
         {
-            options.Prefix = "myapp";
-            options.KeySeparator = ":";
+            options.Tenant = "myapp";
+            options.Separator = ":";
         })
     );
 
@@ -262,7 +274,7 @@ public class UserService
 
     public async Task<User?> GetUserAsync(int userId, CancellationToken cancellationToken = default)
     {
-        // Generate cache key: "myapp:User:123"
+        // Generate cache key: "myapp:user:123"
         var cacheKey = _keyProvider.CreateKey<User>(userId);
 
         // Try to get from cache
@@ -295,8 +307,8 @@ public class UserService
         string searchTerm, 
         CancellationToken cancellationToken = default)
     {
-        // Generate cache key: "myapp:User:Search:john"
-        var cacheKey = _keyProvider.CreateKey<User>("Search", searchTerm);
+        // Generate cache key: "myapp:search:john"
+        var cacheKey = _keyProvider.CreateKey("Search", searchTerm);
 
         var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
         if (cached != null)
@@ -327,10 +339,12 @@ Implement `ICacheKeyProvider` for custom key generation strategies:
 ```csharp
 public class CustomCacheKeyProvider : ICacheKeyProvider
 {
-    public string CreateKey(string @object, params object[] parameters)
+    public string CreateKey<TObject>(TObject @object, params object[] parameters)
+        where TObject : class
     {
         // Custom implementation: use MD5 hash for long keys
-        var raw = $"{@object}:{string.Join(":", parameters)}";
+        var objString = @object is string str ? str : JsonSerializer.Serialize(@object);
+        var raw = $"{objString}:{string.Join(":", parameters)}";
         if (raw.Length > 250)
         {
             using var md5 = MD5.Create();
@@ -341,6 +355,7 @@ public class CustomCacheKeyProvider : ICacheKeyProvider
     }
 
     public string CreateKey<TObject>(params object[] parameters)
+        where TObject : class
     {
         return CreateKey(typeof(TObject).Name, parameters);
     }
@@ -358,18 +373,19 @@ builder.Services.AddSumapap()
 ### ✅ Do
 
 - **Use consistent key generation** across your entire application via `ICacheKeyProvider`
-- **Configure prefix** for multi-tenant or multi-environment scenarios (`options.Prefix = "prod"` vs `"dev"`)
-- **Include type name** when caching multiple entity types with similar keys
+- **Configure tenant** for multi-tenant or multi-environment scenarios (`options.Tenant = "tenant-a"` or `"prod"` vs `"dev"`)
+- **Leverage content hashing** for complex filter objects to ensure stable cache keys
 - **Use generic methods** (`CreateKey<T>()`) for type safety when possible
 - **Test cache key generation** to verify correct formatting before deploying
+- **Remember kebab-case transformation** - all keys are automatically converted (e.g., "UserSession" becomes "user-session")
 
 ### ❌ Don''t
 
-- **Don''t hardcode cache keys** - always use `ICacheKeyProvider` for consistency
+- **Don't hardcode cache keys** - always use `ICacheKeyProvider` for consistency
 - **Avoid very long cache keys** - some cache providers have key length limits (Redis: 512MB, but practical limits are much lower)
-- **Don''t include sensitive data** in cache keys (passwords, tokens) - keys may be logged or exposed
-- **Avoid using `IncludeTypeName = true` unnecessarily** - increases key length without value for most scenarios
-- **Don''t forget to configure separator** if your cache provider has special character restrictions
+- **Don't include sensitive data** in cache keys (passwords, tokens) - keys may be logged or exposed
+- **Don't use mutable objects** for key generation - content hash will change if object properties change
+- **Don't forget to configure separator** if your cache provider has special character restrictions
 
 ### Cache Key Length Limits
 
@@ -379,23 +395,23 @@ Different cache providers have different key length limits:
 - **Azure Redis Cache**: 512MB
 
 Keep cache keys concise by:
-1. Using short, descriptive object names
-2. Avoiding full type names unless necessary (`IncludeTypeName = false`)
-3. Using identifiers instead of full objects as parameters
+1. Using short, descriptive object names (they'll be kebab-cased automatically)
+2. Using simple parameters (primitives, strings, IDs) instead of complex objects when possible
+3. Relying on content hashing for complex objects - the provider handles this automatically
 
 ### Multi-Tenancy Support
 
-Use prefix for tenant isolation:
+Use tenant configuration for tenant isolation:
 
 ```csharp
 .WithCaching(caching => caching
     .UseDefaultKeyProvider(options =>
     {
-        options.Prefix = $"tenant-{tenantId}";
+        options.Tenant = $"tenant-{tenantId}";
     })
 )
 
-// Keys: "tenant-123:User:456", "tenant-123:Product:789"
+// Keys: "tenant-123:user:456", "tenant-123:product:789"
 ```
 
 ### Testing Recommendations
@@ -410,8 +426,8 @@ public async Task GetUser_GeneratesCorrectCacheKey()
     var keyProviderMock = new Mock<ICacheKeyProvider>();
     keyProviderMock
         .Setup(k => k.CreateKey<User>(123))
-        .Returns("User:123");
-    
+        .Returns("user:123");
+
     var service = new UserService(keyProviderMock.Object, cacheMock.Object);
 
     // Act

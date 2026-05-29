@@ -1,4 +1,5 @@
-using Sumapap.Ddd.Abstractions;
+using Sumapap.Ddd.Abstractions.Entities;
+using Sumapap.Ddd.Abstractions.Events;
 
 namespace Sumapap.Ddd.Tests
 {
