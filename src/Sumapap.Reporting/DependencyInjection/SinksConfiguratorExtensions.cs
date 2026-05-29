@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Sumapap.Reporting.Abstractions;
-using Sumapap.Reporting.DependencyInjection;
-using Sumapap.Reporting.Logging.Sinks;
+using Sumapap.Reporting.Sinks;
 
-namespace Sumapap.Reporting.Logging.DependencyInjection
+namespace Sumapap.Reporting.DependencyInjection
 {
-    public static class LoggerSinksConfiguratorExtensions
+    public static class SinksConfiguratorExtensions
     {
         extension(SinksConfigurator configurator)
         {

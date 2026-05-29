@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Sumapap.Reporting.Abstractions;
 
-namespace Sumapap.Reporting.Logging.Sinks
+namespace Sumapap.Reporting.Sinks
 {
     /// <summary>
     /// Report sink that forwards reports to Microsoft.Extensions.Logging.

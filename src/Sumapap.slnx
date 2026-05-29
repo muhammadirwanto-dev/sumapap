@@ -13,7 +13,6 @@
   <Project Path="Sumapap.Persistence/Sumapap.Persistence.csproj" />
   <Project Path="Sumapap.Queries.Abstractions/Sumapap.Queries.Abstractions.csproj" Id="f7ddc5e2-f06a-463e-a92d-576e61297189" />
   <Project Path="Sumapap.Queries/Sumapap.Queries.csproj" />
-  <Project Path="Sumapap.Reporting.Logging/Sumapap.Reporting.Logging.csproj" Id="12b1ff65-3e6b-429f-b86c-47767d8849d5" />
   <Project Path="Sumapap.Reporting.Maui/Sumapap.Reporting.Maui.csproj" Id="b79b4892-3883-4697-a284-8cc05c66c59a" />
   <Project Path="Sumapap.Reporting/Sumapap.Reporting.csproj" Id="c5399c7b-f113-4c44-94bb-622d3097358f" />
 </Solution>
