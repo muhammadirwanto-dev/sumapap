@@ -14,7 +14,7 @@ permissions:
 jobs:
   publish-nuget:
     if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - name: Checkout Code
@@ -30,6 +30,7 @@ jobs:
           dotnet workload install maui-android
           dotnet workload install maui-ios
           dotnet workload install maui-maccatalyst
+          # All workloads available on macOS runners
 
       - name: Cleanup NuGet Output Folder
         run: mkdir -p .nuget && rm -rf .nuget/*

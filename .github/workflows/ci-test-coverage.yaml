@@ -31,25 +31,31 @@ jobs:
       - name: Install .NET MAUI Workloads
         run: |
           dotnet workload install maui-android
-          dotnet workload install maui-ios
-          dotnet workload install maui-maccatalyst
+          # Note: maui-ios and maui-maccatalyst require macOS runners
+          # For cross-platform builds, use a matrix strategy with platform-specific runners
 
-      # 1. Restore everything
       - name: Restore Dependencies
         run: |
           dotnet restore src/Sumapap.slnx
           dotnet restore tests/Sumapap.Tests.slnx
 
-      # 2. Build everything (Forces new/unreferenced modules to compile)
-      - name: Build Source
+      # Build all non-MAUI projects (MAUI requires macOS for iOS/Catalyst)
+      - name: Build Source Projects
         run: |
-          dotnet build src/Sumapap.slnx -c Release --no-restore
+          for csproj in src/**/*.csproj; do
+            if grep -q '<UseMaui>true</UseMaui>' "$csproj"; then
+              echo "⏭️ Skipping MAUI project (requires macOS for full build): $csproj"
+              continue
+            fi
+
+            dotnet build "$csproj" -c Release --no-restore
+          done
 
       - name: Build Tests
         run: |
           dotnet build tests/Sumapap.Tests.slnx -c Release --no-restore
 
-      # 3. Run tests via the Test Solution, but isolate coverage filters to Sumapap.* core assemblies
+      # Run tests via the Test Solution, but isolate coverage filters to Sumapap.* core assemblies
       # (Excludes files ending in .Tests from dragging down or masking the real business logic metrics)
       - name: Run Unit Tests
         run: |
@@ -60,7 +66,6 @@ jobs:
             DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude="[* *.Tests]*" \
             DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.IncludeDirectory="src/**/bin/Release/"
 
-      # 4. Parse the generated Cobertura XML files safely
       - name: Code Coverage Summary
         id: coverage_summary
         uses: irongut/CodeCoverageSummary@v1.3.0
@@ -106,7 +111,6 @@ jobs:
         with:
           message-path: pr_comment.md
 
-      # Uses the variable definition directly from the global env context
       - name: Update Coverage Badge Gist
         uses: schneegans/dynamic-badges-action@v1.7.0
         with:
