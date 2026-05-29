@@ -28,28 +28,30 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Install .NET MAUI Workloads
+      # Remove MAUI projects from solution (they require macOS for iOS/Catalyst workloads)
+      - name: Remove MAUI Projects from Solution
         run: |
-          dotnet workload install maui-android
-          # Note: maui-ios and maui-maccatalyst require macOS runners
-          # For cross-platform builds, use a matrix strategy with platform-specific runners
+          for csproj in src/**/*.csproj; do
+            if grep -q '<UseMaui>true</UseMaui>' "$csproj"; then
+              echo "🗑️ Removing MAUI project from solution: $csproj"
+              dotnet sln src/Sumapap.slnx remove "$csproj" || true
+            fi
+          done
 
+          # List remaining projects
+          echo ""
+          echo "📋 Remaining projects in solution:"
+          dotnet sln src/Sumapap.slnx list
+
+      # Restore and build (MAUI projects already removed)
       - name: Restore Dependencies
         run: |
           dotnet restore src/Sumapap.slnx
           dotnet restore tests/Sumapap.Tests.slnx
 
-      # Build all non-MAUI projects (MAUI requires macOS for iOS/Catalyst)
       - name: Build Source Projects
         run: |
-          for csproj in src/**/*.csproj; do
-            if grep -q '<UseMaui>true</UseMaui>' "$csproj"; then
-              echo "⏭️ Skipping MAUI project (requires macOS for full build): $csproj"
-              continue
-            fi
-
-            dotnet build "$csproj" -c Release --no-restore
-          done
+          dotnet build src/Sumapap.slnx -c Release --no-restore
 
       - name: Build Tests
         run: |

@@ -4,19 +4,20 @@
 
 ## Current Configuration
 
-Sumapap uses a **two-stage pipeline approach**:
+Sumapap uses a **two-stage pipeline approach** optimized for cost:
 
 1. **CI (Pull Requests)**: Runs on **Linux** (`ubuntu-latest`) 
-   - Builds all non-MAUI projects
-   - Skips `Sumapap.Reporting.Maui` (requires macOS)
-   - Fast feedback (~3-5 minutes)
+   - Removes MAUI projects from solution before restore
+   - Builds all non-MAUI projects (14 projects)
+   - Runs non-MAUI unit tests
+   - Fast feedback (~3-5 minutes), cost-effective
 
 2. **CD (Publishing)**: Runs on **macOS** (`macos-latest`)
    - Builds ALL projects including MAUI with all platforms
    - Creates complete multi-platform NuGet packages
    - Publishes to NuGet.org
 
-This approach balances speed, cost, and completeness. See [CI_CD_ARCHITECTURE.md](./CI_CD_ARCHITECTURE.md) for details.
+**Trade-off**: MAUI library tests not run in CI (tested locally). This saves ~99% of CI costs. See [CI_CD_ARCHITECTURE.md](./CI_CD_ARCHITECTURE.md) for details.
 
 ## Platform Workload Requirements
 

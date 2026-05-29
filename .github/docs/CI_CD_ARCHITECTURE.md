@@ -11,15 +11,15 @@
 
 ## Solution Architecture
 
-### Two-Stage Pipeline Approach
+### Two-Stage Pipeline Approach (Cost-Optimized)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  STAGE 1: CI - Pull Request Validation (Linux, Fast)       │
 │  ────────────────────────────────────────────────────────   │
-│  • Builds all non-MAUI projects                             │
-│  • Skips Sumapap.Reporting.Maui (platform limitation)       │
-│  • Runs all tests                                           │
+│  • Removes MAUI projects from solution before restore       │
+│  • Builds all 14 non-MAUI projects                          │
+│  • Runs all non-MAUI tests                                  │
 │  • Generates code coverage                                  │
 │  • Fast feedback (~3-5 minutes)                             │
 │  • Cost: ~5 billable minutes per run                        │
@@ -28,14 +28,14 @@
 ┌─────────────────────────────────────────────────────────────┐
 │  STAGE 2: CD - NuGet Publishing (macOS, Complete)          │
 │  ────────────────────────────────────────────────────────   │
-│  • Builds ALL projects including MAUI                       │
+│  • Builds ALL 15 projects including MAUI                    │
 │  • Sumapap.Reporting.Maui built with all targets:          │
 │    - net10.0-android                                        │
 │    - net10.0-ios                                            │
 │    - net10.0-maccatalyst                                    │
 │  • Packs complete multi-platform NuGet packages             │
 │  • Publishes to NuGet.org                                   │
-│  • Cost: ~10-20 billable minutes per run (10x macOS rate)  │
+│  • Cost: ~100-200 billable minutes per run (10x macOS rate)│
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -67,34 +67,38 @@
 
 **Runner**: `ubuntu-latest` (Linux)
 
-**Purpose**: Fast validation of pull requests
+**Purpose**: Fast validation of non-MAUI code
 
 **Strategy**:
 ```yaml
-- name: Build Source Projects Individually
+- name: Remove MAUI Projects from Solution
   run: |
 	for csproj in src/**/*.csproj; do
-	  # Skip MAUI project on Linux
-	  if [[ "$csproj" == *"Sumapap.Reporting.Maui"* ]]; then
-		echo "⏭️ Skipping MAUI project (requires macOS): $csproj"
-		continue
+	  if grep -q '<UseMaui>true</UseMaui>' "$csproj"; then
+		dotnet sln src/Sumapap.slnx remove "$csproj" || true
 	  fi
-
-	  dotnet build "$csproj" -c Release --no-restore
 	done
+
+- name: Restore Dependencies
+  run: |
+	dotnet restore src/Sumapap.slnx
+
+- name: Build Source Projects
+  run: |
+	dotnet build src/Sumapap.slnx -c Release --no-restore
 ```
 
 **What Runs**:
-- ✅ Builds: All 14 non-MAUI projects
-- ⏭️ Skips: `Sumapap.Reporting.Maui`
-- ✅ Tests: All unit tests (MAUI project has no tests in CI)
-- ✅ Coverage: Code coverage for all testable projects
+- ✅ Builds: 14 non-MAUI projects
+- ⏭️ Excluded: `Sumapap.Reporting.Maui` (removed from solution)
+- ✅ Tests: All non-MAUI unit tests
+- ✅ Coverage: Code coverage for non-MAUI projects
 
-**Why Skip MAUI on CI?**
-1. **Fast Feedback**: Linux runners are fastest (no 10x cost multiplier)
-2. **Core Validation**: 95% of codebase is platform-agnostic
-3. **Cost Efficiency**: Saves ~90% of CI costs
-4. **Frequent Runs**: PR validation runs on every commit
+**Why Remove from Solution?**
+1. **Workload Requirement**: iOS/Catalyst workloads not available on Linux
+2. **Restore Failure**: MAUI projects fail during restore without workloads
+3. **Clean Approach**: Removing before restore avoids all errors
+4. **Cost Efficiency**: Linux is 10x cheaper than macOS (~$5 vs ~$100/month)
 
 ### CD Workflow (`.github/workflows/cd-publish-nuget.yaml`)
 
