@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net10.0</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<AssemblyVersion>1.0.0</AssemblyVersion>
+		<FileVersion>1.0.0.0524</FileVersion>
+		<VersionPrefix>$(AssemblyVersion)</VersionPrefix>
+	</PropertyGroup>
+
+	<!--NuGet properties-->
+	<PropertyGroup>
+		<Title>Sumapap.Reporting</Title>
+		<PackageId>Sumapap.Reporting</PackageId>
+		<PackageTags>Sumapap;Reporting</PackageTags>
+		<Description>
+			The `Sumapap.Reporting` package provides a set of tools and abstractions for implementing reporting functionality in your applications. It includes features such as report generation, data visualization, and integration with various data sources. With Sumapap.Reporting, you can easily create and manage reports while maintaining a clean and modular architecture.
+		</Description>
+		<PackageReadmeFile>docs\Sumapap.Reporting.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\docs\Sumapap.Reporting.md" Pack="true" PackagePath="docs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.8" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="10.0.8" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Sumapap.DependencyInjection\Sumapap.DependencyInjection.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="Sumapap.Reporting.Maui" />
+	</ItemGroup>
+
+</Project>

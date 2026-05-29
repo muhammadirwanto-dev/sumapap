@@ -8,10 +8,10 @@ namespace Sumapap.Persistence.DependencyInjection
     /// </summary>
     public class RepositoryConfigurator
     {
-        private readonly PersistenceBuilder _builder;
+        private readonly IPersistenceBuilder _builder;
         private readonly int _registrationIndex;
 
-        internal RepositoryConfigurator(PersistenceBuilder builder, int registrationIndex)
+        internal RepositoryConfigurator(IPersistenceBuilder builder, int registrationIndex)
         {
             _builder = builder;
             _registrationIndex = registrationIndex;
