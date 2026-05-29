@@ -28,6 +28,12 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - name: Install .NET MAUI Workloads
+        run: |
+          dotnet workload install maui-android
+          dotnet workload install maui-ios
+          dotnet workload install maui-maccatalyst
+
       # 1. Restore everything
       - name: Restore Dependencies
         run: |
