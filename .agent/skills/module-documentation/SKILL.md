@@ -88,6 +88,7 @@ After creating a documentation, verify:
 - [ ] Documentation is clear, concise, and free of jargon or technical terms that may not be widely understood
 - [ ] Documentation follows the project's formatting guidelines and is consistent with other documentation files
 - [ ] Documentation is organized logically with appropriate headings and subheadings for easy navigation
+- [ ] Documentation put in the correct location in the `docs/` folder instead of `src/docs/` or other locations
 
 ## References
 

@@ -39,7 +39,7 @@ namespace Sumapap.Persistence.Caching.FusionCache.Visitors
 
             if (rwInterface != null)
             {
-                return implType.IsGenericTypeDefinition 
+                return implType.IsGenericTypeDefinition
                     ? typeof(CachedReadWriteRepository<,>)
                     : typeof(CachedReadWriteRepository<,>).MakeGenericType(rwInterface.GenericTypeArguments);
             }
@@ -53,7 +53,7 @@ namespace Sumapap.Persistence.Caching.FusionCache.Visitors
 
             if (woInterface != null)
             {
-                return implType.IsGenericTypeDefinition 
+                return implType.IsGenericTypeDefinition
                     ? typeof(CachedWriteRepository<,>)
                     : typeof(CachedWriteRepository<,>).MakeGenericType(woInterface.GenericTypeArguments);
             }

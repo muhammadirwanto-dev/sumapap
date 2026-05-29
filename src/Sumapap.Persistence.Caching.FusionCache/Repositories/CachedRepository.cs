@@ -14,14 +14,14 @@ namespace Sumapap.Persistence.Caching.FusionCache.Repositories
         protected readonly ICacheKeyProvider _keyProvider = _serviceProvider.GetRequiredService<ICacheKeyProvider>();
         private readonly IFusionCache _cache = _serviceProvider.GetRequiredService<IFusionCache>();
         private readonly RepositoryCacheRegistry _registry = _serviceProvider.GetRequiredService<RepositoryCacheRegistry>();
+        private readonly HashSet<string> _pendingCacheInvalidationTags = [];
 
-        protected TResult ExecuteGetOrSet<TResult, TEntity>(
+        protected TResult ExecuteGetOrSet<TResult>(
             IRepository inner,
             string methodName,
             string cacheKey,
             string[] tags,
             Func<TResult> operation)
-            where TEntity : class, IEntity
         {
             if (_registry.GetCacheEntry(inner) is RepositoryCacheEntry entry
                 && entry.IsCached(methodName))
@@ -34,14 +34,13 @@ namespace Sumapap.Persistence.Caching.FusionCache.Repositories
             return operation();
         }
 
-        protected async Task<TResult> ExecuteGetOrSetAsync<TResult, TEntity>(
+        protected async Task<TResult> ExecuteGetOrSetAsync<TResult>(
             IRepository inner,
             string methodName,
             string cacheKey,
             string[] tags,
             Func<Task<TResult>> operation,
             CancellationToken cancellationToken = default)
-            where TEntity : class, IEntity
         {
             if (_registry.GetCacheEntry(inner) is RepositoryCacheEntry entry
                 && entry.IsCached(methodName))
@@ -54,27 +53,61 @@ namespace Sumapap.Persistence.Caching.FusionCache.Repositories
             return await operation();
         }
 
-        protected void ExecuteSet<TEntity>(
+        protected void ExecuteSet(
             string[] tags,
             Action operation)
-            where TEntity : class, IEntity
         {
-            _cache.RemoveByTag(tags);
+            RegisterTagsInvalidation(tags);
             operation();
         }
 
-        protected async Task ExecuteSetAsync<TEntity>(
+        protected async Task ExecuteSetAsync(
             string[] tags,
             Func<CancellationToken, Task> operation,
             CancellationToken cancellationToken = default)
-            where TEntity : class, IEntity
         {
-            await _cache.RemoveByTagAsync(tags, token: cancellationToken);
+            RegisterTagsInvalidation(tags);
             await operation(cancellationToken);
+        }
+
+        protected void ExecuteSave<TEntity>(IWriteRepository<TEntity> inner)
+            where TEntity : class
+        {
+            try
+            {
+                inner.Save();
+                _cache.RemoveByTag([.. _pendingCacheInvalidationTags]);
+            }
+            finally
+            {
+                _pendingCacheInvalidationTags.Clear();
+            }
+        }
+
+        protected async Task ExecuteSaveAsync<TEntity>(IWriteRepository<TEntity> inner, CancellationToken cancellationToken = default)
+            where TEntity : class
+        {
+            try
+            {
+                await inner.SaveAsync(cancellationToken);
+                await _cache.RemoveByTagAsync([.. _pendingCacheInvalidationTags], token: cancellationToken);
+            }
+            finally
+            {
+                _pendingCacheInvalidationTags.Clear();
+            }
         }
 
         protected string GetAllItemTag<TEntity>()
             where TEntity : class, IEntity
             => _keyProvider.CreateKey<TEntity>("*");
+
+        private void RegisterTagsInvalidation(string[] tags)
+        {
+            foreach (var tag in tags)
+            {
+                _pendingCacheInvalidationTags.Add(tag);
+            }
+        }
     }
 }
