@@ -10,12 +10,11 @@
 
   <!--NuGet properties-->
   <PropertyGroup>
-    <Title>Sumapap.Persistence.Domain</Title>
-    <PackageId>Sumapap.Persistence.Domain</PackageId>
-    <PackageTags>Sumapap;Persistence</PackageTags>
+    <Title>Sumapap.Persistence.Abstractions</Title>
+    <PackageId>Sumapap.Persistence.Abstractions</PackageId>
+    <PackageTags>Sumapap;Persistence;Abstractions</PackageTags>
     <Description>
-      `Sumapap.Persistence.Domain` is a C# .NET library providing core abstractions and building blocks for the data persistence layer.
-      It facilitates the implementation of patterns like Repository and Unit of Work.
+      This package contains the abstractions for the persistence layer of the Sumapap application. It defines the interfaces and contracts that must be implemented by any persistence provider used in the application. The abstractions include repositories, unit of work, and other related components that facilitate data access and manipulation while maintaining a clean separation of concerns between the application logic and the underlying data storage mechanism.
     </Description>
     <PackageReadmeFile>docs\Sumapap.Persistence.Abstractions.md</PackageReadmeFile>
   </PropertyGroup>

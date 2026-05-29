@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>2.0.0</AssemblyVersion>
-    <FileVersion>2.0.0.0524</FileVersion>
+    <AssemblyVersion>2.0.1</AssemblyVersion>
+    <FileVersion>2.0.1.0524</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
   </PropertyGroup>
 
@@ -12,7 +12,7 @@
   <PropertyGroup>
     <Title>Sumapap.Persistence</Title>
     <PackageId>Sumapap.Persistence</PackageId>
-    <PackageTags>Sumapap;Persistence;DI</PackageTags>
+    <PackageTags>Sumapap;Persistence</PackageTags>
     <Description>
       The `Sumapap.Persistence` package provides a set of tools and abstractions for implementing persistence in your applications. It includes features such as caching, database access, and integration with dependency injection frameworks. With Sumapap.Persistence, you can easily manage your application's data storage and retrieval while maintaining a clean and modular architecture.
     </Description>
