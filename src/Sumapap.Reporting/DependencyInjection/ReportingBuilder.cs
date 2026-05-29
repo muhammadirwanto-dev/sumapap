@@ -12,7 +12,7 @@ namespace Sumapap.Reporting.DependencyInjection
 
         IServiceCollection IBuilder<ISumapapServiceBuilder>.Services => _services;
 
-        public SinksConfigurator Sinks { get; } = new SinksConfigurator();
+        public SinksConfigurator Sinks { get; } = new SinksConfigurator(_builder.Services);
 
         public IReportingBuilder AddReporting() => AddReporting(_ => { });
 

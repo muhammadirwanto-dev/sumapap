@@ -5,14 +5,13 @@ using Sumapap.Reporting.Logging.Sinks;
 
 namespace Sumapap.Reporting.Logging.DependencyInjection
 {
-    public static class SinksConfiguratorExtensions
+    public static class LoggerSinksConfiguratorExtensions
     {
         extension(SinksConfigurator configurator)
         {
-            public SinksConfigurator Logger()
+            public SinksConfigurator AddLogger()
             {
-                configurator.Builder.Services.AddSingleton<IReportSink, LoggerReportSink>();
-
+                configurator.Services.AddSingleton<IReportSink, LoggerReportSink>();
                 return configurator;
             }
         }

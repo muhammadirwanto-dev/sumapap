@@ -1,9 +1,9 @@
-﻿using Sumapap.Reporting.DependencyInjection.Abstractions;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace Sumapap.Reporting.DependencyInjection
 {
-    public struct SinksConfigurator(IReportingBuilder _builder)
+    public class SinksConfigurator(IServiceCollection services)
     {
-        public readonly IReportingBuilder Builder => _builder;
+        public IServiceCollection Services => services;
     }
 }

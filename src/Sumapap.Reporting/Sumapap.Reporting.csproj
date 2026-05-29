@@ -33,6 +33,7 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="Sumapap.Reporting.Logging" />
+		<InternalsVisibleTo Include="Sumapap.Reporting.Maui" />
 	</ItemGroup>
 
 </Project>
