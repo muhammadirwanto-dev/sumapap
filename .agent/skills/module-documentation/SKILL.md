@@ -23,7 +23,7 @@ Module means a library or package in the `src/` folder, such as `Sumapap.Persist
 - When the request is for a module that is not relevant to the project's goals or scope (e.g., unrelated libraries, third-party dependencies)
 - When the request is for a module that has very limited functionality or is only intended for internal use (e.g., helper classes, internal APIs)
 
-### Key Principles
+## Key Principles
 
 - Focus on clarity and conciseness: Use clear language and avoid unnecessary jargon or technical terms. Keep sentences and paragraphs short and to the point.
 - Use consistent formatting: Follow the project's guidelines for headings, lists, code blocks, and other Markdown elements. Use consistent formatting throughout the documentation.
@@ -31,7 +31,7 @@ Module means a library or package in the `src/` folder, such as `Sumapap.Persist
 - Organize content logically: Structure the documentation in a way that makes it easy to navigate and understand. Use headings and subheadings to break up content into sections.
 - Review and update regularly: Documentation should be reviewed and updated regularly to ensure that it remains accurate and relevant. Remove outdated information and add new information as needed.
 
-### Don'ts
+## Don'ts
 
 - Don't include sensitive information; Avoid including any secrets, tokens, internal URLs, or other sensitive information in the documentation.
 - Don't rewrite class or record definitions in the documentation. Instead, provide a high-level overview and link to the relevant code files for details.
