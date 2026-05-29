@@ -1,22 +1,27 @@
 ---
-name: markdown-documentation
-description: 'Create or Update existing Markdown documentations. Use when asked to create or update Markdown documentation for specified modules.'
+name: module-documentation
+description: 'Create or update existing module documentations to elaborate the module's purpose, functionality, and usage. Use when asked to create or update documentation for specified modules.'
 ---
 
-# Markdown Documentation
+# Module Documentation
 
-This skill helps you create or update Markdown documentation for the project. It ensures that documentation is clear, concise, and follows the project's guidelines.
+This skill helps you create or update existing module documentations to elaborate the module's purpose, functionality, and usage. It ensures that documentation is clear, concise, and follows the project's guidelines.
+
+## Definition of Module
+
+Module means a library or package in the `src/` folder, such as `Sumapap.Persistence` or `Sumapap.Ddd`. Each module should have its own documentation file in the `docs/` folder with the same name (e.g., `Sumapap.Persistence.md`).
+
+`/src/Sumapap.{Capability}.{Technology}` → `/docs/Sumapap.{Capability}.{Technology}.md`
 
 ## When Not to Use
 
 - When the documentation is already up-to-date and accurate
 - When the request is for a different format (e.g., HTML, PDF)
 - When the request is for a non-documentation task (e.g., code implementation, bug fixing)
-- When the request is for a task that requires real-time information or data that may change frequently
-- When the request is for a task that requires subjective judgment or creative writing beyond technical documentation
-- When the request is for a task that can be easily accomplished with existing documentation or resources
-- When the request is for a task that requires access to private or sensitive information that should not be included in documentation
-- When the request is for a task that requires a level of detail or specificity that is not appropriate for general documentation (e.g., internal implementation details, specific code examples that may become outdated)
+- When the request is for a module that does not exist or is not intended for public use (e.g., internal utilities, experimental features)
+- When the request is for a module that is deprecated or no longer maintained (e.g., legacy code, old versions)
+- When the request is for a module that is not relevant to the project's goals or scope (e.g., unrelated libraries, third-party dependencies)
+- When the request is for a module that has very limited functionality or is only intended for internal use (e.g., helper classes, internal APIs)
 
 ### Key Principles
 
@@ -25,14 +30,13 @@ This skill helps you create or update Markdown documentation for the project. It
 - Include relevant examples: Provide examples that illustrate key concepts or usage scenarios. Ensure that examples are accurate and up-to-date.
 - Organize content logically: Structure the documentation in a way that makes it easy to navigate and understand. Use headings and subheadings to break up content into sections.
 - Review and update regularly: Documentation should be reviewed and updated regularly to ensure that it remains accurate and relevant. Remove outdated information and add new information as needed.
-- Filename same as the module `/src/Sumapap.{Capability}.{Technology}` → `/docs/Sumapap.{Capability}.{Technology}.md`
-- All modules should have documentation, even if it's just a brief overview. If a module is deprecated or not intended for public use, this should be clearly stated in the documentation.
 
 ### Don'ts
 
-- Don't include sensitive information: Avoid including any secrets, tokens, internal URLs, or other sensitive information in the documentation.
+- Don't include sensitive information; Avoid including any secrets, tokens, internal URLs, or other sensitive information in the documentation.
 - Don't rewrite class or record definitions in the documentation. Instead, provide a high-level overview and link to the relevant code files for details.
 - Don't rewrite method signatures in the documentation. Instead, provide a high-level overview of the method's purpose and link to the relevant code files for details.
+- Don't write examples that are not present in the interfaces or public APIs of the module. Instead, provide examples that are based on the actual code and functionality of the module.
 
 ## Workflow
 
@@ -62,7 +66,7 @@ Create or update the documentation file with the following sections:
 1. **Title** (# Package Name)
 2. **Badges** - NuGet version, downloads, license, GitHub issues/stars/forks, contributions welcome
 3. **Overview** (## 💡 Overview) - Brief description of what the module does and its core concept
-4. **Why?** (## ✨ Why use `Package.Name`?) - Value proposition and benefits
+4. **Why?** (## ✨ Why use `{Module.Name}`?) - Value proposition and benefits
 5. **Quick Start** (## 🚀 Quick start) - Step-by-step installation and dependency injection setup (numbered list)
 6. **Features and Usage** (## 🛠 Features and usage) - Detailed feature documentation with code examples
 7. **Notes & Best Practices** (## ⚠️ Notes & best practices) - Important considerations, gotchas, and recommendations
@@ -83,9 +87,7 @@ After creating a documentation, verify:
 - [ ] All code examples are accurate, up-to-date, and optionally tested
 - [ ] Documentation is clear, concise, and free of jargon or technical terms that may not be widely understood
 - [ ] Documentation follows the project's formatting guidelines and is consistent with other documentation files
-- [ ] Documentation includes relevant examples and usage scenarios that illustrate key concepts
 - [ ] Documentation is organized logically with appropriate headings and subheadings for easy navigation
-- [ ] Add new tests project to `tests/Sumapap.Tests.slnx`
 
 ## References
 
