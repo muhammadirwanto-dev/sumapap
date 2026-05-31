@@ -1,7 +1,7 @@
 # Test Coverage Summary
 
 ## Overview
-Comprehensive test suite expansion based on available modules in `src/`. Added 104+ new tests across multiple projects.
+Comprehensive test suite expansion based on available modules in `src/`. Added 112+ new tests across multiple projects.
 
 ## New Test Projects Created
 
@@ -17,9 +17,24 @@ Comprehensive test suite expansion based on available modules in `src/`. Added 1
 - QueryOptions integration
 - Complex filtering scenarios
 
-### 2. Sumapap.Caching.Tests
+### 2. Sumapap.Mvvm.Maui.SourceGenerator.Tests
+**Location:** `tests/Sumapap.Mvvm.Maui.SourceGenerator.Tests/`
+**Test Files:**
+- `ViewModelOwnerAttributeGeneratorTests.cs` (8 tests)
+
+**Coverage:**
+- Source generator validation for ViewModelOwnerAttribute
+- Generated partial class structure verification
+- IsDefaultConstructor flag handling
+- Generic attribute syntax support
+- Multiple class generation
+- BindingContext assignment
+- Namespace preservation
+- Service provider injection (GetRequiredService)
+
+### 3. Sumapap.Caching.Tests
 **Location:** `tests/Sumapap.Caching.Tests/`
-**Status:** Project created, test file removed due to internal API access limitations
+**Status:** Project created, ready for public API integration tests
 **Note:** Future tests should focus on public DI extension methods rather than internal DefaultCacheKeyProvider
 
 ## Expanded Test Projects
@@ -77,6 +92,7 @@ Comprehensive test suite expansion based on available modules in `src/`. Added 1
 | Sumapap.Queries | Sumapap.Queries.Tests | 97 | ✅ All Passing |
 | Sumapap.Queries.Abstractions | (covered by Queries.Tests) | - | ✅ Covered |
 | Sumapap.Persistence.Abstractions | Sumapap.Persistence.Abstractions.Tests | 7 | ✅ All Passing |
+| Sumapap.Mvvm.Maui.SourceGenerator | Sumapap.Mvvm.Maui.SourceGenerator.Tests | 8 | ✅ All Passing |
 | Sumapap.Common | Sumapap.Common.Tests | 28 | ✅ Existing |
 | Sumapap.Ddd | Sumapap.Ddd.Tests | - | ✅ Existing |
 | Sumapap.Ddd.Abstractions | (covered by Ddd.Tests) | - | ✅ Covered |
@@ -95,12 +111,15 @@ The following modules do not yet have dedicated test projects:
 ## Build Status
 
 All test projects compile successfully:
-- ✅ Sumapap.Queries.Tests
-- ✅ Sumapap.Persistence.Abstractions.Tests
+- ✅ Sumapap.Queries.Tests (97 tests passing)
+- ✅ Sumapap.Persistence.Abstractions.Tests (7 tests passing)
+- ✅ Sumapap.Mvvm.Maui.SourceGenerator.Tests (8 tests passing)
 - ✅ Sumapap.Caching.Tests (empty, ready for integration tests)
 - ✅ Sumapap.Common.Tests
 - ✅ Sumapap.Ddd.Tests
 - ✅ Sumapap.DependencyInjection.Tests
+
+**Total New Tests Added: 112 tests (97 + 7 + 8)**
 
 ## Key Testing Patterns Established
 
