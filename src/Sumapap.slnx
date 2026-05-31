@@ -5,6 +5,7 @@
   <Project Path="Sumapap.Ddd.Mediator/Sumapap.Ddd.Mediator.csproj" Id="38da446b-fa53-4c51-8bc8-daa619399d1c" />
   <Project Path="Sumapap.Ddd/Sumapap.Ddd.csproj" />
   <Project Path="Sumapap.DependencyInjection/Sumapap.DependencyInjection.csproj" />
+  <Project Path="Sumapap.Navigations.Maui/Sumapap.Navigations.Maui.csproj" Id="73b76409-bb1a-4d05-991b-0f1984376e56" />
   <Project Path="Sumapap.Navigations/Sumapap.Navigations.csproj" Id="16d14765-f967-4d67-b16a-603285a6f7ed" />
   <Project Path="Sumapap.Persistence.Abstractions/Sumapap.Persistence.Abstractions.csproj" />
   <Project Path="Sumapap.Persistence.Caching.FusionCache/Sumapap.Persistence.Caching.FusionCache.csproj" Id="659e56f2-92f4-4de9-a787-15727182a3f3" />
