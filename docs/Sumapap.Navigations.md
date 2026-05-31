@@ -14,8 +14,10 @@
 
 The package includes:
 - **INavigationService** — Core interface for navigation operations
+- **INavigationAdapter** — Adapter pattern interface for platform-specific implementations
 - **INavigationParams** — Marker interface for type-safe parameter passing
-- **NavigationPresentation** — Enum for specifying presentation modes (Normal/Modal)
+
+> **📦 Ready-to-use implementation:** For .NET MAUI applications, use [Sumapap.Navigations.Maui](https://www.nuget.org/packages/Sumapap.Navigations.Maui/) which provides complete Page-based and Shell-based navigation adapters with zero boilerplate.
 
 ## ✨ Why use `Sumapap.Navigations`?
 
@@ -24,9 +26,13 @@ The package includes:
 - **Type-Safe** — Strongly-typed parameter objects prevent runtime errors
 - **Clean Architecture** — Decouple navigation logic from view implementation
 - **Async-First** — All navigation operations support async/await with cancellation tokens
-- **Presentation Control** — Specify how views should be presented (normal push or modal)
+- **Adapter Pattern** — Extensible design supporting multiple navigation strategies
 
 ## 🚀 Quick start
+
+> **💡 For MAUI developers:** Skip the manual implementation and use [Sumapap.Navigations.Maui](https://www.nuget.org/packages/Sumapap.Navigations.Maui/) for instant Page and Shell navigation support.
+
+### For custom implementations:
 
 1. Add the package to your project:
 
@@ -64,7 +70,7 @@ public class MainViewModel
 }
 ```
 
-4. Implement the navigation service in your UI layer:
+4. Implement the navigation service or adapter in your UI layer (see examples below).
 
 ```csharp
 // Example implementation for MAUI
@@ -221,49 +227,69 @@ var editParams = new EditProductParams
 await _navigationService.NavigateToAsync<ProductEditView>(editParams);
 ```
 
-### NavigationPresentation
+### INavigationAdapter
 
-Enum for specifying how the destination should be presented:
+The adapter pattern interface extends `INavigationService` with a capability check method. This allows multiple navigation strategies to coexist and be selected at runtime:
 
 ```csharp
-public enum NavigationPresentation
+public interface INavigationAdapter : INavigationService
 {
-	Normal,  // Standard navigation (push onto stack)
-	Modal    // Modal presentation (overlay current view)
+	bool CanHandle(); // Returns true if this adapter can handle navigation in current context
 }
 ```
 
-**Usage in custom implementations:**
+**Usage in implementations:**
 ```csharp
-// Example: Extended navigation service with presentation mode
-public interface IExtendedNavigationService : INavigationService
+// Example: Shell-specific adapter
+public class ShellNavigationAdapter : INavigationAdapter
 {
-	Task NavigateToAsync<TView>(
-		INavigationParams param,
-		NavigationPresentation presentation,
-		CancellationToken cancellationToken = default);
-}
+	public bool CanHandle() => Shell.Current is not null;
 
-public class MauiExtendedNavigationService : IExtendedNavigationService
-{
-	public async Task NavigateToAsync<TView>(
-		INavigationParams param,
-		NavigationPresentation presentation,
-		CancellationToken cancellationToken = default)
+	public async Task NavigateToAsync<TView>(CancellationToken cancellationToken = default)
 	{
-		var view = GetView<TView>();
-
-		if (presentation == NavigationPresentation.Modal)
-		{
-			await Shell.Current.Navigation.PushModalAsync(view);
-		}
-		else
-		{
-			await Shell.Current.Navigation.PushAsync(view);
-		}
+		await Shell.Current.GoToAsync(typeof(TView).Name);
 	}
+
+	// Implement other methods...
+}
+
+// Example: Page-specific adapter
+public class PageNavigationAdapter : INavigationAdapter
+{
+	public bool CanHandle() => Application.Current?.MainPage is not null;
+
+	public async Task NavigateToAsync<TView>(CancellationToken cancellationToken = default)
+	{
+		var page = ServiceProvider.GetRequiredService<TView>() as Page;
+		await Application.Current.MainPage.Navigation.PushAsync(page);
+	}
+
+	// Implement other methods...
+}
+
+// Service can choose adapter based on context
+public class AdaptiveNavigationService : INavigationService
+{
+	private readonly IEnumerable<INavigationAdapter> _adapters;
+
+	public AdaptiveNavigationService(IEnumerable<INavigationAdapter> adapters)
+	{
+		_adapters = adapters;
+	}
+
+	public Task NavigateToAsync<TView>(CancellationToken cancellationToken = default)
+	{
+		var adapter = _adapters.FirstOrDefault(a => a.CanHandle())
+			?? throw new InvalidOperationException("No suitable navigation adapter found");
+
+		return adapter.NavigateToAsync<TView>(cancellationToken);
+	}
+
+	// Implement other methods similarly...
 }
 ```
+
+> **💡 See it in action:** [Sumapap.Navigations.Maui](https://www.nuget.org/packages/Sumapap.Navigations.Maui/) includes `PageNavigationAdapter` and `ShellNavigationAdapter` implementations you can use directly.
 
 ### Navigation lifecycle integration
 
@@ -506,6 +532,36 @@ public interface INavigationAware
 	void OnNavigatedFrom();
 }
 ```
+
+## 📦 Framework implementations
+
+### .NET MAUI
+
+**Package:** [Sumapap.Navigations.Maui](https://www.nuget.org/packages/Sumapap.Navigations.Maui/)
+
+Complete implementation for .NET MAUI with two built-in adapters:
+- **PageNavigationAdapter** — Traditional page-based navigation with modal support
+- **ShellNavigationAdapter** — Modern Shell-based navigation with route patterns
+
+```bash
+dotnet add package Sumapap.Navigations.Maui
+```
+
+```csharp
+// Register in MauiProgram.cs
+builder.Services.AddSumapap()
+	.WithNavigations(nav => nav.UsePageNavigation());
+	// or nav.UseShellNavigation()
+
+// Use in ViewModels
+await _navigationService.NavigateToAsync<DetailPage>();
+```
+
+See the [full documentation](https://github.com/muhammadirwanto-dev/sumapap/blob/main/docs/Sumapap.Navigations.Maui.md) for detailed usage, examples, and advanced scenarios.
+
+### Other frameworks
+
+Implementations for WPF, Avalonia, Blazor, and other frameworks are planned. Contributions welcome!
 
 # ⭐ License
 
