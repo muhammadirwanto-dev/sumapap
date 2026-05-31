@@ -1,15 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
     <TargetFrameworks>net10.0-android;net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
 
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
     <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0531</FileVersion>
+    <FileVersion>1.0.0.0524</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
 
     <!-- Enable XAML source generation for faster build times and improved performance.
@@ -26,29 +26,33 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 	</PropertyGroup>
-
-  <!--NuGet properties-->
-  <PropertyGroup>
-    <Title>Sumapap.Navigations.Maui</Title>
-    <PackageId>Sumapap.Navigations.Maui</PackageId>
-    <PackageTags>Sumapap;Navigations;MAUI</PackageTags>
-    <Description>
-      The `Sumapap.Navigations.Maui` package provides a set of tools and abstractions for implementing navigation functionality in your MAUI applications. It includes features such as page routing, navigation stacks, and integration with various UI frameworks. With Sumapap.Navigations.Maui, you can easily manage your application's navigation flow while maintaining a clean and modular architecture.
+  
+	<!--NuGet properties-->
+	<PropertyGroup>
+		<Title>Sumapap.Mvvm.Maui</Title>
+		<PackageId>Sumapap.Mvvm.Maui</PackageId>
+		<PackageTags>Sumapap;Mvvm;MAUI</PackageTags>
+		<Description>
+      The `Sumapap.Mvvm.Maui` package provides a set of tools and abstractions for implementing the MVVM (Model-View-ViewModel) architectural pattern in your MAUI applications. It includes features such as data binding, command handling, and view model management. With Sumapap.Mvvm.Maui, you can easily structure your application using the MVVM pattern while maintaining a clean and modular architecture.
     </Description>
-    <PackageReadmeFile>docs\Sumapap.Navigations.Maui.md</PackageReadmeFile>
-  </PropertyGroup>
+		<PackageReadmeFile>docs\Sumapap.Mvvm.Maui.md</PackageReadmeFile>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Include="..\..\docs\Sumapap.Navigations.Maui.md" Pack="true" PackagePath="docs" />
-  </ItemGroup>
-
-  <ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\docs\Sumapap.Mvvm.Maui.md" Pack="true" PackagePath="docs" />
+		<None Include="MauiServiceProvider.cs" />
+	</ItemGroup>
+  
+	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 	</ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Sumapap.DependencyInjection\Sumapap.DependencyInjection.csproj" />
-    <ProjectReference Include="..\Sumapap.Navigations\Sumapap.Navigations.csproj" />
+  
+	<ItemGroup>
+	  <ProjectReference Include="..\Sumapap.Mvvm.Maui.SourceGenerator\Sumapap.Mvvm.Maui.SourceGenerator.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false"
+                      Pack="true"
+                      PackagePath="analyzers/dotnet/cs" />
   </ItemGroup>
 
 </Project>
