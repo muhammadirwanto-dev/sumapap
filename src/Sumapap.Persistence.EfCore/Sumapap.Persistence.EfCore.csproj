@@ -3,14 +3,14 @@
   <PropertyGroup>
     <TargetFrameworks>net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>1.2.0</AssemblyVersion>
-    <FileVersion>1.2.0.0524</FileVersion>
+    <AssemblyVersion>1.2.1</AssemblyVersion>
+    <FileVersion>1.2.1.0524</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
   </PropertyGroup>
 
   <!--NuGet properties-->
   <PropertyGroup>
-    <Title>Sumapap.Persistence</Title>
+    <Title>Sumapap.Persistence.EfCore</Title>
     <PackageId>Sumapap.Persistence.EfCore</PackageId>
     <PackageTags>Sumapap;Persistence;Repository;EfCore</PackageTags>
     <Description>

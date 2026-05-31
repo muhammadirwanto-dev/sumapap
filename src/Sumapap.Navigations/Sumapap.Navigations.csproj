@@ -3,8 +3,8 @@
 	<PropertyGroup>
 		<TargetFrameworks>net10.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
-		<AssemblyVersion>1.0.0</AssemblyVersion>
-		<FileVersion>1.0.0.0524</FileVersion>
+		<AssemblyVersion>1.0.1</AssemblyVersion>
+		<FileVersion>1.0.1.0524</FileVersion>
 		<VersionPrefix>$(AssemblyVersion)</VersionPrefix>
 	</PropertyGroup>
 
@@ -23,4 +23,8 @@
 		<None Include="..\..\docs\Sumapap.Navigations.md" Pack="true" PackagePath="docs" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\Sumapap.DependencyInjection\Sumapap.DependencyInjection.csproj" />
+	</ItemGroup>
+  
 </Project>

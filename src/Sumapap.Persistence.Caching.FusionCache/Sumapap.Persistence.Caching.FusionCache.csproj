@@ -3,10 +3,24 @@
   <PropertyGroup>
     <TargetFrameworks>net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>1.2.0</AssemblyVersion>
-    <FileVersion>1.2.0.0524</FileVersion>
+    <AssemblyVersion>1.2.1</AssemblyVersion>
+    <FileVersion>1.2.1.0524</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <Title>Sumapap.Persistence.Caching.FusionCache</Title>
+    <PackageId>Sumapap.Persistence.Caching.FusionCache</PackageId>
+    <PackageTags>Sumapap;Persistence;Caching;FusionCache</PackageTags>
+    <Description>
+      This package provides an implementation of caching for the persistence layer of the Sumapap application using the FusionCache library. It offers a set of utilities and extensions that enable efficient caching of data retrieved from the persistence layer, improving performance and reducing latency in data access operations. The package is designed to be easily integrated with the existing persistence abstractions and can be used to cache results from repositories, queries, or any other data retrieval mechanisms within the application.
+    </Description>
+    <PackageReadmeFile>docs\Sumapap.Persistence.Caching.FusionCache.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\Sumapap.Persistence.Caching.FusionCache.md" Pack="true" PackagePath="docs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Scrutor" Version="7.0.0" />
