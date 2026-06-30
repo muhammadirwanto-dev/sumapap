@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0524</FileVersion>
+    <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
+  </PropertyGroup>
+
+  <!--NuGet properties-->
+  <PropertyGroup>
+    <Title>Sumapap.Mvvm</Title>
+    <PackageId>Sumapap.Mvvm</PackageId>
+    <PackageTags>Sumapap;Mvvm</PackageTags>
+    <Description>
+      Provides MVVM infrastructure and base classes built on CommunityToolkit.Mvvm for building modern .NET applications with Model-View-ViewModel pattern support.
+    </Description>
+    <PackageReadmeFile>docs\Sumapap.Mvvm.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\Sumapap.Mvvm.md" Pack="true" PackagePath="docs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sumapap.Common\Sumapap.Common.csproj" />
+  </ItemGroup>
+
+</Project>
