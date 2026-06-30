@@ -123,6 +123,30 @@ namespace Sumapap.Persistence.EfCore.Repositories
         public Task SaveAsync(CancellationToken cancellationToken = default)
             => _write.SaveAsync(cancellationToken);
 
+        public IList<T> Select<T>(Expression<Func<TEntity, T>> selector)
+            => _read.Select(selector);
+
+        public IList<T> Select<T>(Expression<Func<TEntity, T>> selector, ISpecification<TEntity> specification)
+            => _read.Select(selector, specification);
+
+        public Task<List<T>> SelectAsync<T>(Expression<Func<TEntity, T>> selector, CancellationToken cancellation = default)
+            => _read.SelectAsync(selector, cancellation);
+
+        public Task<List<T>> SelectAsync<T>(Expression<Func<TEntity, T>> selector, ISpecification<TEntity> specification, CancellationToken cancellation = default)
+            => _read.SelectAsync(selector, specification, cancellation);
+
+        public IList<T> SelectMany<T>(Expression<Func<TEntity, IEnumerable<T>>> selector)
+            => _read.SelectMany(selector);
+
+        public IList<T> SelectMany<T>(Expression<Func<TEntity, IEnumerable<T>>> selector, ISpecification<TEntity> specification)
+            => _read.SelectMany(selector, specification);
+
+        public Task<List<T>> SelectManyAsync<T>(Expression<Func<TEntity, IEnumerable<T>>> selector, CancellationToken cancellation = default)
+            => _read.SelectManyAsync(selector, cancellation);
+
+        public Task<List<T>> SelectManyAsync<T>(Expression<Func<TEntity, IEnumerable<T>>> selector, ISpecification<TEntity> specification, CancellationToken cancellation = default)
+            => _read.SelectManyAsync(selector, specification, cancellation);
+
         public TEntity? SingleOrDefault(Expression<Func<TEntity, bool>> predicate)
             => _read.SingleOrDefault(predicate);
 

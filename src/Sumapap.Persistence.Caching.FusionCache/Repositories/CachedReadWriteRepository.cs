@@ -82,6 +82,18 @@ namespace Sumapap.Persistence.Caching.FusionCache.Repositories
         public Task<List<T>> SelectAsync<T>(Expression<Func<TEntity, T>> selector, ISpecification<TEntity> specification, CancellationToken cancellation = default) => ExecuteGetOrSetAsync(
             _inner, "Select", _keyProvider.CreateKey<TEntity>("*", "Select", selector, specification), tags: [GetAllItemTag()], () => _inner.SelectAsync(selector, specification, cancellation), cancellation);
 
+        public IList<T> SelectMany<T>(Expression<Func<TEntity, IEnumerable<T>>> selector) => ExecuteGetOrSet(
+            _inner, "SelectMany", _keyProvider.CreateKey<TEntity>("*", "SelectMany", selector), tags: [GetAllItemTag()], () => _inner.SelectMany(selector));
+
+        public IList<T> SelectMany<T>(Expression<Func<TEntity, IEnumerable<T>>> selector, ISpecification<TEntity> specification) => ExecuteGetOrSet(
+            _inner, "SelectMany", _keyProvider.CreateKey<TEntity>("*", "SelectMany", selector, specification), tags: [GetAllItemTag()], () => _inner.SelectMany(selector, specification));
+
+        public Task<List<T>> SelectManyAsync<T>(Expression<Func<TEntity, IEnumerable<T>>> selector, CancellationToken cancellation = default) => ExecuteGetOrSetAsync(
+            _inner, "SelectMany", _keyProvider.CreateKey<TEntity>("*", "SelectMany", selector), tags: [GetAllItemTag()], () => _inner.SelectManyAsync(selector, cancellation), cancellation);
+
+        public Task<List<T>> SelectManyAsync<T>(Expression<Func<TEntity, IEnumerable<T>>> selector, ISpecification<TEntity> specification, CancellationToken cancellation = default) => ExecuteGetOrSetAsync(
+            _inner, "SelectMany", _keyProvider.CreateKey<TEntity>("*", "SelectMany", selector, specification), tags: [GetAllItemTag()], () => _inner.SelectManyAsync(selector, specification, cancellation), cancellation);
+
         public TEntity? SingleOrDefault(Expression<Func<TEntity, bool>> predicate) => ExecuteGetOrSet(
              _inner, "SingleOrDefault", _keyProvider.CreateKey<TEntity>("*", "SingleOrDefault", predicate), tags: [GetAllItemTag()], () => _inner.SingleOrDefault(predicate));
 

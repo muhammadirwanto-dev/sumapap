@@ -40,6 +40,10 @@ namespace Sumapap.Persistence.Abstractions.Repositories
 
         IList<T> Select<T>(Expression<Func<TEntity, T>> selector, ISpecification<TEntity> specification);
 
+        IList<T> SelectMany<T>(Expression<Func<TEntity, IEnumerable<T>>> selector);
+
+        IList<T> SelectMany<T>(Expression<Func<TEntity, IEnumerable<T>>> selector, ISpecification<TEntity> specification);
+
         bool IsExists(Expression<Func<TEntity, bool>> predicate);
 
         long Count();
@@ -74,6 +78,10 @@ namespace Sumapap.Persistence.Abstractions.Repositories
         Task<List<T>> SelectAsync<T>(Expression<Func<TEntity, T>> selector, CancellationToken cancellation = default);
 
         Task<List<T>> SelectAsync<T>(Expression<Func<TEntity, T>> selector, ISpecification<TEntity> specification, CancellationToken cancellation = default);
+
+        Task<List<T>> SelectManyAsync<T>(Expression<Func<TEntity, IEnumerable<T>>> selector, CancellationToken cancellation = default);
+
+        Task<List<T>> SelectManyAsync<T>(Expression<Func<TEntity, IEnumerable<T>>> selector, ISpecification<TEntity> specification, CancellationToken cancellation = default);
 
         IAsyncEnumerable<TEntity> StreamWhereAsync(Expression<Func<TEntity, bool>> predicate);
 

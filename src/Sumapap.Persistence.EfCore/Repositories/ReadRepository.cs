@@ -183,6 +183,26 @@ namespace Sumapap.Persistence.EfCore.Repositories
             return ApplySpecification(specification).Select(selector).ToListAsync(cancellation);
         }
 
+        public IList<T> SelectMany<T>(Expression<Func<TEntity, IEnumerable<T>>> selector)
+        {
+            return _set.AsNoTracking().SelectMany(selector).ToList();
+        }
+
+        public IList<T> SelectMany<T>(Expression<Func<TEntity, IEnumerable<T>>> selector, ISpecification<TEntity> specification)
+        {
+            return ApplySpecification(specification).SelectMany(selector).ToList();
+        }
+
+        public Task<List<T>> SelectManyAsync<T>(Expression<Func<TEntity, IEnumerable<T>>> selector, CancellationToken cancellation = default)
+        {
+            return _set.AsNoTracking().SelectMany(selector).ToListAsync(cancellation);
+        }
+
+        public Task<List<T>> SelectManyAsync<T>(Expression<Func<TEntity, IEnumerable<T>>> selector, ISpecification<TEntity> specification, CancellationToken cancellation = default)
+        {
+            return ApplySpecification(specification).SelectMany(selector).ToListAsync(cancellation);
+        }
+
         public IAsyncEnumerable<TEntity> StreamWhereAsync(Expression<Func<TEntity, bool>> predicate)
         {
             return _set.AsNoTracking().Where(predicate).AsAsyncEnumerable();
