@@ -1,7 +1,7 @@
-﻿using System.Linq.Expressions;
-using Sumapap.Persistence.Abstractions.Entities;
+﻿using Sumapap.Persistence.Abstractions.Entities;
 using Sumapap.Persistence.Abstractions.Specifications;
 using Sumapap.Queries.Abstractions;
+using System.Linq.Expressions;
 
 namespace Sumapap.Persistence.Abstractions.Repositories
 {
@@ -36,6 +36,10 @@ namespace Sumapap.Persistence.Abstractions.Repositories
 
         IList<TEntity> Where(ISpecification<TEntity> specification);
 
+        IList<T> Select<T>(Expression<Func<TEntity, T>> selector);
+
+        IList<T> Select<T>(Expression<Func<TEntity, T>> selector, ISpecification<TEntity> specification);
+
         bool IsExists(Expression<Func<TEntity, bool>> predicate);
 
         long Count();
@@ -66,6 +70,10 @@ namespace Sumapap.Persistence.Abstractions.Repositories
         Task<List<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellation = default);
 
         Task<List<TEntity>> WhereAsync(ISpecification<TEntity> specification, CancellationToken cancellation = default);
+
+        Task<List<T>> SelectAsync<T>(Expression<Func<TEntity, T>> selector, CancellationToken cancellation = default);
+
+        Task<List<T>> SelectAsync<T>(Expression<Func<TEntity, T>> selector, ISpecification<TEntity> specification, CancellationToken cancellation = default);
 
         IAsyncEnumerable<TEntity> StreamWhereAsync(Expression<Func<TEntity, bool>> predicate);
 

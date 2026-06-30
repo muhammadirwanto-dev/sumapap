@@ -1,11 +1,11 @@
-﻿using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Sumapap.Persistence.Abstractions.Entities;
 using Sumapap.Persistence.Abstractions.Repositories;
 using Sumapap.Persistence.Abstractions.Specifications;
 using Sumapap.Persistence.EfCore.Specifications;
 using Sumapap.Queries.Abstractions;
 using Sumapap.Queries.Extensions;
+using System.Linq.Expressions;
 
 namespace Sumapap.Persistence.EfCore.Repositories
 {
@@ -161,6 +161,26 @@ namespace Sumapap.Persistence.EfCore.Repositories
         public Task<List<TEntity>> WhereAsync(ISpecification<TEntity> specification, CancellationToken cancellation = default)
         {
             return ApplySpecification(specification).ToListAsync(cancellation);
+        }
+
+        public IList<T> Select<T>(Expression<Func<TEntity, T>> selector)
+        {
+            return _set.AsNoTracking().Select(selector).ToList();
+        }
+
+        public IList<T> Select<T>(Expression<Func<TEntity, T>> selector, ISpecification<TEntity> specification)
+        {
+            return ApplySpecification(specification).Select(selector).ToList();
+        }
+
+        public Task<List<T>> SelectAsync<T>(Expression<Func<TEntity, T>> selector, CancellationToken cancellation = default)
+        {
+            return _set.AsNoTracking().Select(selector).ToListAsync(cancellation);
+        }
+
+        public Task<List<T>> SelectAsync<T>(Expression<Func<TEntity, T>> selector, ISpecification<TEntity> specification, CancellationToken cancellation = default)
+        {
+            return ApplySpecification(specification).Select(selector).ToListAsync(cancellation);
         }
 
         public IAsyncEnumerable<TEntity> StreamWhereAsync(Expression<Func<TEntity, bool>> predicate)
