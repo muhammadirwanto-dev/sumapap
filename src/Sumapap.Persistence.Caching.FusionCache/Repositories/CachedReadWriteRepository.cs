@@ -70,6 +70,18 @@ namespace Sumapap.Persistence.Caching.FusionCache.Repositories
         public Task<IQueryResult<TEntity>> QueryAsync(ISpecification<TEntity> specification, CancellationToken cancellation = default) =>
             _inner.QueryAsync(specification, cancellation);
 
+        public IList<T> Select<T>(Expression<Func<TEntity, T>> selector) => ExecuteGetOrSet(
+            _inner, "Select", _keyProvider.CreateKey<TEntity>("*", "Select", selector), tags: [GetAllItemTag()], () => _inner.Select(selector));
+
+        public IList<T> Select<T>(Expression<Func<TEntity, T>> selector, ISpecification<TEntity> specification) => ExecuteGetOrSet(
+            _inner, "Select", _keyProvider.CreateKey<TEntity>("*", "Select", selector, specification), tags: [GetAllItemTag()], () => _inner.Select(selector, specification));
+
+        public Task<List<T>> SelectAsync<T>(Expression<Func<TEntity, T>> selector, CancellationToken cancellation = default) => ExecuteGetOrSetAsync(
+            _inner, "Select", _keyProvider.CreateKey<TEntity>("*", "Select", selector), tags: [GetAllItemTag()], () => _inner.SelectAsync(selector, cancellation), cancellation);
+
+        public Task<List<T>> SelectAsync<T>(Expression<Func<TEntity, T>> selector, ISpecification<TEntity> specification, CancellationToken cancellation = default) => ExecuteGetOrSetAsync(
+            _inner, "Select", _keyProvider.CreateKey<TEntity>("*", "Select", selector, specification), tags: [GetAllItemTag()], () => _inner.SelectAsync(selector, specification, cancellation), cancellation);
+
         public TEntity? SingleOrDefault(Expression<Func<TEntity, bool>> predicate) => ExecuteGetOrSet(
              _inner, "SingleOrDefault", _keyProvider.CreateKey<TEntity>("*", "SingleOrDefault", predicate), tags: [GetAllItemTag()], () => _inner.SingleOrDefault(predicate));
 
