@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Sumapap.Persistence.Abstractions.Entities;
 using Sumapap.Queries;
 using Sumapap.Queries.Abstractions.Paging;
@@ -18,7 +18,11 @@ namespace Sumapap.Persistence.Specifications
             if (typeof(IEntity<>).IsAssignableFrom(typeof(T)))
             {
                 // sort by Id by default if T implements IEntity<TKey>
+#if NET10_0_OR_GREATER
                 query.Sort.By(nameof(IEntity<>.Id), sortDirection);
+#else
+                query.Sort.By(nameof(IEntity<Guid>.Id), sortDirection);
+#endif
             }
 
             SetQuery(query);
@@ -36,7 +40,11 @@ namespace Sumapap.Persistence.Specifications
             if (typeof(IEntity<>).IsAssignableFrom(typeof(T)))
             {
                 // sort by Id by default if T implements IEntity<TKey>
+#if NET10_0_OR_GREATER
                 query.Sort.By(nameof(IEntity<>.Id), sortDirection);
+#else
+                query.Sort.By(nameof(IEntity<Guid>.Id), sortDirection);
+#endif
             }
 
             SetQuery(query);

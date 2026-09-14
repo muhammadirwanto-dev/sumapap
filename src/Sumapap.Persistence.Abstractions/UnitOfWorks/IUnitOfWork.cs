@@ -1,4 +1,4 @@
-﻿using Sumapap.Persistence.Abstractions.Entities;
+using Sumapap.Persistence.Abstractions.Entities;
 using Sumapap.Persistence.Abstractions.Repositories;
 
 namespace Sumapap.Persistence.Abstractions.UnitOfWorks
@@ -50,6 +50,11 @@ namespace Sumapap.Persistence.Abstractions.UnitOfWorks
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task ExecuteAsync(Func<CancellationToken, Task> action, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Clears the tracking of entities in the unit of work, if applicable.
+        /// </summary>
+        void ClearTracking();
     }
 
     public interface IUnitOfWork<TContext> : IUnitOfWork;
