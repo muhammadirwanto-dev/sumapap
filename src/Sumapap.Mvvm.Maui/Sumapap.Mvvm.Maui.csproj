@@ -8,8 +8,8 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0524</FileVersion>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0914</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
 
     <!-- Enable XAML source generation for faster build times and improved performance.
