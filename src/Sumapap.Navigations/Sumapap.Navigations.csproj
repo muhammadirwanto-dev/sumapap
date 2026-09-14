@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net10.0</TargetFrameworks>
+		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
-		<AssemblyVersion>1.0.0</AssemblyVersion>
-		<FileVersion>1.0.0.0524</FileVersion>
+		<AssemblyVersion>2.0.0</AssemblyVersion>
+		<FileVersion>2.0.0.0914</FileVersion>
 		<VersionPrefix>$(AssemblyVersion)</VersionPrefix>
 	</PropertyGroup>
 
@@ -14,8 +14,8 @@
 		<PackageId>Sumapap.Navigations</PackageId>
 		<PackageTags>Sumapap;Navigations</PackageTags>
 		<Description>
-			The `Sumapap.Navigations` package provides a set of tools and abstractions for implementing navigation functionality in your applications. It includes features such as navigation between views, passing parameters, and managing navigation stacks. With Sumapap.Navigations, you can easily create and manage navigation flows while maintaining a clean and modular architecture.
-		</Description>
+      The `Sumapap.Navigations` package provides a set of tools and abstractions for implementing navigation functionality in your applications. It includes features such as page routing, navigation stacks, and integration with various UI frameworks. With Sumapap.Navigations, you can easily manage your application's navigation flow while maintaining a clean and modular architecture.
+    </Description>
 		<PackageReadmeFile>docs\Sumapap.Navigations.md</PackageReadmeFile>
 	</PropertyGroup>
 
@@ -23,4 +23,8 @@
 		<None Include="..\..\docs\Sumapap.Navigations.md" Pack="true" PackagePath="docs" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\Sumapap.DependencyInjection\Sumapap.DependencyInjection.csproj" />
+	</ItemGroup>
+  
 </Project>

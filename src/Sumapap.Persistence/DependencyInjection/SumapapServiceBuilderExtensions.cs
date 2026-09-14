@@ -1,4 +1,4 @@
-﻿using Sumapap.DependencyInjection.Abstractions;
+using Sumapap.DependencyInjection.Abstractions;
 using Sumapap.Persistence.DependencyInjection.Abstractions;
 
 namespace Sumapap.Persistence.DependencyInjection
@@ -8,39 +8,15 @@ namespace Sumapap.Persistence.DependencyInjection
     /// </summary>
     public static class SumapapServiceBuilderExtensions
     {
-        /// <summary>
-        /// Configures repository registrations with fluent API supporting opt-in caching.
-        /// </summary>
-        /// <param name="configuration">Action to configure repository registrations.</param>
-        /// <returns>The same builder for method chaining.</returns>
-        /// <example>
-        /// <code>
-        /// services.AddSumapap()
-        ///     .WithRepositories(builder =>
-        ///     {
-        ///         builder.AddScopedRepository&lt;UserRepository, User&gt;()
-        ///             .AllowCaching(config =>
-        ///             {
-        ///                 config[nameof(IReadRepository&lt;User&gt;.FindAsync)] = true;
-        ///                 config[nameof(IReadRepository&lt;User&gt;.GetAllAsync)] = true;
-        ///             });
-        ///             
-        ///         builder.AddScopedRepository&lt;ProductRepository, Product&gt;();  // No caching
-        ///     });
-        /// </code>
-        /// </example>
-        extension(ISumapapServiceBuilder builder)
+        public static ISumapapServiceBuilder WithPersistence(this ISumapapServiceBuilder builder, Action<IPersistenceBuilder> configuration)
         {
-            public ISumapapServiceBuilder WithPersistence(Action<IPersistenceBuilder> configuration)
-            {
-                ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentNullException.ThrowIfNull(configuration);
 
-                var persistenceBuilder = new PersistenceBuilder(builder);
+            var persistenceBuilder = new PersistenceBuilder(builder);
 
-                configuration(persistenceBuilder);
+            configuration(persistenceBuilder);
 
-                return persistenceBuilder.Build();
-            }
+            return persistenceBuilder.Build();
         }
     }
 }

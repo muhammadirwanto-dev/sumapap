@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using Sumapap.Ddd.Abstractions.Events;
 
 namespace Sumapap.Ddd.Abstractions.Entities
@@ -9,7 +9,7 @@ namespace Sumapap.Ddd.Abstractions.Entities
     /// </summary>
     public abstract class DomainEntity
     {
-        private readonly ConcurrentQueue<IDomainEvent> _events = [];
+        private readonly System.Collections.Concurrent.ConcurrentQueue<IDomainEvent> _events = [];
 
         /// <summary>
         /// Adds a domain event to the entity's event queue.
@@ -19,6 +19,13 @@ namespace Sumapap.Ddd.Abstractions.Entities
         {
             _events.Enqueue(domainEvent);
         }
+
+        /// <summary>
+        /// Attempts to consume a single domain event from the queue.
+        /// </summary>
+        /// <param name="domainEvent">The domain event to consume.</param>
+        /// <returns>True if a domain event was successfully consumed; otherwise, false.</returns>
+        public bool TryConsumeEvent(out IDomainEvent? domainEvent) => _events.TryDequeue(out domainEvent);
 
         /// <summary>
         /// Retrieves all pending domain events and clears the queue.

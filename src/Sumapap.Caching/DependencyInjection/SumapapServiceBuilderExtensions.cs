@@ -1,26 +1,23 @@
-﻿using Sumapap.DependencyInjection.Abstractions;
+using Sumapap.DependencyInjection.Abstractions;
 
 namespace Sumapap.Caching.DependencyInjection
 {
     public static class SumapapServiceBuilderExtensions
     {
-        extension(ISumapapServiceBuilder builder)
+        public static ISumapapServiceBuilder WithCaching(this ISumapapServiceBuilder builder)
         {
-            public ISumapapServiceBuilder WithCaching()
-            {
-                return new CachingServiceBuilder(builder)
-                    .AddKeyProvider()
-                    .Build();
-            }
+            return new CachingServiceBuilder(builder)
+                .AddKeyProvider()
+                .Build();
+        }
 
-            public ISumapapServiceBuilder WithCaching(Action<CachingServiceBuilder> configuration)
-            {
-                var cachingBuilder = new CachingServiceBuilder(builder);
+        public static ISumapapServiceBuilder WithCaching(this ISumapapServiceBuilder builder, Action<CachingServiceBuilder> configuration)
+        {
+            var cachingBuilder = new CachingServiceBuilder(builder);
 
-                configuration(cachingBuilder);
+            configuration(cachingBuilder);
 
-                return cachingBuilder.Build();
-            }
+            return cachingBuilder.Build();
         }
     }
 }

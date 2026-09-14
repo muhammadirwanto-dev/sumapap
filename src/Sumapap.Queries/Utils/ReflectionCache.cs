@@ -1,11 +1,10 @@
-﻿using System.Collections.Concurrent;
 using System.Reflection;
 
 namespace Sumapap.Queries.Utils
 {
     public static class ReflectionCache
     {
-        private static readonly ConcurrentDictionary<string, PropertyInfo?> _cache = new();
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, PropertyInfo?> _cache = new();
 
         public static PropertyInfo? GetProperty<T>(string name)
             => _cache.GetOrAdd(

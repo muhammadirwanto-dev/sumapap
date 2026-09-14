@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Sumapap.Persistence.Abstractions.Entities;
 using Sumapap.Persistence.Abstractions.Repositories;
@@ -147,6 +147,11 @@ namespace Sumapap.Persistence.EfCore.UnitOfWork
                 await RollbackTransactionAsync(cancellationToken);
                 throw;
             }
+        }
+
+        public void ClearTracking()
+        {
+            _context.ChangeTracker.Clear();
         }
 
         private async Task RollbackTransactionInternalAsync(CancellationToken cancellationToken = default)

@@ -1,4 +1,4 @@
-﻿using Sumapap.Persistence.Abstractions.Entities;
+using Sumapap.Persistence.Abstractions.Entities;
 using Sumapap.Persistence.Abstractions.Repositories;
 using Sumapap.Persistence.Abstractions.Specifications;
 using Sumapap.Queries.Abstractions;
@@ -12,6 +12,12 @@ namespace Sumapap.Persistence.Caching.FusionCache.Repositories
         ) : CachedRepository(_serviceProvider), IReadWriteRepository<TEntity, TContext>
         where TEntity : class, IEntity
     {
+        public T GetContext<T>() => _inner.GetContext<T>();
+
+        public bool TryGetContext<T>(out T? context) => _inner.TryGetContext(out context);
+
+        public void ClearTracking() => _inner.ClearTracking();
+
         #region READ
         public long Count() => ExecuteGetOrSet(
             _inner, "Count", _keyProvider.CreateKey<TEntity>("*", "Count"), tags: [GetAllItemTag()], () => _inner.Count());
