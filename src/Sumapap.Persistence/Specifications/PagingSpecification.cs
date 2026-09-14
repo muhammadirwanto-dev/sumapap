@@ -1,8 +1,8 @@
-using System.Linq.Expressions;
 using Sumapap.Persistence.Abstractions.Entities;
 using Sumapap.Queries;
 using Sumapap.Queries.Abstractions.Paging;
 using Sumapap.Queries.Abstractions.Sorting;
+using System.Linq.Expressions;
 
 namespace Sumapap.Persistence.Specifications
 {

@@ -1,22 +1,19 @@
-﻿using Sumapap.DependencyInjection.Abstractions;
+using Sumapap.DependencyInjection.Abstractions;
 using Sumapap.Reporting.DependencyInjection.Abstractions;
 
 namespace Sumapap.Reporting.DependencyInjection
 {
     public static class SumapapServiceBuilderExtensions
     {
-        extension(ISumapapServiceBuilder builder)
+        public static ISumapapServiceBuilder WithReporting(this ISumapapServiceBuilder builder, Action<IReportingBuilder> configuration)
         {
-            public ISumapapServiceBuilder WithReporting(Action<IReportingBuilder> configuration)
-            {
-                ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentNullException.ThrowIfNull(configuration);
 
-                var reportingBuilder = new ReportingBuilder(builder);
+            var reportingBuilder = new ReportingBuilder(builder);
 
-                configuration(reportingBuilder);
+            configuration(reportingBuilder);
 
-                return reportingBuilder.Build();
-            }
+            return reportingBuilder.Build();
         }
     }
 }

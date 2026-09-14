@@ -1,5 +1,5 @@
-using System.Collections.Concurrent;
 using Sumapap.Ddd.Abstractions.Events;
+using System.Collections.Concurrent;
 
 namespace Sumapap.Ddd.Abstractions.Entities
 {

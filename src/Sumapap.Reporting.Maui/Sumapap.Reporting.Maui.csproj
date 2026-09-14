@@ -3,9 +3,9 @@
 	<PropertyGroup>
 		<!-- Target all MAUI platforms for complete NuGet package -->
 		<!-- Note: Full build requires macOS for iOS/Catalyst, Windows for Windows -->
-		<TargetFrameworks>net10.0-android;net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks>net9.0-android;net9.0-ios;net9.0-maccatalyst;net10.0-android;net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
 		<!-- Add Windows target when building on Windows -->
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0;net10.0-windows10.0.19041.0</TargetFrameworks>
 
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
@@ -46,8 +46,12 @@
 		<None Include="..\..\docs\Sumapap.Reporting.Maui.md" Pack="true" PackagePath="docs" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+	<ItemGroup Condition="$(TargetFramework.StartsWith('net9.0'))">
+		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.120" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$(TargetFramework.StartsWith('net10.0'))">
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.20" />
 	</ItemGroup>
 
 	<ItemGroup>

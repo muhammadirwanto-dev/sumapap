@@ -2,6 +2,7 @@
   <PropertyGroup>
     <AnalysisLevel>latest</AnalysisLevel>
     <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
     
     <Authors>muhirwanto.dev</Authors>
     <Company>Sumapap Software Development</Company>

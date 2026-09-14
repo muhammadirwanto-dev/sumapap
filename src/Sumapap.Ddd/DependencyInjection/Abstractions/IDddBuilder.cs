@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using Sumapap.DependencyInjection.Abstractions;
+﻿using Sumapap.DependencyInjection.Abstractions;
+using System.Reflection;
 
 namespace Sumapap.Ddd.DependencyInjection.Abstractions
 {
