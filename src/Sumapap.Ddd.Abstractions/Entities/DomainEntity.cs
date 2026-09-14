@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using Sumapap.Ddd.Abstractions.Events;
-using System.Collections.Concurrent;
 
 namespace Sumapap.Ddd.Abstractions.Entities
 {
@@ -10,7 +9,7 @@ namespace Sumapap.Ddd.Abstractions.Entities
     /// </summary>
     public abstract class DomainEntity
     {
-        private readonly ConcurrentQueue<IDomainEvent> _events = [];
+        private readonly System.Collections.Concurrent.ConcurrentQueue<IDomainEvent> _events = [];
 
         /// <summary>
         /// Adds a domain event to the entity's event queue.
