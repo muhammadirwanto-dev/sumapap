@@ -39,6 +39,8 @@
     <InternalsVisibleTo Include="Sumapap.Ddd" />
     <InternalsVisibleTo Include="Sumapap.Ddd.Abstractions" />
     <InternalsVisibleTo Include="Sumapap.Ddd.Mediator" />
+    <InternalsVisibleTo Include="Sumapap.Navigations" />
+    <InternalsVisibleTo Include="Sumapap.Navigations.Maui" />
     <InternalsVisibleTo Include="Sumapap.Persistence" />
     <InternalsVisibleTo Include="Sumapap.Persistence.Caching" />
     <InternalsVisibleTo Include="Sumapap.Persistence.Caching.FusionCache" />
