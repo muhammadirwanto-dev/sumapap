@@ -39,10 +39,10 @@ jobs:
         run: mkdir -p .nuget && rm -rf .nuget/*
 
       - name: Restore Dependencies
-        run: dotnet restore Sumapap.slnx
+        run: dotnet restore src/Sumapap.slnx
 
       - name: Build Projects
-        run: dotnet build Sumapap.slnx -c Release --no-restore
+        run: dotnet build src/Sumapap.slnx -c Release --no-restore
 
       - name: Process and Pack Projects
         id: pack_step
