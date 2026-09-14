@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Sumapap.Persistence.Abstractions.Entities;
 using Sumapap.Persistence.Abstractions.Repositories;
 
@@ -22,6 +22,28 @@ namespace Sumapap.Persistence.EfCore.Repositories
         protected readonly TContext _context = @context;
         protected readonly DbSet<TEntity> _set = @context.Set<TEntity>();
 
+        public T GetContext<T>()
+        {
+            if (TryGetContext<T>(out var context))
+            {
+                return context!;
+            }
+
+            throw new InvalidOperationException($"The repository is not associated with the requested context type '{typeof(TContext).Name}'.");
+        }
+
+        public bool TryGetContext<T>(out T? context)
+        {
+            if (_context is T match)
+            {
+                context = match;
+                return true;
+            }
+
+            context = default;
+            return false;
+        }
+
         public void Add(TEntity entity)
         {
             _set.Add(entity);
@@ -40,6 +62,11 @@ namespace Sumapap.Persistence.EfCore.Repositories
         public Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
         {
             return _set.AddRangeAsync(entities, cancellationToken);
+        }
+
+        public void ClearTracking()
+        {
+            _context.ChangeTracker.Clear();
         }
 
         public void Delete(TEntity entity)

@@ -1,4 +1,18 @@
 <Solution>
+  <Project Path="../src/Sumapap.Caching/Sumapap.Caching.csproj" />
+  <Project Path="../src/Sumapap.Common/Sumapap.Common.csproj" />
+  <Project Path="../src/Sumapap.Ddd.Abstractions/Sumapap.Ddd.Abstractions.csproj" />
+  <Project Path="../src/Sumapap.Ddd.Mediator/Sumapap.Ddd.Mediator.csproj" />
+  <Project Path="../src/Sumapap.Ddd/Sumapap.Ddd.csproj" />
+  <Project Path="../src/Sumapap.DependencyInjection/Sumapap.DependencyInjection.csproj" />
+  <Project Path="../src/Sumapap.Navigations/Sumapap.Navigations.csproj" />
+  <Project Path="../src/Sumapap.Persistence.Abstractions/Sumapap.Persistence.Abstractions.csproj" />
+  <Project Path="../src/Sumapap.Persistence.Caching.FusionCache/Sumapap.Persistence.Caching.FusionCache.csproj" />
+  <Project Path="../src/Sumapap.Persistence.Caching/Sumapap.Persistence.Caching.csproj" />
+  <Project Path="../src/Sumapap.Persistence.EfCore/Sumapap.Persistence.EfCore.csproj" />
+  <Project Path="../src/Sumapap.Persistence/Sumapap.Persistence.csproj" />
+  <Project Path="../src/Sumapap.Queries.Abstractions/Sumapap.Queries.Abstractions.csproj" />
+  <Project Path="../src/Sumapap.Queries/Sumapap.Queries.csproj" />
   <Project Path="Sumapap.Caching.Tests/Sumapap.Caching.Tests.csproj" />
   <Project Path="Sumapap.Common.Tests/Sumapap.Common.Tests.csproj" />
   <Project Path="Sumapap.Ddd.Tests/Sumapap.Ddd.Tests.csproj" />

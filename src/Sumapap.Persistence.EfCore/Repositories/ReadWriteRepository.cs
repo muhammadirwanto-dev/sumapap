@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Sumapap.Persistence.Abstractions.Entities;
 using Sumapap.Persistence.Abstractions.Repositories;
 using Sumapap.Persistence.Abstractions.Specifications;
@@ -24,6 +24,12 @@ namespace Sumapap.Persistence.EfCore.Repositories
         protected readonly IReadRepository<TEntity, TContext> _read = new ReadRepository<TEntity, TContext>(context);
         protected readonly IWriteRepository<TEntity, TContext> _write = new WriteRepository<TEntity, TContext>(context);
 
+        public T GetContext<T>()
+            => _write.GetContext<T>();
+
+        public bool TryGetContext<T>(out T? context)
+            => _write.TryGetContext(out context);
+
         public void Add(TEntity entity)
             => _write.Add(entity);
 
@@ -35,6 +41,9 @@ namespace Sumapap.Persistence.EfCore.Repositories
 
         public Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
             => _write.AddRangeAsync(entities, cancellationToken);
+
+        public void ClearTracking()
+            => _write.ClearTracking();
 
         public long Count()
             => _read.Count();

@@ -1,4 +1,4 @@
-﻿namespace Sumapap.Persistence.Abstractions.Repositories
+namespace Sumapap.Persistence.Abstractions.Repositories
 {
     /// <summary>
     /// Defines a write-only repository for creating, updating, and deleting entities.
@@ -141,6 +141,11 @@
         /// <param name="cancellationToken">A token to cancel the operation.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
         Task SaveAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Clears the tracking of entities in the repository, if applicable.
+        /// </summary>
+        void ClearTracking();
     }
 
     /// <summary>
