@@ -1,8 +1,8 @@
-﻿using System.Text;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Sumapap.Caching.Abstractions;
 using Sumapap.Caching.DependencyInjection.Options;
 using Sumapap.Common.Extensions;
+using System.Text;
 
 namespace Sumapap.Caching
 {

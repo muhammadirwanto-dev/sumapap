@@ -1,6 +1,6 @@
-﻿using System.Collections;
+﻿using Sumapap.Queries.Abstractions.Filtering;
+using System.Collections;
 using System.Linq.Expressions;
-using Sumapap.Queries.Abstractions.Filtering;
 
 namespace Sumapap.Queries.Utils
 {

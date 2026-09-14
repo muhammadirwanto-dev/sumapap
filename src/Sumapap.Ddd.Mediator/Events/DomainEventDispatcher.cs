@@ -9,7 +9,12 @@ namespace Sumapap.Ddd.Mediator.Events
     {
         public Task DispatchAsync(IEnumerable<IDomainEvent> domainEvents, CancellationToken cancellationToken = default)
         {
-            return Task.WhenAll(domainEvents.Select(@event => _publisher.Publish((@event as IDomainEventAdapter)!, cancellationToken).AsTask()));
+            return Task.WhenAll(domainEvents.Select(@event => DispatchAsync(@event, cancellationToken)));
+        }
+
+        public async Task DispatchAsync(IDomainEvent domainEvent, CancellationToken cancellationToken = default)
+        {
+            await _publisher.Publish((domainEvent as IDomainEventAdapter)!, cancellationToken);
         }
     }
 }

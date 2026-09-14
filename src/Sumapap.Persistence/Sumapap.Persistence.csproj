@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net10.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>2.0.2</AssemblyVersion>
-    <FileVersion>2.0.2.0524</FileVersion>
+    <AssemblyVersion>3.0.0</AssemblyVersion>
+    <FileVersion>3.0.0.0914</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
   </PropertyGroup>
 
@@ -21,6 +21,16 @@
 
   <ItemGroup>
     <None Include="..\..\docs\Sumapap.Persistence.md" Pack="true" PackagePath="docs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,8 +1,8 @@
-﻿using System.Linq.Expressions;
-using Sumapap.Queries.Abstractions;
+﻿using Sumapap.Queries.Abstractions;
 using Sumapap.Queries.Abstractions.Paging;
 using Sumapap.Queries.Abstractions.Sorting;
 using Sumapap.Queries.Utils;
+using System.Linq.Expressions;
 
 namespace Sumapap.Queries.Executors
 {

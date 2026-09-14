@@ -1,6 +1,6 @@
-﻿using System.Linq.Expressions;
-using Sumapap.Persistence.Abstractions.Specifications;
+﻿using Sumapap.Persistence.Abstractions.Specifications;
 using Sumapap.Queries.Abstractions;
+using System.Linq.Expressions;
 
 namespace Sumapap.Persistence.Specifications
 {

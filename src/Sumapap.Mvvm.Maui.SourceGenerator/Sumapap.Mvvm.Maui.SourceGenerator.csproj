@@ -6,8 +6,8 @@
     <IsRoslynComponent>true</IsRoslynComponent>
     <ImplicitUsings>disable</ImplicitUsings>
 
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0106</FileVersion>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0914</FileVersion>
     <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
   </PropertyGroup>
 

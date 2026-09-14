@@ -1,22 +1,19 @@
-﻿using Sumapap.Ddd.DependencyInjection.Abstractions;
+using Sumapap.Ddd.DependencyInjection.Abstractions;
 using Sumapap.DependencyInjection.Abstractions;
 
 namespace Sumapap.Ddd.DependencyInjection
 {
     public static class SumapapServiceBuilderExtensions
     {
-        extension(ISumapapServiceBuilder builder)
+        public static ISumapapServiceBuilder WithDdd(this ISumapapServiceBuilder builder, Action<IDddBuilder> configuration)
         {
-            public ISumapapServiceBuilder WithDdd(Action<IDddBuilder> configuration)
-            {
-                ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentNullException.ThrowIfNull(configuration);
 
-                var dddBuilder = new DddBuilder(builder);
+            var dddBuilder = new DddBuilder(builder);
 
-                configuration(dddBuilder);
+            configuration(dddBuilder);
 
-                return dddBuilder.Build();
-            }
+            return dddBuilder.Build();
         }
     }
 }

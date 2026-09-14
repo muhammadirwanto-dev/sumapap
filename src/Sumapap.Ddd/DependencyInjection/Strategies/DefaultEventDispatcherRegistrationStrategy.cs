@@ -1,8 +1,8 @@
-﻿using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Sumapap.Ddd.Abstractions.Events;
 using Sumapap.Ddd.DependencyInjection.Abstractions;
 using Sumapap.Ddd.Events;
+using System.Reflection;
 
 namespace Sumapap.Ddd.DependencyInjection.Strategies
 {
