@@ -39,10 +39,10 @@ jobs:
         run: mkdir -p .nuget && rm -rf .nuget/*
 
       - name: Restore Dependencies
-        run: dotnet restore src/
+        run: dotnet restore src/Sumapap.slnx -p:Configuration=Release
 
       - name: Build Projects
-        run: dotnet build src/ -c Release --no-restore
+        run: dotnet build src/Sumapap.slnx -c Release --no-restore
 
       - name: Process and Pack Projects
         id: pack_step
@@ -62,8 +62,8 @@ jobs:
               continue
             fi
             
-            VERSION=$(dotnet msbuild "$file" --getProperty:VersionPrefix --nologo | xargs)
-            [ -z "$VERSION" ] && VERSION=$(dotnet msbuild "$file" --getProperty:Version --nologo | xargs)
+            VERSION=$(dotnet msbuild "$file" --getProperty:VersionPrefix -p:Configuration=Release --nologo | xargs)
+            [ -z "$VERSION" ] && VERSION=$(dotnet msbuild "$file" --getProperty:Version -p:Configuration=Release --nologo | xargs)
 
             if [ -z "$VERSION" ] || [ "$VERSION" == "0.0.0" ]; then
               SKIPPED_PACKS+=("$PROJECT_NAME (No Version)")
