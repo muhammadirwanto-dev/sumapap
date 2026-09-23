@@ -60,6 +60,40 @@ namespace Sumapap.Queries.Executors
         }
 
         /// <summary>
+        /// Applies pagination to the in-memory collection and returns the paginated result.
+        /// </summary>
+        /// <param name="source">The in-memory collection.</param>
+        /// <param name="query">The query containing pagination configuration.</param>
+        /// <returns>The paginated query result.</returns>
+        protected override IQueryResult<T> ApplyPaging(IEnumerable<T> source, IQuery query)
+        {
+            if (query.UsesCursorPaging)
+            {
+                return ApplyCursorPaging(source, query);
+            }
+
+            var total = source.Count();
+
+            if (query.UsesOffsetPaging)
+            {
+                var page = query.OffsetPaging!;
+                var items = source
+                    .Skip(page.Offset)
+                    .Take(page.PageSize);
+
+                return new QueryResult<T>(
+                    items,
+                    total,
+                    new PageInfo(
+                        hasNextPage: page.Offset + page.PageSize < total,
+                        hasPreviousPage: page.Offset > 0)
+                    );
+            }
+
+            return new QueryResult<T>(source, total);
+        }
+
+        /// <summary>
         /// Applies cursor-based pagination to the in-memory collection.
         /// </summary>
         /// <param name="source">The in-memory collection.</param>

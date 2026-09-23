@@ -63,36 +63,19 @@ namespace Sumapap.Queries.Executors
         /// <summary>
         /// Applies pagination to the data source and returns the paginated result.
         /// </summary>
+        /// <remarks>
+        /// Left abstract (like <see cref="ApplyFiltering"/>/<see cref="ApplySorting"/>/<see cref="ApplyCursorPaging"/>)
+        /// rather than implemented once here against the generic <typeparamref name="TSource"/>: a body written
+        /// against a type parameter constrained only to <see cref="IEnumerable{TResult}"/> binds `Count`/`Skip`/`Take`
+        /// to <see cref="Enumerable"/> at compile time regardless of the closed generic's actual runtime type, so
+        /// <see cref="QueryableQueryExecutor{T}"/> would silently pull its entire source into memory before paging
+        /// instead of translating Skip/Take into SQL. Each executor implements this against its own concretely
+        /// typed source instead, exactly as the other three methods already do.
+        /// </remarks>
         /// <param name="source">The data source.</param>
         /// <param name="query">The query containing pagination configuration.</param>
         /// <returns>The paginated query result.</returns>
-        protected IQueryResult<TResult> ApplyPaging(TSource source, IQuery query)
-        {
-            if (query.UsesCursorPaging)
-            {
-                return ApplyCursorPaging(source, query);
-            }
-
-            var total = source.Count();
-
-            if (query.UsesOffsetPaging)
-            {
-                var page = query.OffsetPaging!;
-                var items = source
-                    .Skip(page.Offset)
-                    .Take(page.PageSize);
-
-                return new QueryResult<TResult>(
-                    items,
-                    total,
-                    new PageInfo(
-                        hasNextPage: page.Offset + page.PageSize < total,
-                        hasPreviousPage: page.Offset > 0)
-                    );
-            }
-
-            return new QueryResult<TResult>(source, total);
-        }
+        protected abstract IQueryResult<TResult> ApplyPaging(TSource source, IQuery query);
 
         /// <summary>
         /// Applies cursor-based pagination to the data source.
